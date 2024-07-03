@@ -44,6 +44,7 @@ research papers and course notes as mandated or suggested reading.
 ### Haskell
 
 * [Programming in Haskell](https://www.cs.nott.ac.uk/~pszgmh/pih.html)
+* [Course notes from Brent Yorgey's UPenn Haskell course](https://www.cis.upenn.edu/~cis1940/spring13/lectures.html)
 
 ### Erlang
 
