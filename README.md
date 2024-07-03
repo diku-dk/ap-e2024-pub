@@ -9,7 +9,7 @@ this website is a Git repository, you are not required or expected to
 use Git to interact with it, but feel free to do so if convenient for
 you.
 
-The programming languages we will be using are **Haskell** and
+The programming languages we will be using are **Haskell** and (possibly)
 **Erlang**.
 
 The website and course is currently under construction, and all
