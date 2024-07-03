@@ -43,6 +43,10 @@ notes as mandated or suggested reading.
 * [Programming in Haskell](https://www.cs.nott.ac.uk/~pszgmh/pih.html) (video lectures [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK7usPMx3LGMZEHrECUGodd3) and [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK5uFc8FKr_di9bfsYv8-lbc))
 * [Course notes from Brent Yorgey's UPenn Haskell course](https://www.cis.upenn.edu/~cis1940/spring13/lectures.html)
 
+## Software
+
+See [this document on setting up a Haskell development environment](haskell.md).
+
 ## Course structure
 
 The course consists of two lectures and two exercise classes every
