@@ -33,4 +33,4 @@ work, but these are what we use for testing.
 
 ## If you use NixOS
 
-Use this [shell.nix].
+Use this [shell.nix](shell.nix).
