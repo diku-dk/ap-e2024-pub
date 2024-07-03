@@ -9,8 +9,7 @@ this website is a Git repository, you are not required or expected to
 use Git to interact with it, but feel free to do so if convenient for
 you.
 
-The programming languages we will be using are **Haskell** and (possibly)
-**Erlang**.
+The programming language we will be using is **Haskell**.
 
 The website and course is currently under construction, and all
 information is still tentative.
@@ -37,18 +36,12 @@ to.
 
 ## Textbooks
 
-We do not mandate specific textbooks for learning programming
-languages, but we do have suggestions. We will also specify some
-research papers and course notes as mandated or suggested reading.
-
-### Haskell
+We do not mandate a specific textbooks for learning Haskell, but we do
+have suggestions. We will also specify some research papers and course
+notes as mandated or suggested reading.
 
 * [Programming in Haskell](https://www.cs.nott.ac.uk/~pszgmh/pih.html) (video lectures [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK7usPMx3LGMZEHrECUGodd3) and [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK5uFc8FKr_di9bfsYv8-lbc))
 * [Course notes from Brent Yorgey's UPenn Haskell course](https://www.cis.upenn.edu/~cis1940/spring13/lectures.html)
-
-### Erlang
-
-* [Erlang and OTP in Action](https://www.manning.com/books/erlang-and-otp-in-action)
 
 ## Course structure
 
