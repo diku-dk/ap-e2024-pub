@@ -76,7 +76,7 @@ do c <- newChan
    ...
 ```
 
-The new thread now has a reference to the channel (`c`), as do we. We
+The new thread now has a reference to the channel (`c`), as do we.
 
 A channel can be both read and written, using the following two
 functions:
