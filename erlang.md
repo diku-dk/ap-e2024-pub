@@ -4,11 +4,10 @@ AP previously used the [Erlang programming
 language](http://erlang.org/) for some course components. In 2024, we
 use only Haskell. If you previously failed the course but are
 attending the exam this year, you will need to adapt your knowledge
-about concurrent program in Erlang, and learn how to use Haskell
-instead. The best way to do so is to follow the course, attend the
-lectures, and complete the assignments. But as a special help, this
-*work-in-progess* document describes how to translate aspects of
-concurrent Erlang to concurrent Haskell.
+about concurrency from Erlang to Haskell. The best way to do so is to
+follow the course, attend the lectures, and complete the assignments.
+But as a special help, this *work-in-progess* document describes how
+to translate aspects of concurrent Erlang to concurrent Haskell.
 
 ## Basics
 
