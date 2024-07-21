@@ -34,6 +34,9 @@ real-world programming, but unnecessary for AP, where we take a more
 narrow focus. You do not need to read a thick book, unless you want
 to.
 
+If you have taken the course previously, see [these notes on
+translating Erlang concepts to Haskell](erlang.md).
+
 ## Textbooks
 
 We do not mandate a specific textbooks for learning Haskell, but we do
