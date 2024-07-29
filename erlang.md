@@ -126,14 +126,14 @@ threadLoop c = do
   threadLoop c
 ```
 
-## Remote procedure calls
+## Remote procedure calls (RPC)
 
 Just as in Erlang, the Haskell message passing facility is
-asynchronous. To implement synchronous calls, where we wait for a
-response after sending a message, we need to invent a bit of machinery
-on top. The way we make it work is by creating a new channel that is
-used for transmitting the result. This channel is then sent along as
-part of the message.
+asynchronous. To implement synchronous (RPC) calls, where we wait for
+a response after sending a message, we need to invent a bit of
+machinery on top. The way we make it work is by creating a new channel
+that is used for transmitting the result. This channel is then sent
+along as part of the message.
 
 The starting point (and always good practice) is to define an explicit
 type for the messages we would like to send.
@@ -176,3 +176,91 @@ ex2 = do
   print =<< performRPC c 1
 
 ```
+
+## Timeouts
+
+The channel abstraction does not directly support timeouts for RPC
+calls. However, we can build our own support for timeouts. The
+technique we employ is to allow the reply to be either the intended
+value *or* a special timeout value. When we perform an RPC, we then
+also launch a new thread that sleeps for some period of time, then
+write the timeout value to the channel. If the non-timeout response is
+the first to arrive, then the timeout value is ignored and harmless.
+
+First we must import the `threadDelay` function.
+
+```Haskell
+import Control.Concurrent (threadDelay)
+```
+
+Then we define a type `Timeout` with a single value `Timeout`.
+
+```Haskell
+data Timeout = Timeout
+```
+
+Then we define a message type (in this case polymorphic in `a`) where
+the reply channel accepts messages of type `Either Timeout a`.
+
+```Haskell
+data Msg a = MsgDoIt (Chan (Either Timeout a)) (IO a)
+```
+
+A `Msg a` denotes a request to perform some impure operation `IO a`
+(perhaps a network request), then reply with the resulting value of
+type `a`.
+
+We can use this to build a facility for performing an action with a
+timeout:
+
+```Haskell
+actionWithTimeout :: Int -> IO a -> IO (Either Timeout a)
+actionWithTimeout seconds action = do
+  reply_chan <- newChan
+  _ <- forkIO $ do -- worker thread
+    x <- action
+    writeChan reply_chan $ Right x
+  _ <- forkIO $ do -- timeout thread
+    threadDelay (seconds * 1000000)
+    writeChan reply_chan $ Left Timeout
+  readChan reply_chan
+```
+
+You will note that this is not a server in the usual sense, as it does
+not loop: it simply launches two threads.
+
+One downside of this function is that the worker thread (the one that
+runs `action`, and might take too long) is not terminated after the
+timeout. This is a problem if it is, for example, stuck in an infinite
+loop that consumes ever more memory. To fix this, we can have the
+timeout thread explicitly kill the worker thread. First we have to
+import the `killThread` function.
+
+```Haskell
+import Control.Concurrent (killThread)
+```
+
+Then we can use it as follows.
+
+```Haskell
+actionWithTimeout2 :: Int -> IO a -> IO (Either Timeout a)
+actionWithTimeout2 seconds action = do
+  reply_chan <- newChan
+  worker_tid <- forkIO $ do
+    -- worker thread
+    x <- action
+    writeChan reply_chan $ Right x
+  _ <- forkIO $ do
+    -- timeout thread
+    threadDelay (seconds * 1000000)
+    killThread worker_tid
+    writeChan reply_chan $ Left Timeout
+  readChan reply_chan
+```
+
+Note that killing a thread is a dangerous operation in general. It may
+be the case that the worker thread is stuck in some loop or waiting
+for a network request, in which case it is harmless, but killing it
+may also leave some shared state in an unspecified state. We will
+(hopefully) not encounter such cases in AP, but it is something to be
+aware of in the future.
