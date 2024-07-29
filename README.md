@@ -20,7 +20,8 @@ The material for each week (including assignments) can be found in the
 ## Discord
 
 We have created a Discord server for discussing the course: [Invite
-link](https://discord.gg/dJgTJ7mry7).
+link](https://discord.gg/dJgTJ7mry7). Please use your government name
+rather than your sweet hacker nick.
 
 You are not *required* or *expected* to use Discord. We continue to
 monitor the Absalon discussion forum, and course announcements are
@@ -75,3 +76,15 @@ week. The lectures are on Tuesday 10:00-12:00 and Thursday
 and 15:00-17:00 respectively.
 
 Locations are TBD.
+
+## Exam
+
+The exam will be a multi-day take-home exam held in one of the exam
+weeks. Precise dates TBD. It will strongly resemble the mandatory
+assignments in content and form, with the following differences:
+
+* It is strictly individual.
+
+* It is roughly the size of two assignments.
+
+* You receive only summative feedback (i.e., a grade).
