@@ -14,6 +14,18 @@ The programming language we will be using is **Haskell**.
 The website and course is currently under construction, and all
 information is still tentative.
 
+The material for each week (including assignments) can be found in the
+`weekI` subdirectories above.
+
+## Discord
+
+We have created a Discord server for discussing the course: [Invite
+link](https://discord.gg/dJgTJ7mry7).
+
+You are not *required* or *expected* to use Discord. We continue to
+monitor the Absalon discussion forum, and course announcements are
+posted solely on Absalon.
+
 ## Preparation
 
 AP has a reputation as a difficult course, particularly for
