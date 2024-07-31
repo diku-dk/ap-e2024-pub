@@ -56,19 +56,20 @@ channel-based messaging.
 ## Channels and messages
 
 In Erlang, if we have a process ID, we can send a message to that
-process. In Haskell, processes are sent to *channels*. A channel is
-created with `newChan`:
+process. In Haskell, communication is done via *channels*. A channel is
+created using the `newChan` action:
 
 ```Haskell
 newChan :: IO (Chan a)
 ```
 
-The `newChan` action produces a channel that can send messages of type
-`a`. The precise type of `a` will be inferred by the compiler. This is
-also a deviation from Erlang, where messages are untyped.
+The `newChan` action produces a channel that can be used for sending
+and receiving messages of type `a`. The precise type of `a` will be
+inferred by the compiler. This is also a deviation from Erlang, where
+messages are untyped.
 
-Whenever we create a thread, we also create a channel through which we
-can communicate with the thread, like so (assuming the existence of a
+Whenever we create a thread, we will also create a channel through which we
+can communicate with the thread, as shown in below (assuming the existence of a
 function `threadLoop`):
 
 ```Haskell
@@ -77,10 +78,10 @@ do c <- newChan
    ...
 ```
 
-The new thread now has a reference to the channel (`c`), as do we.
+Now, both the new thread and we have a reference to the channel (`c`).
 
-A channel can be both read and written, using the following two
-functions:
+Messages can be both read and written to a channel, corresponding to
+receiving and sending messages, using the following two functions:
 
 ```Haskell
 writeChan :: Chan a -> a -> IO ()
@@ -98,7 +99,7 @@ only a *single* reader, meaning only a single thread is allowed to
 call `writeChan` on any given channel. This is typically the thread
 that we created the channel for. This is not enforced by the Haskell
 type system, and there are indeed forms of concurrent programming
-that are more flexible, but they are outside the scope of AP.
+that are more flexible, but they are outside the scope of this note.
 
 It is perfectly acceptable (and often necessary) for a channel to have
 multiple writers.
@@ -108,10 +109,26 @@ If we call `readChan` on a channel where we hold the only reference
 system will raise an exception that will cause the thread to be
 terminated. This is a natural and safe way to shut down a thread that
 is no longer necessary, assuming the thread does not hold resources
-(e.g. open files) that must be manually closed. Handling such cases is
-outside the scope of AP.
+(e.g., open files) that must be manually closed. Handling such cases is
+outside the scope of this note.
 
 ### Example
+
+The following Erlang example:
+
+```erlang
+ex1() ->
+  C = spawn(fun threadLoop/0),
+  C ! 0,
+  C ! 1.
+
+threadLoop() ->
+  Msg = receive N -> N end,
+  io:format("Got message ~p~n", [Msg]),
+  threadLoop().
+```
+
+Can thus be translated to the following Haskell code:
 
 ```Haskell
 ex1 :: IO ()
