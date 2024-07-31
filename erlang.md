@@ -96,7 +96,7 @@ available.
 
 **Single-reader principle:** we adopt the rule that a channel may have
 only a *single* reader, meaning only a single thread is allowed to
-call `writeChan` on any given channel. This is typically the thread
+call `readChan` on any given channel. This is typically the thread
 that we created the channel for. This is not enforced by the Haskell
 type system, and there are indeed forms of concurrent programming
 that are more flexible, but they are outside the scope of this note.
