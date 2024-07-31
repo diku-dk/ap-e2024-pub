@@ -30,19 +30,20 @@ import Control.Concurrent
   )
 ```
 
-## Threads
+## Processes and Threads
 
-In Erlang, *processes* directly send asynchronous messages to each
-other. The Haskell equivalent to an Erlang process is a *thread*. We
-create a new thread with the `forkIO` function, which has the
-following type:
+In Erlang, *processes* communicate by directly sending asynchronous
+messages to each other. In Haskell, the equivalent of an Erlang
+process is a *thread*. To create a new thread in Haskell, we use the
+`forkIO` function, similar to using `spawn` in Erlang for creating
+processes. The `forkIO` function has the following type:
 
 ```Haskell
 forkIO :: IO () -> IO ThreadId
 ```
 
-In other words, to create a thread we pass it an action of type `IO
-()`, meaning a monadic computation in the `IO` monad. In most cases,
+In other words, to create a thread we pass `forkIO` an action of type
+`IO ()`, meaning a monadic computation in the `IO` monad. Typically,
 this will be some kind of potentially infinite loop that receives and
 handles messages, just as in Erlang. The thread will continue to run
 until this action terminates.
