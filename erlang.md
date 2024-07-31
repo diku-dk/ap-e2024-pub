@@ -115,7 +115,23 @@ is no longer necessary, assuming the thread does not hold resources
 (e.g., open files) that must be manually closed. Handling such cases is
 outside the scope of this note.
 
-### Example
+Thus, we have the following correspondences between Erlang and
+Haskell:
+
+* **Sending messages:** In Erlang, we send a message (to a process)
+  with the operator `!`.  For example, `Pid ! Msg` sends `Msg` to the
+  process identified by `Pid`. In Haskell, we send a message (to a
+  process via a channel) with the function `writeChan`.
+
+* **Receiving messages:** In Erlang, the `recieve ... end`-expression
+  is used for receiving messages. It not only waits for a message but
+  also performs pattern matching on the received message to decide on
+  the appropriate action. To do the same in Haskell, we first use the
+  `readChan` function to receive a massage, and then do pattern
+  matching with a `case`-expression.
+
+
+### Basic Example
 
 The following Erlang example:
 
@@ -198,6 +214,115 @@ ex2 = do
   print =<< performRPC c 1
 
 ```
+
+
+
+## Counter Server Example
+
+Let's consider a more comprehensive Erlang example, where we use a
+process to create a server that maintains a counter:
+
+```erlang
+counter()         -> spawn(fun () -> counter_loop(0) end).
+incr(Cid)         -> request_reply(Cid, incr).
+decr_with(Cid, N) -> request_reply(Cid, {decr, N}).
+get_value(Cid)    -> request_reply(Cid, get_value).
+
+request_reply(Pid, Request) ->
+    Pid ! {self(), Request},
+    receive
+        {Pid, Response} -> Response
+    end.
+
+counter_loop(State) ->
+    receive
+      {From, incr} ->
+        {NewState, Res} = {State + 1, ok},
+        From ! {self(), Res},
+        counter_loop(NewState);
+      {From, {decr, N}} ->
+        {NewState, Res} = {State - N, ok},
+        From ! {self(), Res},
+        counter_loop(NewState);
+      {From, get_value} ->
+        {NewState, Res} = {State, {ok, State}},
+        From ! {self(), Res},
+        counter_loop(NewState)
+    end.
+```
+
+To translate this example to Haskell, the first step is to make a type
+for the messages that will be send to the server. Again, we use the
+pattern where we make constructor for each kind of message, and the
+last argument for each constructor is a channel for sending back the
+response:
+
+```Haskell
+data Msg = Incr     (Chan ())
+         | Decr Int (Chan ())
+         | GetValue (Chan Int)
+```
+
+Here we use the Haskell type `()` (unit) in lieu of the Erlang atom `ok`.
+
+Next, we declare a type alias `Counter` for representing a counter
+server, here just the input channel, and a function for creating a new
+counter server:
+
+```Haskell
+type Counter = Chan Msg
+
+counter :: IO Counter
+counter = do
+  input <- newChan
+  _ <- forkIO $ counterLoop input 0
+  return input
+```
+
+Like in the previous section, we define a function to abstract the
+communication pattern where we send a message and then wait for an
+reply:
+
+```haskell
+requestReply :: Counter -> (Chan a -> Msg) -> IO a
+requestReply cnt con = do
+  reply_chan <- newChan
+  writeChan cnt $ con reply_chan
+  readChan reply_chan
+```
+
+Note that the second argument of the `requesReply` function is a
+*function* that constructs a `Msg` value.
+
+Now we can use the `requestReply` function to define the three API
+functions `incr`, `decrWith` and `getValue` for a counter server:
+
+```haskell
+incr cnt = requestReply cnt Incr
+decrWith cnt n = requestReply cnt $ Decr n
+getValue cnt = requestReply cnt GetValue
+```
+
+Finally, we define the internal server loop function:
+
+```Haskell
+counterLoop input state = do
+  msg <- readChan input
+  case msg of
+    Incr from -> do
+      let (newState, res) = (state + 1, ())
+      writeChan from res
+      counterLoop input newState
+    Decr n from -> do
+      let (newState, res) = (state - n, ())
+      writeChan from res
+      counterLoop input newState
+    GetValue from -> do
+      let (newState, res) = (state, state)
+      writeChan from res
+      counterLoop input newState
+```
+
 
 ## Timeouts
 
