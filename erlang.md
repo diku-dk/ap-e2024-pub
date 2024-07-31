@@ -2,12 +2,13 @@
 
 AP previously used the [Erlang programming
 language](http://erlang.org/) for some course components. In 2024, we
-use only Haskell. If you previously failed the course but are
-attending the exam this year, you will need to adapt your knowledge
-about concurrency from Erlang to Haskell. The best way to do so is to
-follow the course, attend the lectures, and complete the assignments.
-But as a special help, this *work-in-progess* document describes how
-to translate aspects of concurrent Erlang to concurrent Haskell.
+use only Haskell. If you previously followed the course, but didn't
+pass, and are attending the exam this year, you will need to adapt
+your knowledge about concurrency from Erlang to Haskell. The best way
+to do so is to follow the course, attend the lectures, and complete
+the assignments.  But as a special help, this *work-in-progess*
+document describes how to translate aspects of concurrent Erlang to
+concurrent Haskell.
 
 ## Basics
 
@@ -29,19 +30,20 @@ import Control.Concurrent
   )
 ```
 
-## Threads
+## Processes and Threads
 
-In Erlang, *processes* directly send asynchronous messages to each
-other. The Haskell equivalent to an Erlang process is a *thread*. We
-create a new thread with the `forkIO` function, which has the
-following type:
+In Erlang, *processes* communicate by directly sending asynchronous
+messages to each other. In Haskell, the equivalent of an Erlang
+process is a *thread*. To create a new thread in Haskell, we use the
+`forkIO` function, similar to using `spawn` in Erlang for creating
+processes. The `forkIO` function has the following type:
 
 ```Haskell
 forkIO :: IO () -> IO ThreadId
 ```
 
-In other words, to create a thread we pass it an action of type `IO
-()`, meaning a monadic computation in the `IO` monad. In most cases,
+In other words, to create a thread we pass `forkIO` an action of type
+`IO ()`, meaning a monadic computation in the `IO` monad. Typically,
 this will be some kind of potentially infinite loop that receives and
 handles messages, just as in Erlang. The thread will continue to run
 until this action terminates.
@@ -54,19 +56,20 @@ channel-based messaging.
 ## Channels and messages
 
 In Erlang, if we have a process ID, we can send a message to that
-process. In Haskell, processes are sent to *channels*. A channel is
-created with `newChan`:
+process. In Haskell, communication is done via *channels*. A channel is
+created using the `newChan` action:
 
 ```Haskell
 newChan :: IO (Chan a)
 ```
 
-The `newChan` action produces a channel that can send messages of type
-`a`. The precise type of `a` will be inferred by the compiler. This is
-also a deviation from Erlang, where messages are untyped.
+The `newChan` action produces a channel that can be used for sending
+and receiving messages of type `a`. The precise type of `a` will be
+inferred by the compiler. This is also a deviation from Erlang, where
+messages are untyped.
 
-Whenever we create a thread, we also create a channel through which we
-can communicate with the thread, like so (assuming the existence of a
+Whenever we create a thread, we will also create a channel through which we
+can communicate with the thread, as shown in below (assuming the existence of a
 function `threadLoop`):
 
 ```Haskell
@@ -75,10 +78,10 @@ do c <- newChan
    ...
 ```
 
-The new thread now has a reference to the channel (`c`), as do we.
+Now, both the new thread and we have a reference to the channel (`c`).
 
-A channel can be both read and written, using the following two
-functions:
+Messages can be both read and written to a channel, corresponding to
+receiving and sending messages, using the following two functions:
 
 ```Haskell
 writeChan :: Chan a -> a -> IO ()
@@ -96,7 +99,7 @@ only a *single* reader, meaning only a single thread is allowed to
 call `writeChan` on any given channel. This is typically the thread
 that we created the channel for. This is not enforced by the Haskell
 type system, and there are indeed forms of concurrent programming
-that are more flexible, but they are outside the scope of AP.
+that are more flexible, but they are outside the scope of this note.
 
 It is perfectly acceptable (and often necessary) for a channel to have
 multiple writers.
@@ -106,10 +109,26 @@ If we call `readChan` on a channel where we hold the only reference
 system will raise an exception that will cause the thread to be
 terminated. This is a natural and safe way to shut down a thread that
 is no longer necessary, assuming the thread does not hold resources
-(e.g. open files) that must be manually closed. Handling such cases is
-outside the scope of AP.
+(e.g., open files) that must be manually closed. Handling such cases is
+outside the scope of this note.
 
 ### Example
+
+The following Erlang example:
+
+```erlang
+ex1() ->
+  C = spawn(fun threadLoop/0),
+  C ! 0,
+  C ! 1.
+
+threadLoop() ->
+  Msg = receive N -> N end,
+  io:format("Got message ~p~n", [Msg]),
+  threadLoop().
+```
+
+Can thus be translated to the following Haskell code:
 
 ```Haskell
 ex1 :: IO ()
