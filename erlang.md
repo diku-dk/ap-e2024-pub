@@ -1,5 +1,8 @@
 # Translating from Erlang to Haskell
 
+<img align="right" src="https://github.com/user-attachments/assets/f935aa00-315a-4365-b44d-ca29144b924d">
+
+
 AP previously used the [Erlang programming
 language](http://erlang.org/) for some course components. In 2024, we
 use only Haskell. If you previously followed the course, but didn't
