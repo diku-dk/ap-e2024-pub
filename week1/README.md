@@ -94,7 +94,11 @@ integer evaluates (unsurprisingly) to the corresponding integer value.
 
 <details>
 <summary>Open this to see the answer</summary>
+
+```Haskell
 eval (CstInt x) = ValInt x
+```
+
 </details>
 
 Add a test to `APL_Tests.hs` that tests whether your implementation of
