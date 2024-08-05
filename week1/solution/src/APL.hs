@@ -2,7 +2,6 @@ module APL
   ( VName,
     Exp (..),
     Val (..),
-    printExp,
     Env,
     envEmpty,
     eval,
