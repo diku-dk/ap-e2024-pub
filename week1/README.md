@@ -150,7 +150,7 @@ conventional mathematical notation are written as `Exp`.
 
 Note that the parentheses that we use in mathematical notation are not
 present in `Exp` - this is because the structure of the Haskell value
-already precisely encodes with expressions are operands of which
+already precisely encodes which expressions are operands of which
 operators. In the nomenclature of programming languages, the `Exp`
 value is an *Abstract Syntax Tree* (AST), with unnecessary information
 excluded.
