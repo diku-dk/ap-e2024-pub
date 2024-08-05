@@ -206,8 +206,8 @@ It is defined as follows (it is already defined in the implicit
 Haskell prelude, so you should *not* add it to `APL`):
 
 ```Haskell
-data Either 'a 'b = Left a
-                  | Right b
+data Either a b = Left a
+                | Right b
 ```
 
 By convention, the `Left` constructor is used to represent failure,
