@@ -17,6 +17,8 @@ TBA
   functional programming material, so feel free to skim those parts.
   The most interesting chapter is chapter 8.
 
+* [Course Notes Chapter 1](https://diku-dk.github.io/ap-notes/chapter_1.html)
+
 ## Exercises
 
 The mandatory assignment builds directly on the concepts *and code*
