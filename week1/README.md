@@ -146,7 +146,7 @@ conventional mathematical notation are written as `Exp`.
 | 2<sup>3</sup> | `Pow (CstInt 2) (CstInt 3)` |
 | 2<sup>3+4</sup> | `Pow (CstInt 2) (Add (CstInt 3) (CstInt 4)` |
 | 2+3*4 | `Add (CstInt 2) (Mul (CstInt 3) (CstInt 4))` |
-| (2+3)\*4) | `Mul (Add (CstInt 2) (CstInt 3)) (CstInt 4))` |
+| (2+3)\*4 | `Mul (Add (CstInt 2) (CstInt 3)) (CstInt 4))` |
 
 Note that the parentheses that we use in mathematical notation are not
 present in `Exp` - this is because the structure of the Haskell value
