@@ -14,8 +14,11 @@ The programming language we will be using is **Haskell**.
 The website and course is currently under construction, and all
 information is still tentative.
 
-The material for each week (including assignments) can be found in the
-`weekI` subdirectories above.
+The teaching material for each week can be found in the `weekI`
+subdirectories.
+
+The assignments for each week can be found in the `assignmentI`
+subdirectories.
 
 ## Discord
 
@@ -77,10 +80,24 @@ and 15:00-17:00 respectively.
 
 Locations are TBD.
 
+## Assignments
+
+There are 6 assignment in total during the course with deadlines every
+week. They overlap slightly to allow for more flexibility in your
+scheduling, but think of them as weekly assignments.
+
+The assignments will be graded with points from 0 to 4 and it is not
+possible to re-hand-in any of the assignments.
+
+Assignments are made to be solved in groups of up to three students.
+We strongly encourage you not to work alone. Each group must make
+their own solutions and cannot share implementations and report with
+other. You may discuss material and ideas.
+
 ## Exam
 
 The exam will be a multi-day take-home exam held in one of the exam
-weeks. Precise dates TBD. It will strongly resemble the mandatory
+weeks. It will strongly resemble the mandatory
 assignments in content and form, with the following differences:
 
 * It is strictly individual.
@@ -88,3 +105,14 @@ assignments in content and form, with the following differences:
 * It is roughly the size of two assignments.
 
 * You receive only summative feedback (i.e., a grade).
+
+### Qualification
+
+To qualify for the exam you are required to achieve at least 50% of
+the total number of points in the assignments (that is, 10 points at
+minimum). You also need to get *at least* one point in each of the
+assignments.
+
+### Date
+
+TBD
