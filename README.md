@@ -78,7 +78,55 @@ week. The lectures are on Tuesday 10:00-12:00 and Thursday
 13:00-15:00. The exercise classes are both on Thursday, at 10:00-12:00
 and 15:00-17:00 respectively.
 
-Locations are TBD.
+### Exercise class locations
+
+* **Hold 1:**
+
+  - 10-12: DIKU 3-0-25
+
+  - 15-17: NBB 2.2.I.158
+
+* **Hold 2:**
+
+  - 10-12: DIKU 1-0-37
+
+  - 15-17: NBB 2.2.H.142
+
+* **Hold 3:**
+
+  - 10-12: DIKU 1-0-04
+
+  - 15-17: NBB 2.3.H.142
+
+* **Hold 4:**
+
+  - 10-12: DIKU 1-0-26
+
+  - 15-17: NBB NBB 2.3.I.164
+
+* **Hold 5:**
+
+  - 10-12: DIKU 1-0-30
+
+  - 15-17: DIKU 1-0-30
+
+* **Hold 6:**
+
+  - 10-12: DIKU 1-0-18
+
+  - 15-17: DIKU 1-0-18
+
+* **Hold 7:**
+
+  - 10-12: DIKU 1-0-22
+
+  - 15-17: DIKU 1-0-22
+
+* **Hold 8:**
+
+  - 10-12: 1-0-10
+
+  - 15-17: 1-0-10
 
 ## Assignments
 
