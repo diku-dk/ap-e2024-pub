@@ -82,7 +82,7 @@ and 15:00-17:00 respectively.
 
 * **Hold 1:**
 
-  - TA: [Robert Schenck](https://github.com/zfnmxt)
+  - TA: [Robert Schenck](https://github.com/zfnmxt) (rschenck@di.ku.dk)
 
   - 10-12: DIKU 3-0-25
 
