@@ -82,11 +82,15 @@ and 15:00-17:00 respectively.
 
 * **Hold 1:**
 
+  - TA: [Robert Schenck](https://github.com/zfnmxt)
+
   - 10-12: DIKU 3-0-25
 
   - 15-17: NBB 2.2.I.158
 
 * **Hold 2:**
+
+  - TA: TBD
 
   - 10-12: DIKU 1-0-37
 
@@ -94,11 +98,15 @@ and 15:00-17:00 respectively.
 
 * **Hold 3:**
 
+  - TA: TBD
+
   - 10-12: DIKU 1-0-04
 
   - 15-17: NBB 2.3.H.142
 
 * **Hold 4:**
+
+  - TA: TBD
 
   - 10-12: DIKU 1-0-26
 
@@ -106,11 +114,15 @@ and 15:00-17:00 respectively.
 
 * **Hold 5:**
 
+  - TA: TBD
+
   - 10-12: DIKU 1-0-30
 
   - 15-17: DIKU 1-0-30
 
 * **Hold 6:**
+
+  - TA: TBD
 
   - 10-12: DIKU 1-0-18
 
@@ -118,11 +130,15 @@ and 15:00-17:00 respectively.
 
 * **Hold 7:**
 
+  - TA: TBD
+
   - 10-12: DIKU 1-0-22
 
   - 15-17: DIKU 1-0-22
 
 * **Hold 8:**
+
+  - TA: TBD
 
   - 10-12: 1-0-10
 
