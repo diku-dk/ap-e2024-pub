@@ -37,7 +37,7 @@ partial or complete solutions are also included inline below.
 
 The starting point is a skeletal Haskell program consisting of the
 modules `APL` (in `src/APL.hs`) and `APL_Tests` (in
-`src/APL_Tests.hs`), as well as `apl.cabal` with build instructions.
+`src/APL_Tests.hs`), as well as `week1.cabal` with build instructions.
 You should start by running `cabal test` to ensure that your Haskell
 setup is functional. This compiles everything and runs the (currently
 empty) test suite. When going through these exercises, run `cabal

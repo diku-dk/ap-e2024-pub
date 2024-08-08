@@ -1,5 +1,5 @@
 cabal-version:      3.0
-name:               apl
+name:               week1
 version:            1.0.0.0
 build-type:         Simple
 
@@ -18,11 +18,11 @@ library
         APL
         APL_Tests
 
-test-suite assignment1-test
+test-suite week1-test
     import: common
     type: exitcode-stdio-1.0
     main-is: tests.hs
     build-depends:
         base
       , tasty
-      , apl
+      , week1
