@@ -53,5 +53,5 @@ newtype EvalM a = EvalM a -- TODO
 runEval :: EvalM a -> Either Error a
 runEval = undefined -- TODO
 
-eval :: Exp -> EvalM Val
+eval :: Env -> Exp -> EvalM Val
 eval = undefined -- TODO
