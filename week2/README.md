@@ -89,7 +89,7 @@ runEval :: EvalM a -> Either Error a
 runEval (EvalM x) = x
 ```
 
-</summary>
+</details>
 
 ### Monadic evaluation
 
