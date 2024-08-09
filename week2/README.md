@@ -148,7 +148,7 @@ eval env (Add e1 e2) = do
     _ -> failure "Non-integer operand"
 ```
 
-</summary>
+</details>
 
 ### Implementing `TryCatch`
 
@@ -197,7 +197,7 @@ eval (TryCatch e1 e2) =
   eval e1 `catch` eval e2
 ```
 
-</summary>
+</details>
 
 ### Adding an environment to the `EvalM`
 
