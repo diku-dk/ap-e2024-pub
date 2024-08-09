@@ -199,7 +199,7 @@ eval (TryCatch e1 e2) =
 
 </details>
 
-### Adding an environment to the `EvalM`
+### Adding an environment to `EvalM`
 
 Factoring error handling into `EvalM` itself has significantly reduced
 the amount of boilerplate code in `eval`, but there is still one piece
