@@ -96,7 +96,7 @@ instance Functor (EvalOp r) where
   fmap f (ReadOp k) = ReadOp $ f . k
 
 runEval :: Env -> EvalM a -> a
-runEval _ (Pure x) = (mempty, Right x)
+runEval _ (Pure x) = x
 runEval r (Free (ReadOp k)) = runEval r s $ k r
 ```
 
