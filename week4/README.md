@@ -209,7 +209,11 @@ modifyEffects g (Free e) = ...
 
 Define `modiifyState` using `getState` and `putState`.
 
-`modifyEffects` is a recursive function.
+`modifyEffects` is a recursive function and uses `fmap`.
+
+In your definition of`localEnv`, the function you pass to `modifyEffects` should
+only modify `ReadOp` effects; for all other effects it should act as the
+identity function.
 
 
 #### Solution 
