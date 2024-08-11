@@ -150,7 +150,7 @@ instance Functor (EvalOp r s) where
   fmap f (StateGet k) = StateGet $ f . k
   fmap f (StatePut s m) = StatePut s $ f m
   
-runEval :: Env -> State EvalM a -> a
+runEval :: Env -> State -> EvalM a -> a
 runEval _ _ (Pure x) = (mempty, Right x)
 runEval r s (Free (ReadOp k)) = runEval r s $ k r
 runEval r s (Free (StateGet k)) = runEval r s $ k s
