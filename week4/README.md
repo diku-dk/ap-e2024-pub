@@ -2,9 +2,9 @@
 
 ## Slides and Material
 
-## TBA
-
 ## Suggested Reading
+
+* [Course Notes Chapter 4](https://diku-dk.github.io/ap-notes/chapter_4.html)
 
 ## Exercises
 
