@@ -62,6 +62,13 @@ notes as mandated or suggested reading.
 * [Programming in Haskell](https://www.cs.nott.ac.uk/~pszgmh/pih.html) (video lectures [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK7usPMx3LGMZEHrECUGodd3) and [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK5uFc8FKr_di9bfsYv8-lbc))
 * [Course notes from Brent Yorgey's UPenn Haskell course](https://www.cis.upenn.edu/~cis1940/spring13/lectures.html)
 
+We will also occasionally suggest reading material labeled *Going
+Beyond*. This is material that goes beyond the requirements of the
+course, but may be of interest to students who wish to apply the
+techniques we investigate in applied settings. That is, students who
+wish to become capable of writing advanced Haskell programs that solve
+real problems.
+
 ## Course-specific material
 
 * [Guide for setting up a Haskell development environment](haskell.md)

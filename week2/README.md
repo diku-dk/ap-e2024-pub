@@ -17,6 +17,10 @@ topic is foundational to the remainder of the course.
 
 * [Course Notes Chapter 2](https://diku-dk.github.io/ap-notes/chapter_2.html)
 
+### Going Beyond
+
+* [Finding Success in Haskell](https://leanpub.com/finding-success-in-haskell)
+
 ## Exercises
 
 In these exercises you will construct an interpreter that is similar

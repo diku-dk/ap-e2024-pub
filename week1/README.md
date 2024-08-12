@@ -19,6 +19,10 @@ TBA
 
 * [Course Notes Chapter 1](https://diku-dk.github.io/ap-notes/chapter_1.html)
 
+### Going Beyond
+
+* [Real World Haskell](https://book.realworldhaskell.org/) (a bit dated, however).
+
 ## Exercises
 
 The mandatory assignment builds directly on the concepts *and code*

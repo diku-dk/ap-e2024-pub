@@ -21,7 +21,7 @@ library
 test-suite a2-test
     import: common
     type: exitcode-stdio-1.0
-    main-is: tests.hs
+    main-is: runtests.hs
     build-depends:
         base
       , tasty
