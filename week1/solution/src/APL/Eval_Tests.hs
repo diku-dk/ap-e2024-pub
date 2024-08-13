@@ -1,6 +1,7 @@
-module APL_Tests (tests) where
+module APL.Eval_Tests (tests) where
 
-import APL (Exp (..), Val (..), envEmpty, eval)
+import APL.AST (Exp (..))
+import APL.Eval (Val (..), envEmpty, eval)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 

@@ -1,28 +1,12 @@
-module APL
-  ( VName,
-    Exp (..),
-    Val (..),
+module APL.Eval
+  ( Val (..),
     Env,
     envEmpty,
     eval,
   )
 where
 
-type VName = String
-
-data Exp
-  = CstInt Integer
-  | CstBool Bool
-  | Add Exp Exp
-  | Sub Exp Exp
-  | Mul Exp Exp
-  | Div Exp Exp
-  | Pow Exp Exp
-  | Eql Exp Exp
-  | If Exp Exp Exp
-  | Var VName
-  | Let VName Exp Exp
-  deriving (Eq, Show)
+import APL.AST (Exp (..), VName)
 
 data Val
   = ValInt Integer
