@@ -1,5 +1,5 @@
 cabal-version:      3.0
-name:               week2
+name:               week3
 version:            1.0.0.0
 build-type:         Simple
 
@@ -14,16 +14,26 @@ library
         base
       , tasty
       , tasty-hunit
+      , megaparsec
     exposed-modules:
         APL.AST
         APL.Eval
-        APL.Eval_Tests
+        APL.Parser
+        APL.Parser_Tests
 
-test-suite week2-test
+executable apl
+    import: common
+    main-is: apl.hs
+    build-depends:
+        base
+      , week3
+
+test-suite week3-test
     import: common
     type: exitcode-stdio-1.0
     main-is: runtests.hs
     build-depends:
         base
       , tasty
-      , week2
+      , week3
+
