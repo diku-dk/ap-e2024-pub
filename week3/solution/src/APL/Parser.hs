@@ -1,7 +1,7 @@
 module APL.Parser (parseAPL) where
 
 import APL.AST (Exp (..), VName)
-import Control.Monad (guard, void)
+import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isDigit)
 import Data.Void (Void)
 import Text.Megaparsec
@@ -10,6 +10,7 @@ import Text.Megaparsec
     chunk,
     eof,
     errorBundlePretty,
+    many,
     notFollowedBy,
     parse,
     parseTest,
@@ -24,31 +25,40 @@ type Parser = Parsec Void String
 lexeme :: Parser a -> Parser a
 lexeme p = p <* space
 
-reserved :: [String]
-reserved =
+keywords :: [String]
+keywords =
   [ "if",
     "then",
     "else",
     "true",
-    "false"
+    "false",
+    "let",
+    "in",
+    "try",
+    "catch",
+    "print",
+    "put",
+    "get"
   ]
 
 lVName :: Parser VName
-lVName = lexeme $ do
-  v <- some $ satisfy isAlphaNum
-  if (v `elem` reserved)
+lVName = lexeme $ try $ do
+  c <- satisfy isAlpha
+  cs <- many $ satisfy isAlphaNum
+  let v = c : cs
+  if v `elem` keywords
     then fail "Unexpected keyword"
     else pure v
 
 lInteger :: Parser Integer
 lInteger =
-  lexeme $ read <$> some (satisfy isDigit) <* notFollowedBy (satisfy isAlpha)
+  lexeme $ read <$> some (satisfy isDigit) <* notFollowedBy (satisfy isAlphaNum)
 
 lString :: String -> Parser ()
 lString s = lexeme $ void $ chunk s
 
 lKeyword :: String -> Parser ()
-lKeyword s = lexeme $ void $ try $ chunk s <* notFollowedBy (satisfy isAlpha)
+lKeyword s = lexeme $ void $ try $ chunk s <* notFollowedBy (satisfy isAlphaNum)
 
 lBool :: Parser Bool
 lBool =

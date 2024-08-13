@@ -35,7 +35,7 @@ written in
 
 ```
 digit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-int = {digit};
+int = digit {digit};
 Exp ::= int "+" int;
 ```
 
@@ -100,7 +100,7 @@ lInteger = read <$> some (satisfy isDigit)
 trying to parse an integer followed by end-of-input (`eof`), when the
 string has trailing whitespace:
 
-```Haskell
+```
 > parseTest (lInteger <* eof) "123 "
 1:4:
   |
@@ -235,7 +235,17 @@ parserTests =
 
 ### Parsing identifiers
 
-An APL identifier consists of one or more alphanumeric characters.
+An APL identifier follows this grammar:
+
+```
+alphabetic = ? any alphabetic character ?;
+alphanumeric = ? any alphanumeric character ?;
+var = alphabetic {alphanumeric};
+```
+
+That is, it consists of an alphabetic character followed by zero or
+more alphanumeric characters.
+
 Implement a parser
 
 ```Haskell
@@ -247,6 +257,13 @@ that parses APL identifiers, including consuming trailing whitespace.
 Also modify the `pExp` parser to handle identifiers (producing `Var`
 nodes) and add appropriate tests.
 
+#### Hints
+
+Use `isAlpha` and `isAlphaNum` from `Data.Char`.
+
+First read one character (which must be alphabetic), then read any
+number of characters (which must be alphanumeric).
+
 #### Solution
 
 <details>
@@ -254,7 +271,10 @@ nodes) and add appropriate tests.
 
 ```Haskell
 lVName :: Parser VName
-lVName = lexeme $ some $ satisfy isAlpha
+lVName = lexeme $ do
+  c <- satisfy isAlpha
+  cs <- many $ satisfy isAlphaNum
+  pure $ c:cs
 
 pExp :: Parser Exp
 pExp =
@@ -268,7 +288,47 @@ pExp =
 
 ### Parsing Boolean values
 
-TODO
+Booleans follow this grammar in APL:
+
+```
+bool ::= "true" | "false";
+```
+
+Implement a lexer function
+
+```Haskell
+lBool :: Parser Bool
+```
+
+that parses boleans. As with numbers, it is important that inputs such
+as `truee` are not parsed as `true` followed by another character.
+Also add a case for `CstBool` to `pExp`.
+
+#### Examples
+
+```
+> parseTest lBool "true"
+True
+> parseTest lBool "truee"
+1:5:
+  |
+1 | truee
+  |     ^
+unexpected 'e'
+> parseTest lBool "true e"
+True
+```
+
+#### Hints
+
+Consider defining a function
+
+```Haskell
+lKeyword :: String -> Parser ()
+```
+
+that parse a given alphanumeric string, and uses `notFollowedBy` to
+require that it is not followed by another alphanumeric character.
 
 #### Solution
 
@@ -276,6 +336,9 @@ TODO
 <summary>Open this to see the answer</summary>
 
 ```Haskell
+lKeyword :: String -> Parser ()
+lKeyword s = lexeme $ void $ try $ chunk s <* notFollowedBy (satisfy isAlphaNum)
+
 lBool :: Parser Bool
 lBool =
   try $ lexeme $
@@ -303,7 +366,7 @@ the following keywords: if, then, else, true, false, let, in, try,
 catch, print, put, get. Modify `lVName` such that it fails if the
 parsed name is a keyword.
 
-#### Example
+#### Examples
 
 ```
 > parseTest lVName "if"
@@ -335,10 +398,29 @@ but you will have subtle issues when we start to make use of keywords.
 <summary>Open this to see the answer</summary>
 
 ```Haskell
+keywords :: [String]
+keywords =
+  [ "if",
+    "then",
+    "else",
+    "true",
+    "false",
+    "let",
+    "in",
+    "try",
+    "catch",
+    "print",
+    "put",
+    "get"
+  ]
+
+
 lVName :: Parser VName
 lVName = lexeme $ try $ do
-  v <- some $ satisfy isAlphaNum
-  if v `elem` reserved
+  c <- satisfy isAlpha
+  cs <- many $ satisfy isAlphaNum
+  let v = c : cs
+  if v `elem` keywords
     then fail "Unexpected keyword"
     else pure v
 ```
@@ -347,8 +429,114 @@ lVName = lexeme $ try $ do
 
 ### Implement infix operators
 
-In this task we will implement infix operators without taking operator
-precedence into account. The challenge is handling left recursion.
+In this task we will implement the infix operators `+`, `-`, `\`, and
+`*`, without taking operator precedence into account. The challenge is
+handling left recursion. We will also add explicit parentheses to the
+language - note that these do not correspond to any AST constructor.
+
+Specifically, our grammar now looks like this (excluding unchanged
+rules from above):
+
+```
+Exp ::= var
+      | int
+      | bool
+      | "(" Exp ")"
+      | Exp "+" Exp
+      | Exp "-" Exp
+      | Exp "*" Exp
+      | Exp "/" Exp
+```
+
+First you must transform the grammar to eliminate left recursion. Use
+the approach explained in the course material. Assume all operators
+are left-associative. This will give you a new definition of `Exp`
+that recognises the same language.
+
+<details>
+<summary>Open this to see the left-factorised grammar</summary>
+
+```
+Exp1 ::= var
+       | int
+       | bool
+       | "(" Exp ")"
+
+Exp0' ::=            (* empty *)
+        | "+" Exp1 Exp0'
+        | "-" Exp1 Exp0'
+        | "*" Exp1 Exp0'
+        | "/" Exp1 Exp0'
+
+Exp0 ::= Exp1 Exp'
+
+Exp  ::= Exp0
+```
+
+</details>
+
+Finish the parser `pExp` using your transformed grammar. Consider
+using the helper function
+
+```
+lString :: String -> Parser ()
+lString s = lexeme $ void $ chunk s
+```
+
+to parse parentheses.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+pExp1 :: Parser Exp
+pExp1 =
+  choice
+    [ CstInt <$> lInteger,
+      CstBool <$> lBool,
+      Var <$> lVName,
+      lString "(" *> pExp <* lString ")"
+    ]
+
+pExp0 :: Parser Exp
+pExp0 = pExp1 >>= chain
+  where
+    chain x =
+      choice
+        [ do
+            lString "+"
+            y <- pExp1
+            chain $ Add x y,
+          do
+            lString "-"
+            y <- pExp1
+            chain $ Sub x y,
+          do
+            lString "*"
+            y <- pLExp
+            chain $ Mul x y,
+          do
+            lString "/"
+            y <- pLExp
+            chain $ Div x y,
+          pure x
+        ]
+
+pExp :: Parser Exp
+pExp = pExp0
+
+```
+
+</details>
+
+#### Examples
+
+```
+> parseTest pExp "x+y*z"
+Mul (Add (Var "x") (Var "y")) (Var "z")
+> parseTest pExp "x+(y*z)"
+Add (Var "x") (Mul (Var "y") (Var "z"))
+```
 
 ### Running the interpreter
 
@@ -365,4 +553,8 @@ can simply do `apl PROG` to run programs.
 There is no task here. Congratulate yourself on having written a full
 Haskell program and continue on.
 
+### Implement operator precedence
+
 ### Implement `if-then-else`
+
+TODO

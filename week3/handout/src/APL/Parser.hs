@@ -1,7 +1,7 @@
 module APL.Parser (parseAPL) where
 
 import APL.AST (Exp (..), VName)
-import Control.Monad (guard, void)
+import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isDigit)
 import Data.Void (Void)
 import Text.Megaparsec
@@ -10,6 +10,7 @@ import Text.Megaparsec
     chunk,
     eof,
     errorBundlePretty,
+    many,
     notFollowedBy,
     parse,
     parseTest,
