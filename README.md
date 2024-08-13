@@ -165,6 +165,38 @@ We strongly encourage you not to work alone. Each group must make
 their own solutions and cannot share implementations and report with
 other. You may discuss material and ideas.
 
+### General assignment rules
+
+The following rules apply to all assignments. They are intended to
+ease our correction process, and in particular to allow automated
+testing. Consider the assignments to be a specification or API that
+you are asked to implement.
+
+1. Do not modify the types of any definitions in the handout, except
+   when the assignment text explicitly instructs you to do so.
+
+2. Do not rename or remove any definitions that are present in the
+   handout, except when the assignment text explicitly instructs you
+   to do so.
+
+3. Do not remove anything from module export lists.
+
+4. Do not rename modules or otherwise modify the file tree. (You may
+   add new files if you wish, although it is rarely necessary.)
+
+5. When handing in, you must hand in a complete workable program
+   (including unmodified files from the handout).
+
+6. When handing in, do not include temporary build files (such as
+   `dist-newstyle`), editor backup files, or various other computer
+   detritus. Run e.g. the `tree` command and read the file listing and
+   ponder for each file whether it is something it makes sense to hand
+   to your TA. At a *minimum*, run `cabal clean` before handing in.
+
+Violation of these rules will result in points deductions. If you
+violate these rules at the exam, it will negatively influence your
+grade.
+
 ## Exam
 
 The exam will be a multi-day take-home exam held in one of the exam
