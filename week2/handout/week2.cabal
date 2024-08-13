@@ -15,8 +15,9 @@ library
       , tasty
       , tasty-hunit
     exposed-modules:
-        APL
-        APL_Tests
+        APL.AST
+        APL.Eval
+        APL.Eval_Tests
 
 test-suite a2-test
     import: common

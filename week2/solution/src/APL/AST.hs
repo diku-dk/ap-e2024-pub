@@ -1,4 +1,4 @@
-module APL
+module APL.AST
   ( VName,
     Exp (..),
     Val (..),

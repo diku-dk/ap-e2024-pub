@@ -1,14 +1,15 @@
-module APL_Tests (tests) where
+module APL.Eval_Tests (tests) where
 
-import APL (Error, Exp (..), Val (..), eval, runEval)
+import APL.AST (Exp (..))
+import APL.Eval (Error, Val (..), eval, runEval)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
 eval' :: Exp -> Either Error Val
 eval' = runEval . eval
 
-evalTests :: TestTree
-evalTests =
+tests :: TestTree
+tests =
   testGroup
     "EValuation"
     [ testCase "Add" $
@@ -78,6 +79,3 @@ evalTests =
           (TryCatch (Div (CstInt 7) (CstInt 0)) (CstBool True))
           @?= Right (ValBool True)
     ]
-
-tests :: TestTree
-tests = testGroup "APL" [evalTests]

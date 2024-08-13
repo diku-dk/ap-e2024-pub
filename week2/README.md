@@ -36,9 +36,9 @@ of modules, the structure is identical to week 1.
 
 ### Getting Started
 
-The `APL` module already contains various definitions that should be
-familiar to you from week 1. It also contains some stub definitions
-for you to fill out.
+The `APL.AST` and `APL.Eval` modules already contains various
+definitions that should be familiar to you from week 1. `APL.Eval`
+also contains some stub definitions for you to fill out.
 
 To start with, we will define `EvalM` such that it tracks evaluation
 failure.

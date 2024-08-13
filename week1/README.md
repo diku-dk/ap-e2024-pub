@@ -40,30 +40,34 @@ solutions are in [solutions/](solutions/). For some of the tasks,
 partial or complete solutions are also included inline below.
 
 The starting point is a skeletal Haskell program consisting of the
-modules `APL` (in `src/APL.hs`) and `APL_Tests` (in
-`src/APL_Tests.hs`), as well as `week1.cabal` with build instructions.
-You should start by running `cabal test` to ensure that your Haskell
-setup is functional. This compiles everything and runs the (currently
-empty) test suite. When going through these exercises, run `cabal
-test` frequently to see whether your code still works. It is also a
-good idea to use `ghci` to interactively debug and test your work.
+modules `APL.AST` (in `src/APL/AST.hs`), `APL.Eval` (in
+`src/APL/Eval.hs`) and `APL.Eval_Tests` (in `src/APL/Eval_Tests.hs`),
+as well as `week1.cabal` with build instructions. You should start by
+running `cabal test` to ensure that your Haskell setup is functional.
+This compiles everything and runs the (currently empty) test suite.
+When going through these exercises, run `cabal test` frequently to see
+whether your code still works. It is also a good idea to use `ghci` to
+interactively debug and test your work.
 
-The `APL` module will contain the definition of APL. Initially it is
-almost empty.
+The `APL.AST` module will contain the definition of APL. Initially it
+is almost empty.
 
-The `APL_Tests` module should import definitions from `APL` and tests
-them. It also imports unit testing modules from `tasty`. Initially it
-imports almost nothing, so you will have to extend the `import`
-statements with the things you need.
+The `APL.Eval` module will import `APL.AST` and define an evaluation
+function for APL programs.
 
-The `tests.hs` file is a very simple program that runs the test suite.
-You should not modify it.
+The `APL.Eval_Tests` module should import definitions from `APL` and
+`APL.Eval` and tests them. It also imports unit testing modules from
+`tasty`. Initially it imports almost nothing, so you will have to
+extend the `import` statements with the things you need.
+
+The `runtests.hs` file is a very simple program that runs the test
+suite. You should not modify it.
 
 ### Getting started
 
 We will represent expressions by a Haskell datatype `Exp`. It will
 initially be tiny, and then we will extend it as we go along. In the
-`APL` module, add the following definition:
+`APL.AST` module, add the following definition:
 
 ```Haskell
 data Exp
@@ -76,8 +80,13 @@ integer, like `1`. The `Eq` instance is so we can compare expressions
 with `==`, and the `Show` is so we can print them to the screen
 (critical for debugging).
 
+You should also export the `Exp` type, including its constructors,
+from the `APL.AST` module so it can be imported by other modules. Do
+this by adding `Exp(..)` to the module export list.
+
 The result of *evaluating* an expression is a *value*, which we
-represent with the type `Val`. Add the following definition to `APL`:
+represent with the type `Val`. Add the following definition to the
+`APL.Eval` module:
 
 ```Haskell
 data Val
@@ -85,12 +94,12 @@ data Val
   deriving (Eq, Show)
 ```
 
-(These types are currently isomorphic, but will not remain so for
-long.)
+(The `Exp` and `Val` types are currently isomorphic, but will not
+remain so for long.)
 
 We will now define an evaluation function that can transform an
-expression to a value. Define a function `eval` with the following
-type:
+expression to a value. In `APL.Eval`, define a function `eval` with
+the following type:
 
 ```Haskell
 eval :: Exp -> Val
@@ -108,12 +117,14 @@ eval (CstInt x) = ValInt x
 
 </details>
 
-Add a test to `APL_Tests.hs` that tests whether your implementation of
-`CstInt` is correct. You will need to extend the `import` statements
-at the beginning of the module to include at least the following:
+Export the `eval` function from `APL.Eval`, and add a test to
+`APL_Tests.hs` that tests whether your implementation of `CstInt` is
+correct. You will need to extend the `import` statements at the
+beginning of the module to include at least the following:
 
 ```Haskell
-import APL (Exp (..), Val (..), eval)
+import APL.AST (Exp (..))
+import APL.Eval (Val (..), eval)
 import Test.Tasty.HUnit (testCase, (@?=))
 ```
 
@@ -137,7 +148,7 @@ data Exp
 
 These correspond to addition, subtraction, multiplication, division,
 and exponentiation. Implement the corresponding cases in `eval` and
-add appropriate tests to `APL_Tests`.
+add appropriate tests to the test suite.
 
 #### Examples of `Exp`
 
@@ -363,7 +374,7 @@ expression.
 To implement variables, we need to main *environments*. An environment
 maps a name to a value. Evaluation of an expression takes place in an
 environment. We will represent environments with this `Env` type,
-which you must add to `APL`:
+which you must add to `APL.Eval`:
 
 ```Haskell
 type Env = [(VName, Val)]

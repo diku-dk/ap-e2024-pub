@@ -15,10 +15,11 @@ library
       , tasty
       , tasty-hunit
     exposed-modules:
-        APL
-        APL_Tests
+        APL.AST
+        APL.Eval
+        APL.Eval_Tests
 
-test-suite week2-test
+test-suite a2-test
     import: common
     type: exitcode-stdio-1.0
     main-is: runtests.hs
