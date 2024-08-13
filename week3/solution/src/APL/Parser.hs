@@ -73,19 +73,8 @@ pAtom =
     [ CstInt <$> lInteger,
       CstBool <$> lBool,
       Var <$> lVName,
-      lString "(" *> pExp0 <* lString ")"
+      lString "(" *> pExp <* lString ")"
     ]
-
-pFExp :: Parser Exp
-pFExp = chain =<< pAtom
-  where
-    chain x =
-      choice
-        [ do
-            y <- pAtom
-            chain $ Apply x y,
-          pure x
-        ]
 
 pLExp :: Parser Exp
 pLExp =
@@ -94,7 +83,7 @@ pLExp =
         <$> (lKeyword "if" *> pExp0)
         <*> (lKeyword "then" *> pExp0)
         <*> (lKeyword "else" *> pExp0),
-      pFExp
+      pAtom
     ]
 
 pExp1 :: Parser Exp
@@ -129,7 +118,10 @@ pExp0 = pExp1 >>= chain
           pure x
         ]
 
+pExp :: Parser Exp
+pExp = pExp0
+
 parseAPL :: FilePath -> String -> Either String Exp
-parseAPL fname s = case parse (space *> pExp0 <* eof) fname s of
+parseAPL fname s = case parse (space *> pExp <* eof) fname s of
   Left err -> Left $ errorBundlePretty err
   Right x -> Right x

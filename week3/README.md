@@ -438,10 +438,12 @@ Specifically, our grammar now looks like this (excluding unchanged
 rules from above):
 
 ```
-Exp ::= var
-      | int
-      | bool
-      | "(" Exp ")"
+Atom ::= var
+       | int
+       | bool
+       | "(" Exp ")"
+
+Exp ::=
       | Exp "+" Exp
       | Exp "-" Exp
       | Exp "*" Exp
@@ -457,7 +459,7 @@ that recognises the same language.
 <summary>Open this to see the left-factorised grammar</summary>
 
 ```
-Exp1 ::= var
+Atom ::= var
        | int
        | bool
        | "(" Exp ")"
@@ -468,7 +470,7 @@ Exp0' ::=            (* empty *)
         | "*" Exp1 Exp0'
         | "/" Exp1 Exp0'
 
-Exp0 ::= Exp1 Exp'
+Exp0 ::= Exp1 Exp0'
 
 Exp  ::= Exp0
 ```
@@ -483,14 +485,14 @@ lString :: String -> Parser ()
 lString s = lexeme $ void $ chunk s
 ```
 
-to parse parentheses.
+to parse parentheses and operator symbols.
 
 <details>
 <summary>Open this to see the implementation</summary>
 
 ```Haskell
-pExp1 :: Parser Exp
-pExp1 =
+pAtom :: Parser Exp
+pAtom =
   choice
     [ CstInt <$> lInteger,
       CstBool <$> lBool,
@@ -505,19 +507,19 @@ pExp0 = pExp1 >>= chain
       choice
         [ do
             lString "+"
-            y <- pExp1
+            y <- pAtom
             chain $ Add x y,
           do
             lString "-"
-            y <- pExp1
+            y <- pAtom
             chain $ Sub x y,
           do
             lString "*"
-            y <- pLExp
+            y <- pAtom
             chain $ Mul x y,
           do
             lString "/"
-            y <- pLExp
+            y <- pAtom
             chain $ Div x y,
           pure x
         ]
@@ -555,6 +557,177 @@ Haskell program and continue on.
 
 ### Implement operator precedence
 
+Starting from the left-factorised grammar, also separate the parser
+rules into levels corresponding to operator priorities. We have only
+two levels: `+` and `-` have the same priority, and `*` and `/` have
+the same priority, with the latter being the highest.
+
+<details>
+<summary>Open this to see the transformed grammar</summary>
+
+```
+Atom ::= var
+       | int
+       | bool
+       | "(" Exp ")"
+
+Exp1' ::=            (* empty *)
+        | "*" Exp2 Exp1'
+        | "/" Exp2 Exp1'
+
+Exp1 ::= Exp2 Exp1'
+
+Exp0' ::=            (* empty *)
+        | "+" Exp1 Exp0'
+        | "-" Exp1 Exp0'
+
+Exp0 ::= Exp1 Exp0'
+
+Exp  ::= Exp0
+```
+
+</details>
+
+Now implement the corresponding parser.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+pAtom :: Parser Exp
+pAtom =
+  choice
+    [ CstInt <$> lInteger,
+      CstBool <$> lBool,
+      Var <$> lVName,
+      lString "(" *> pExp <* lString ")"
+    ]
+
+pExp1 :: Parser Exp
+pExp1 = pAtom >>= chain
+  where
+    chain x =
+      choice
+        [ do
+            lString "*"
+            y <- pAtom
+            chain $ Mul x y,
+          do
+            lString "/"
+            y <- pAtom
+            chain $ Div x y,
+          pure x
+        ]
+
+pExp0 :: Parser Exp
+pExp0 = pExp1 >>= chain
+  where
+    chain x =
+      choice
+        [ do
+            lString "+"
+            y <- pExp1
+            chain $ Add x y,
+          do
+            lString "-"
+            y <- pExp1
+            chain $ Sub x y,
+          pure x
+        ]
+
+pExp :: Parser Exp
+pExp = pExp0
+```
+
+</details>
+
+#### Examples
+
+```
+> parseTest pExp "x+y*z"
+Add (Var "x") (Mul (Var "y") (Var "z"))
+```
+
 ### Implement `if-then-else`
 
-TODO
+We extend the grammar to be the following:
+
+```
+Atom ::= var
+       | int
+       | bool
+       | "(" Exp ")"
+
+LExp ::= "let" var "=" Exp "in" Exp
+
+Exp ::= LExp
+      | Exp "+" Exp
+      | Exp "-" Exp
+      | Exp "*" Exp
+      | Exp "/" Exp
+```
+
+Implement this grammar.
+
+#### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+pAtom :: Parser Exp
+pAtom =
+  choice
+    [ CstInt <$> lInteger,
+      CstBool <$> lBool,
+      Var <$> lVName,
+      lString "(" *> pExp <* lString ")"
+    ]
+
+pLExp :: Parser Exp
+pLExp =
+  choice
+    [ If
+        <$> (lKeyword "if" *> pExp0)
+        <*> (lKeyword "then" *> pExp0)
+        <*> (lKeyword "else" *> pExp0),
+      pAtom
+    ]
+
+pExp1 :: Parser Exp
+pExp1 = pLExp >>= chain
+  where
+    chain x =
+      choice
+        [ do
+            lString "*"
+            y <- pLExp
+            chain $ Mul x y,
+          do
+            lString "/"
+            y <- pLExp
+            chain $ Div x y,
+          pure x
+        ]
+
+pExp0 :: Parser Exp
+pExp0 = pExp1 >>= chain
+  where
+    chain x =
+      choice
+        [ do
+            lString "+"
+            y <- pExp1
+            chain $ Add x y,
+          do
+            lString "-"
+            y <- pExp1
+            chain $ Sub x y,
+          pure x
+        ]
+
+pExp :: Parser Exp
+pExp = pExp0
+```
+
+</details>
