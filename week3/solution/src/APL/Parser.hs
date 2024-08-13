@@ -13,7 +13,6 @@ import Text.Megaparsec
     many,
     notFollowedBy,
     parse,
-    parseTest,
     satisfy,
     some,
     try,

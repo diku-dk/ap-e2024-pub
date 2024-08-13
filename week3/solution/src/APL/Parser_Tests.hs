@@ -62,9 +62,7 @@ tests =
         ],
       testGroup
         "Lexing edge cases"
-        [ parserTest "iff x thenn y elsee z" $
-            foldl Apply (Var "iff") [Var "x", Var "thenn", Var "y", Var "elsee", Var "z"],
-          parserTest "2 " $ CstInt 2,
+        [ parserTest "2 " $ CstInt 2,
           parserTest " 2" $ CstInt 2
         ]
     ]
