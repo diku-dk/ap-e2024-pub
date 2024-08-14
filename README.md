@@ -184,10 +184,13 @@ you are asked to implement.
 4. Do not rename modules or otherwise modify the file tree. (You may
    add new files if you wish, although it is rarely necessary.)
 
-5. When handing in, you must hand in a complete workable program
+5. Your code should compile without warnings. (Do not achieve this by
+   disabling warnings.)
+
+6. When handing in, you must hand in a complete workable program
    (including unmodified files from the handout).
 
-6. When handing in, do not include temporary build files (such as
+7. When handing in, do not include temporary build files (such as
    `dist-newstyle`), editor backup files, or various other computer
    detritus. Run e.g. the `tree` command and read the file listing and
    ponder for each file whether it is something it makes sense to hand
