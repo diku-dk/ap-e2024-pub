@@ -219,6 +219,15 @@ the total number of points in the assignments (that is, 10 points at
 minimum). You also need to get *at least* one point in each of the
 assignments.
 
+### If you qualified in a previous year
+
+If you qualified for the exam in a previous year, then you are still
+qualified. When we approach the exam, and we have to send in a list of
+students who have qualified, we will post a message telling you to
+contact us to inform us of this.
+
+We still recommend you follow the course.
+
 ### Date
 
 TBD
