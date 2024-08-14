@@ -9,6 +9,10 @@ TBA
 * [Course Notes Chapter 3](https://diku-dk.github.io/ap-notes/chapter_3.html)
 * [Grammars and parsing with Haskell using Parser Combinators](parsernotes.pdf)
 
+### Going Beyond
+
+* [Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)
+
 ## Exercises
 
 In these exercises you will construct a parser for APL, using the same
