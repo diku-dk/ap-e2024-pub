@@ -56,16 +56,18 @@ data Free e a
   | Free (e (Free e a))
 
 instance (Functor e) => Functor (Free e) where
-  fmap f (Pure x) = error "TODO"
-  fmap f (Free g) = error "TODO"
+  fmap f (Pure x) = Pure $ f x
+  fmap f (Free g) = Free $ fmap (fmap f) g
 
 instance (Functor e) => Applicative (Free e) where
   pure = Pure
   (<*>) = ap
 
 instance (Functor e) => Monad (Free e) where
-  Pure x >>= f = error "TODO"
-  Free g >>= f = error "TODO"
+  Pure x >>= f = f x
+  Free g >>= f = Free $ h <$> g
+    where
+      h x = x >>= f
 
 data EvalOp a
   = ReadOp (Env -> a)
