@@ -13,6 +13,4 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 -- runEvalIO' r s (Free (StateGetOp k)) = runEvalIO' r s $ k s
 -- runEvalIO' r _ (Free (StatePutOp s' m)) = runEvalIO' r s' m
 -- runEvalIO' r s (Free (PrintOp p m)) = error "TODO"
---  putStrLn p
---  runEvalIO' r s m
 -- runEvalIO' _ _ (Free (ErrorOp e)) = pure $ Left e
