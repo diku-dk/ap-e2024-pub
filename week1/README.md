@@ -215,7 +215,7 @@ will treat it as a human-readable string.
 Now change the type of `eval` to be the following:
 
 ```Haskell
-eval :: Env -> Exp -> Either Error Val
+eval :: Exp -> Either Error Val
 ```
 
 The `Either` type is often used to express computations that can fail.
