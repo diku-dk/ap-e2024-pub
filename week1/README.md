@@ -355,6 +355,12 @@ We will now add variable bindings, through which an expression can be
 bound to a name and used multiple times. We will assume you are
 already familiar with the concept of variables.
 
+Add the following type synonym:
+
+```Haskell
+type VName = String
+```
+
 Add the following constructors to `Exp`:
 
 ```Haskell
@@ -371,10 +377,10 @@ expression.
 
 #### Environments
 
-To implement variables, we need to main *environments*. An environment
-maps a name to a value. Evaluation of an expression takes place in an
-environment. We will represent environments with this `Env` type,
-which you must add to `APL.Eval`:
+To implement variables, we need to maintain *environments*. An
+environment maps a name to a value. Evaluation of an expression takes
+place in an environment. We will represent environments with this
+`Env` type, which you must add to `APL.Eval`:
 
 ```Haskell
 type Env = [(VName, Val)]
