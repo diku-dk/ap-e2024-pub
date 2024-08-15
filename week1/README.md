@@ -206,11 +206,11 @@ Add a type synonym for error messages:
 type Error = String
 ```
 
-the type `Error` is completely interchangeable with `String`, but its
-intended use is a little more explicit. In a more sophisticated
-system, we might use a more complicated `Error` type with various
-constructors for indicating different kinds of errors. For now, we
-will treat it as a human-readable string.
+the type `Error` is completely interchangeable with `String`, but is
+named to make its intended use in function types explicit. In a more
+sophisticated system, we might use a more complicated `Error` type
+with various constructors for indicating different kinds of errors.
+For now, we will treat it as a human-readable string.
 
 Now change the type of `eval` to be the following:
 
