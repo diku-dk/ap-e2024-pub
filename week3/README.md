@@ -662,7 +662,7 @@ Atom ::= var
        | bool
        | "(" Exp ")"
 
-LExp ::= "let" var "=" Exp "in" Exp
+LExp ::= "if" Exp "then" Exp "else" Exp
 
 Exp ::= LExp
       | Exp "+" Exp
