@@ -220,7 +220,7 @@ eval :: Exp -> Either Error Val
 
 The `Either` type is often used to express computations that can fail.
 It is defined as follows (it is already defined in the implicit
-Haskell prelude, so you should *not* add it to `APL`):
+Haskell prelude, so you should *not* add it to `APL.AST`):
 
 ```Haskell
 data Either a b = Left a
