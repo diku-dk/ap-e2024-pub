@@ -55,9 +55,9 @@ is almost empty.
 The `APL.Eval` module will import `APL.AST` and define an evaluation
 function for APL programs.
 
-The `APL.Eval_Tests` module should import definitions from `APL` and
-`APL.Eval` and tests them. It also imports unit testing modules from
-`tasty`. Initially it imports almost nothing, so you will have to
+The `APL.Eval_Tests` module should import definitions from `APL.AST`
+and `APL.Eval` and tests them. It also imports unit testing modules
+from `tasty`. Initially it imports almost nothing, so you will have to
 extend the `import` statements with the things you need.
 
 The `runtests.hs` file is a very simple program that runs the test
