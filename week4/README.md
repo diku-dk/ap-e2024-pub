@@ -64,8 +64,8 @@ handout
 - `APL.Monad`: Complete the skeleton code for the `Functor` and `Monad`
   instances of `Free e a`.
   
-  If you feel the need to review the course notes, feel free to first do so, but
-  try to complete the definitions without directly copying from the notes.
+If you feel the need to review the course notes, feel free to first do so, but
+try to complete the definitions without directly copying from the notes.
 
 #### Hints
 
