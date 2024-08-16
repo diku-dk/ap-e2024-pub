@@ -6,5 +6,5 @@ runEval :: EvalM a -> a
 runEval = runEval' envEmpty
   where
     runEval' :: Env -> EvalM a -> a
-    runEval' _ (Pure x) = undefined
-    runEval' r (Free (ReadOp k)) = undefined
+    runEval' _ (Pure x) = error "TODO"
+    runEval' r (Free (ReadOp k)) = error "TODO"

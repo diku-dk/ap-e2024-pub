@@ -10,13 +10,13 @@
 
 In these exercises, you will construct a monadic interpreter similar in
 functionality to the one you developed in week 2. This time, however, you will
-implement the evaluation monad in terms of a free monad. The fourth mandatory
-assignment will ask that you then extend the evaluation monad with new effects
-and ways of interpreting them.
+implement the evaluation monad as a free monad. The fourth mandatory assignment
+will ask that you then extend the evaluation monad with new effects and ways of
+interpreting them.
 
 Before you proceed with these exercises, it's important that you've read and
 understood the week 4 course notes on free monads. If you haven't, now's the
-time to pause here and go read!
+time to pause and go read!
 
 Your starting point is found in [handout/](handout/) and complete solutions are
 in [solutions/](solutions/). For some of the tasks, partial or complete
@@ -24,45 +24,40 @@ solutions are also included inline below.
 
 ### Handout Structure
 The handout has the following structure. This will be the same structure as the
-assignment (indeed, these exercises will form the starting basis of the
-assignment), so pay attention!
+assignment (these exercises will form the starting basis of the assignment), so
+pay attention!
 
 ```
-src
-└── APL
-    ├── AST.hs
-    ├── Eval.hs
-    ├── InterpIO.hs
-    ├── InterpPure.hs
-    ├── Interp_Tests.hs
-    └── Monad.hs
+handout
+├── runtests.hs
+├── src
+│   └── APL
+│       ├── AST.hs
+│       ├── Eval.hs
+│       ├── InterpIO.hs
+│       ├── InterpPure.hs
+│       ├── Interp_Tests.hs
+│       └── Monad.hs
+└── week4.cabal
 ```
 
-- `APL.Eval`: Contains the `eval :: Exp -> EvalM Val` function to create an
-evaluation computation from an `Exp`. **You should put your evaluation function
-(along with any necessary helper functions) from assignment 2 here.**
-          
-- `APL.InterpPure`: Contains the `runEval` interpreter.  The "Pure" in the name
-comes from the fact that this interpreter is side-effect free.
+- `runtests.hs`: Test runner. *Do not modify this file.*
 
-- `APL.InterpIO`: Contains the `runEvalIO` interpreter. The "IO" in the name
-comes from the fact this interpreter runs in the IO monad and hence can generate
-side effects.
+- `week4.cabal`: Cabal build file. *Do not modify this file.*
 
-- `APL.Interp_Tests.hs`: Put your tests for both `runEval` and `runEvalIO` here.
+- `src/APL/AST.hs`: AST definition. *Do not modify this file.*
 
-- `APL.Monad`: Contains the definition of the `Free` monad and the `EvalOp`
-effects, and along with many useful interfaces that you will have to complete.
-
-**Note**: the `APL.Monad` contains a definition of the `State` type that differs
-from what you did in assignment 2 since we will no longer track printed strings
-in the state. Since your `eval` function should be agnostic to the specifics of
-`State` (aside from `evalKvGet` and `evalKvPut`), this shouldn't matter (we will
-redfine `evalKvGet` and `evalKvPut` in this assignment).
-
-The `APL` module already contains various definitions that should be
-familiar to you from the prior weeks. It also contains a definition
-of the free monad: `Free e a`. To start,
+- `src/APL/Eval.hs`: An incomplete evaluator corresponding to the solution to
+  the week 2 exercises. You should replace this module with complete evaluator
+  from your solution to assignment 2.
+  
+- `src/APL/InterpIO.hs`: Contains the incomplete IO-based `runEvalIO`
+  interpreter.
+  
+- `src/APL/InterpPure.hs`: Contains the incomplete pure `runEval` interpreter.
+  
+- `src/APL/Interp_Tests.hs`: An interpreter test suite where you will add
+  plentiful tests.
 
 ### Getting Started
 
@@ -83,8 +78,8 @@ instances.
 <details>
 <summary>Open this to see the answer</summary>
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 instance (Functor e) => Functor (Free e) where
   fmap f (Pure x) = Pure $ f x
   fmap f (Free g) = Free $ fmap (fmap f) g
@@ -103,11 +98,11 @@ instance (Functor e) => Monad (Free e) where
 In this task, you'll develop a free monad-based version of the `EvalM` evaluaion
 monad. The first thing to do is define an effect type for`EvalM`, which will
 include a constructor for each kind of effect operation we want the `EvalM`
-monad to support.  To keep things simple, we'll add effect one-by-one. Let's
+monad to support. To keep things simple, we'll add effects one-by-one. Let's
 start with a `Reader` effect:
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 data EvalOp a
   = ReadOp (Env -> a)
 ```
@@ -116,10 +111,10 @@ To make `EvalOp` usable with `Free`, it needs a `Functor` instance.
 
 - `APL.Monad`: Implement the `Functor` instance for `EvalOp`.
 
-Now thaw that `EvalOp` is a functor, we can define `EvalM` in terms of it:
+Our evaluation monad is just a free monad with effects chosen from `EvalOp`:
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 type EvalM a = Free EvalOp a
 ```
 
@@ -134,14 +129,15 @@ monads.
 <details>
 <summary>Open this to see the answer</summary>
 
-`APL.Monad`:
+
 ```Haskell
+-- APL.Monad:
 instance Functor EvalOp where
   fmap f (ReadOp k) = ReadOp $ f . k
 ```
 
-`APL.InterpPure`:
 ```hs
+-- APL.InterpPure:
 runEval :: EvalM a -> a
 runEval = runEval' envEmpty
   where
@@ -153,19 +149,21 @@ runEval = runEval' envEmpty
 </details>
 
 ### Extending `EvalM` with more effects
-Now that we have the basic structure of `EvalM` in place, it's time to extend it
-with some more functionality.
 
-#### State
-Unlike with`Reader`, there are two state effects:
+Now that we have the basic structure of `EvalM` in place, it's time to extend it
+with some more effects.
+
+#### State effects
+
+There are two state effects:
 
 1. You can retrieve the state.
 2. You can replace the state with a new state.
 
 We'll have to model both, so let's extend `EvalOp` appropriately:
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 data EvalOp a
   = ReadOp (Env -> a)
   | StateGetOp (State -> a)
@@ -174,15 +172,16 @@ data EvalOp a
 
 - `APL.Monad`: Extend the `Functor` instance for `EvalOp` to include the new state effects.
 
-- `APL.InterpPure`: Extend the code for `runEval` to include the new state effects.
+- `APL.InterpPure`: Extend the code for `runEval` to include support for the new
+  state effects.
 
 
 #### Hints
 
 You'll have to modify `runEval'` to take a new parameter--the state:
 
-`APL.InterpPure`:
 ```
+-- APL.InterpPure:
 runEval' :: Env -> State -> EvalM a -> a
 ```
 
@@ -191,16 +190,16 @@ runEval' :: Env -> State -> EvalM a -> a
 <details>
 <summary>Open this to see the answer</summary>
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 instance Functor (EvalOp r s) where
   fmap f (ReadOp k) = ReadOp $ f . k
   fmap f (StateGet k) = StateGet $ f . k
   fmap f (StatePut s m) = StatePut s $ f m
 ```
 
-`APL.InterpPure`:
 ```Haskell
+-- APL.InterpPure:
 runEval :: EvalM a -> a
 runEval = runEval' envEmpty stateInitial
   where
@@ -215,31 +214,35 @@ runEval = runEval' envEmpty stateInitial
 
 ### Some useful interfaces
 
-Just like in assignment 2, we don't always want to construct instances of
-`EvalM` manually. Instead, we write interface fucntions. For example, to
-retrieve the environment we re-implement `askEnv` from assignment 2 to work with
-the free monad versin of `EvalM`:
+Just like in assignment 2, we write interface fucntions so we don't have to keep
+manually constructing `EvalM` effect terms. For example, to retrieve the
+environment we re-implement `askEnv` from assignment 2 to work with the free
+monad version of `EvalM`:
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 askEnv :: EvalM Env
 askEnv = Free $ ReadOp $ \env -> pure env
 ```
 
-- `APL.Monad`: Fill in the definition of `evalKvGet` and `evalKvPut`.
+There are also a few useful interfaces for retrieving/putting/manipulating
+state.
 
-We also want a way to make local environments, i.e. implement the function
+- Implement `getState` and `putState`. Use them to implement `modifyState`.
 
-`APL.Monad`:
+We also want a way to make local environments, i.e., we want to implement the
+function
+
 ```Haskell
+-- APL.Monad:
 localEnv :: (Env -> Env) -> EvalM a -> EvalM a
 localEnv f m = ...
 ```
 
-This function is a bit trickier. Somehow we have to take an `EvalM`---which is a
-*stack* of effects---and modify every `ReadOp` effect within that stack
-using`f`. How do we do that? We need some way to traverse the stack of effects
-and modify them.
+This interface is a bit trickier. Somehow we have to take an `EvalM a`---which
+you can think of as *stack* of effects that returns some `a`---and modify every
+`ReadOp` effect within that stack using`f`. How do we do that? We're going to
+need some way to traverse the stack of effects and modify them.
 
 Recall the definition of `Free e a`:
 ```Haskell
@@ -247,13 +250,15 @@ data Free e a
   = Pure a
   | Free (e (Free e a))
 ```
-Our objective is to apply a function to modify each effect `e` in the stack. That is,
-we want to change each `e` to `f`. But, we don't want to just change the top `e` but rather
-every `e` in the stack, so what we really want is a function `e (Free e a) -> f (Free f a)`:
 
-`APL.Monad`:
+Our objective is to apply a function to modify each effect `e` in the
+stack. That is, we want to change each `e` to some new effect type `h`. But, we
+don't want to just change the top `e` but rather every `e` in the stack, so what
+we really want is a function `Free e a -> Free h a`:
+
 ```Haskell
-modifyEffects :: (Functor e, Functor f) => (e (Free e a) -> f (Free e a)) -> Free e a -> Free f a
+-- APL.Monad:
+modifyEffects :: (Functor e, Functor h) => (e (Free e a) -> h (Free e a)) -> Free e a -> Free h a
 modifyEffects _ (Pure x) = Pure x
 modifyEffects g (Free e) = ...
 ```
@@ -261,7 +266,6 @@ modifyEffects g (Free e) = ...
 - `APL.Monad`: Complete the definition of `modifyEffects`.
 
 - `APL.Monad`: Using `modifyEffects`, implement `localEnv`.
-
 
 #### Hints
 
@@ -276,9 +280,10 @@ identity function.
 <details>
 <summary>Open this to see the answer</summary>
 
-`APL.Monad`:
+
 ```Haskell
-modifyEffects :: (Functor e, Functor f) => (e (Free e a) -> f (Free e a)) -> Free e a -> Free f a
+-- APL.Monad:
+modifyEffects :: (Functor e, Functor h) => (e (Free e a) -> h (Free e a)) -> Free e a -> Free h a
 modifyEffects _ (Pure x) = Pure x
 modifyEffects g (Free e) = Free $ modifyEffects g <$> g e
 
@@ -317,34 +322,33 @@ data EvalOp a
 
 - `APL.Monad`: Extend the `Functor` instance of `EvalOp` to include `PrintOp`.
 
-- `APL.Monad`: Using `PrintOp`, fill in the definition for `evalPrint`.
+We'll need to change the type of `runEval` and `runEval'` to also spit out a
+list of printed strings:
 
-- `APL.InterpPure`: Extend `runEval` to support `PrintOp` effects. 
-
-#### Hints
-
-You'll have to change the type of `runEval` and `runEval'` to also spit out a log:
-
-`APL.InterpPure`:
 ```hs 
+-- APL.InterpPure:
 runEval :: EvalM a -> ([String], a)
 
 runEval' :: Env -> State -> EvalM a -> ([String], a)
 ```
 
-On each `PrintOp s m` effect, `runEval` should include thbe string `s` in the
-final output. Make sure that your log is in the right order!
+You'll also have to modify the `Pure` case of `runEval` to play nice with the
+new output type.
 
-You'll also have to modify the `Pure` case of `runEval` to play nice with the new
-output type.
+On each `PrintOp s m` effect, `runEval` should include the string `s` in the
+final output.
+
+- `APL.Monad`: Using `PrintOp`, fill in the definition for `evalPrint`.
+
+- `APL.InterpPure`: Extend `runEval` to support `PrintOp` effects. 
 
 #### Solution 
 
-<details>
-<summary>Open this to see the answer</summary>
+<details> <summary>Open this to see the answer</summary>
 
-`APL.Monad`:
+
 ```Haskell
+-- APL.Monad:
 instance Functor EvalOp where
   fmap f (ReadOp k) = ReadOp $ f . k
   fmap f (StateGetOp k) = StateGetOp $ f . k
@@ -355,8 +359,9 @@ evalPrint :: String -> EvalM ()
 evalPrint p = Free $ PrintOp p $ pure ()
 ```
 
-`APL.InterpPure`:
+
 ```Haskell
+-- APL.InterpPure:
 runEval :: EvalM a -> ([String], a)
 runEval = runEval' envEmpty stateInitial
   where
@@ -388,8 +393,8 @@ entire computation should be `Left e`. For example,
 
 Let's extend `EvalOp` with an effect for error effects:
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 data EvalOp a
   = ReadOp (Env -> a)
   | StateGetOp (State -> a)
@@ -402,15 +407,10 @@ data EvalOp a
 
 - `APL.Monad`: Using `ErrorOp`, fill in the definition for `failure`.
 
-- `APL.InterpPure`: Extend `runEval` to support `ErrorOp` effects. 
+Change the type of `runEval` and `runEval'` to return an `Either Error a` type:
 
-#### Hints
-
-You'll need to change the type of `runEval` and `runEval'` to return an `Either
-Error a` type:
-
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 runEval :: EvalM a -> ([String], Either Error a)
 
 runEval' :: Env -> State -> EvalM a -> ([String], Either Error a)
@@ -419,13 +419,16 @@ runEval' :: Env -> State -> EvalM a -> ([String], Either Error a)
 You'll also need to update the `Pure x` case for `runEval'` to play nice with
 the new return type.
 
+- `APL.InterpPure`: Extend `runEval` to support `ErrorOp` effects. 
+
 #### Solution 
 
 <details>
 <summary>Open this to see the answer</summary>
 
-`APL.Monad`:
+
 ```Haskell
+-- APL.Monad:
 instance Functor EvalOp where
   fmap f (ReadOp k) = ReadOp $ f . k
   fmap f (StateGetOp k) = StateGetOp $ f . k
@@ -467,8 +470,8 @@ monad-based stack of uninterpreted effects; it doesn't actually carry out the
 effects and only produces the uninterpreted structure.
 
 So what actually does the computation/interprets the stack of effects?  The
-interpreters of course! So far, we've only worked on `runEval`.  Let's try it
-out in GHCi:
+interpreters of course! So far, we've only worked on the pure interpreter
+`runEval`. Let's try it out in GHCi:
 
 ```
 > m =  eval $ Let "x" (Add (CstInt 1) (CstInt 2)) $ Print ("The value of x is") (Var "x")
@@ -476,12 +479,13 @@ out in GHCi:
 (["The value of x is: 3"], Right (ValInt 3))
 ```
 
-But `runEval` is just one interpretation of `eval e`'s effect stack. The 
-`APL.InterpIO` contains another interpreter, `runEvalIO` for defining
-a different side-effect based interpreter that has IO access.
+But `runEval` is just one interpretation of `eval e`'s effect stack. The
+`APL.InterpIO` contains another interpreter, `runEvalIO`.  This interpreter
+has IO access and so can generate side effects.
 
 The verison of `runEvalIO` include in the handout mimics the workings of
-`runEval` so far , except that its workings on the `PrintOp` is undefined.
+`runEval` so far (now's the time to uncomment the code in `APL.InterpIO`), except
+that its missing a case for `PrintOp`.
 
 Instead of returning the printed string in the first component of our output,
 the `runEvalIO` interpretation of a `PrintOp` effect should print to the
@@ -495,21 +499,22 @@ Right (ValInt 3)
 
 Notice that this operation is reflected in the type of `runEvalIO`
 
-`APL.InterpIO`:
 ```hs
+-- APL.InterpIO:
 runEvalIO :: EvalM a -> IO (Either Error a)
 ```
 
-There's no need to return a log (the `[String]` component in the return of
-`runEval`) because `PrintOp` effects will be directly printed to the terminal
-(hence the `IO`-based return).
+There's no need to return a list of printed statements (the `[String]` component
+in the return of `runEval`) because `PrintOp` effects will be directly printed
+to the terminal.
 
-Notice that in both the `runEval` and `runEvalIO` examples we used *the same*
-`m`, i.e., the exact same monadic value. The only thing that changed is *how we
-interpreted `m`*.  That is, we can construct our computation once using `eval`
-and the interpret the effects of the computation in different ways, without
-recreating the computation or defining a different evaluator for each effect
-interpretation. Pretty cool!
+Also notice that in both the `runEval` and `runEvalIO` examples above we ran the
+interpreters on *the same* `m` computation. The only thing that changed is
+*how we interpreted* `m`.
+
+The point is that free monads afford us the flexibility to can construct our
+computation just once using `eval` and then interpret the (effects of) the
+computation in different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
 
@@ -522,8 +527,9 @@ You can use `putStrLn` to print strings to the terminal.
 <details>
 <summary>Open this to see the answer</summary>
 
-`APL.InterpIO`:
+
 ```hs
+-- APL.InterpIO:
 runEvalIO :: EvalM a -> IO (Either Error a)
 runEvalIO = runEvalIO' envEmpty stateInitial
   where
