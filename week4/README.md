@@ -41,11 +41,11 @@ handout
 └── week4.cabal
 ```
 
-- `runtests.hs`: Test runner. *Do not modify this file.*
+- `runtests.hs`: Test runner. **Do not modify this file.**
 
-- `week4.cabal`: Cabal build file. *Do not modify this file.*
+- `week4.cabal`: Cabal build file. **Do not modify this file.**
 
-- `src/APL/AST.hs`: AST definition. *Do not modify this file.*
+- `src/APL/AST.hs`: AST definition. **Do not modify this file.**
 
 - `src/APL/Eval.hs`: An incomplete evaluator corresponding to the solution to
   the week 2 exercises. You should replace this module with complete evaluator
