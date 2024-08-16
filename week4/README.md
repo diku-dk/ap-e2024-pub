@@ -299,8 +299,8 @@ modifyState f = do
 
 Let's extend `EvalOp` with an effect for printing:
 
-`APL.Monad`:
 ```Haskell
+-- APL.Monad:
 data EvalOp a
   = ReadOp (Env -> a)
   | StateGetOp (State -> a)
