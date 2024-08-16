@@ -379,7 +379,7 @@ entire computation should be `Left e`. For example,
 ([],Left "Oh no!")
 ```
 
-Let's extend `EvalOp` with an effect for error effects:
+Let's extend `EvalOp` with error effects:
 
 ```Haskell
 -- APL.Monad:
