@@ -178,7 +178,7 @@ data EvalOp a
 
 #### Hints
 
-You'll have to modify `runEval'` to take a new parameter--the state:
+You'll have to modify `runEval'` to take a new parameter---the state:
 
 ```hs
 -- APL.InterpPure:
