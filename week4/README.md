@@ -242,19 +242,7 @@ localEnv f m = ...
 This interface is a bit trickier. Somehow we have to take an `EvalM a`---which
 you can think of as *stack* of effects that returns some `a`---and modify every
 `ReadOp` effect within that stack using`f`. How do we do that? We're going to
-need some way to traverse the stack of effects and modify them.
-
-Recall the definition of `Free e a`:
-```Haskell
-data Free e a
-  = Pure a
-  | Free (e (Free e a))
-```
-
-Our objective is to apply a function to modify each effect `e` in the
-stack. That is, we want to change each `e` to some new effect type `h`. But, we
-don't want to just change the top `e` but rather every `e` in the stack, so what
-we really want is a function `Free e a -> Free h a`:
+need some way to traverse the stack of effects and modify them:
 
 ```Haskell
 -- APL.Monad:
