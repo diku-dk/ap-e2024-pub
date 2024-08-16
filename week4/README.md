@@ -69,7 +69,7 @@ try to complete the definitions without directly copying from the notes.
 
 #### Hints
 
-Keep in mind the `Functor e` constraint on each of the instances--this should
+Keep in mind the `Functor e` constraint on each of the instances---this should
 suggest to you that you'll have to (at least) use `e`'s `fmap` in each of the
 instances.
 
