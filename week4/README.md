@@ -500,7 +500,7 @@ Also notice that in both the `runEval` and `runEvalIO` examples above we ran the
 interpreters on *the same* `m` computation. The only thing that changed is
 *how we interpreted* `m`.
 
-The point is that free monads afford us the flexibility to can construct our
+The point is that free monads afford us the flexibility to construct a
 computation just once using `eval` and then interpret the (effects of) the
 computation in different ways. Pretty cool!
 
