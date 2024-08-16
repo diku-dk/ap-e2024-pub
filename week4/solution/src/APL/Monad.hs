@@ -115,11 +115,11 @@ evalPrint p = Free $ PrintOp p $ pure ()
 failure :: String -> EvalM a
 failure = Free . ErrorOp
 
+catch :: EvalM a -> EvalM a -> EvalM a
+catch = error "To be completed in assignment 4."
+
 evalKvGet :: Val -> EvalM Val
 evalKvGet = error "To be completed in assignment 4."
 
 evalKvPut :: Val -> Val -> EvalM ()
 evalKvPut = error "To be completed in assignment 4."
-
-catch :: EvalM a -> EvalM a -> EvalM a
-catch = error "To be completed in assignment 4."

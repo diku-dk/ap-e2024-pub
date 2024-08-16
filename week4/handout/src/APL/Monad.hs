@@ -97,14 +97,14 @@ modifyState = error "TODO"
 evalPrint :: String -> EvalM ()
 evalPrint = error "TODO"
 
-evalKvGet :: Val -> EvalM Val
-evalKvGet = error "TODO"
-
-evalKvPut :: Val -> Val -> EvalM ()
-evalKvPut = error "TODO"
-
 failure :: String -> EvalM a
-failure = error "To be completed in assignment 4."
+failure = error "TODO"
 
 catch :: EvalM a -> EvalM a -> EvalM a
 catch = error "To be completed in assignment 4."
+
+evalKvGet :: Val -> EvalM Val
+evalKvGet = error "To be completed in assignment 4."
+
+evalKvPut :: Val -> Val -> EvalM ()
+evalKvPut = error "To be completed in assignment 4."
