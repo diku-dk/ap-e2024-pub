@@ -8,8 +8,22 @@ import APL.Monad (Error, Val (..))
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
+eval' :: Exp -> Either Error Val
+eval' = runEval . eval
+
+evalIO' :: Exp -> IO (Either Error Val)
+evalIO' = runEvalIO . eval
+
 tests :: TestTree
-tests =
+tests = testGroup "Free monad interpreters" [pureTests, ioTests]
+
+pureTests :: TestTree
+pureTests =
   testGroup
-    "Evaluation"
+    "Pure interpreter"
+    []
+
+ioTests ::
+  testGroup
+    "IO interpreter"
     []

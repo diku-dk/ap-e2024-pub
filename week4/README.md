@@ -123,6 +123,31 @@ monads.
 
 - `APL.InterpPure`: Complete the skeleton code for `runEval`.
 
+- `APL.Interp_Tests`: Add tests to test your new effect.
+
+#### Hints
+
+Test your `Reader` effect by adding some tests to `pureTests` in
+`APL.Interp_Tests`. It is probably easiest to construct `Exp` whose evaluation
+generates `Reader` effects, like `Let`-expressions:
+
+```hs
+testCase "Let" $
+  eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
+    @?= ValInt 5,
+```
+
+But, of course, you can also test effects directly (`localEnv` isn't implemented
+yet and will be covered soon):
+
+```hs
+testCase "localEnv" $
+  runEval
+    ( localEnv (const [("x", ValInt 1)]) $
+             askEnv
+  )
+    @?= [("x", ValInt 1)]
+```
 
 #### Solution 
 
@@ -175,6 +200,7 @@ data EvalOp a
 - `APL.InterpPure`: Extend the code for `runEval` to include support for the new
   state effects.
 
+- `APL.Interp_Tests`: Add tests to test your new effects.
 
 #### Hints
 
@@ -255,6 +281,10 @@ modifyEffects g (Free e) = ...
 
 - `APL.Monad`: Using `modifyEffects`, implement `localEnv`.
 
+- `APL.Interp_Tests`: Add tests to test your new interfaces. Interpreting `APL`
+  expressins that modify the state and/or generate local environments is
+  probably a good idea.
+
 #### Hints
 
 `modifyEffects` is a recursive function and uses `fmap`.
@@ -329,6 +359,8 @@ final output.
 - `APL.Monad`: Using `PrintOp`, fill in the definition for `evalPrint`.
 
 - `APL.InterpPure`: Extend `runEval` to support `PrintOp` effects. 
+
+- `APL.Interp_Tests`: Add tests for the `PrintOp` effect.
 
 #### Solution 
 
@@ -408,6 +440,8 @@ You'll also need to update the `Pure x` case for `runEval'` to play nice with
 the new return type.
 
 - `APL.InterpPure`: Extend `runEval` to support `ErrorOp` effects. 
+
+- `APL.Interp_Tests`: Add tests for the `ErrorOp` effect.
 
 #### Solution 
 
