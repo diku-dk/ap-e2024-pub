@@ -71,3 +71,11 @@ eval (Apply e1 e2) = do
       failure "Cannot apply non-function"
 eval (TryCatch e1 e2) =
   eval e1 `catch` eval e2
+eval (Print s e) = do
+  v <- eval e
+  evalPrint $ s ++ ": " ++ printVal v
+  pure v
+  where
+    printVal (ValBool b) = show b
+    printVal (ValInt x) = show x
+    printVal ValFun {} = "#<fun>"
