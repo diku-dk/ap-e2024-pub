@@ -8,6 +8,10 @@ TBA
 
 * [Course Notes Chapter 3](https://diku-dk.github.io/ap-notes/chapter_3.html)
 * [Grammars and parsing with Haskell using Parser Combinators](parsernotes.pdf)
+* [Monadic Parsing in Haskell](monadic-parsing.pdf) - one of the classic papers.
+* [Parsec: A practical parser library](2001-parsec.pdf) - a paper on
+  Parsec, one of the first truly practical parser combinator
+  libraries, which eventually became *Megaparsec*, which you will use.
 
 ### Going Beyond
 
