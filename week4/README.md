@@ -6,6 +6,8 @@
 
 * [Course Notes Chapter 4](https://diku-dk.github.io/ap-notes/chapter_4.html)
 
+* Chapter 10 in *Programming in Haskell*.
+
 ## Exercises
 
 In these exercises, you will construct a monadic interpreter similar in

@@ -11,7 +11,8 @@ topic is foundational to the remainder of the course.
 
 * Philip Wadler's [The Essence of Functional Programming](essence-of-functional-programming.pdf).
 
-* Chapter 12 in *Programming in Haskell*.
+* Chapter 12 in *Programming in Haskell*. Chapter 10 may also be of
+  interest.
 
 * [All About Monads](https://wiki.haskell.org/All_About_Monads)
 
