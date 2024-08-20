@@ -60,6 +60,7 @@ have suggestions. We will also specify some research papers and course
 notes as mandated or suggested reading.
 
 * [Programming in Haskell](https://www.cs.nott.ac.uk/~pszgmh/pih.html) (video lectures [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK7usPMx3LGMZEHrECUGodd3) and [here](https://www.youtube.com/playlist?list=PLF1Z-APd9zK5uFc8FKr_di9bfsYv8-lbc))
+* [AP Course Notes](https://diku-dk.github.io/ap-notes/)
 * [Course notes from Brent Yorgey's UPenn Haskell course](https://www.cis.upenn.edu/~cis1940/spring13/lectures.html)
 
 We will also occasionally suggest reading material labeled *Going
@@ -81,9 +82,13 @@ See [this document on setting up a Haskell development environment](haskell.md).
 ## Course structure
 
 The course consists of two lectures and two exercise classes every
-week. The lectures are on Tuesday 10:00-12:00 and Thursday
-13:00-15:00. The exercise classes are both on Thursday, at 10:00-12:00
-and 15:00-17:00 respectively.
+week.
+
+The lectures are on Tuesday 10:00-12:00 in Aud 01 at HCØ and Thursday
+13:00-15:00 in Store UP1 at DIKU.
+
+The exercise classes are both on Thursday, at 10:00-12:00 and
+15:00-17:00 respectively.
 
 ### Exercise class locations
 
@@ -215,7 +220,7 @@ assignments in content and form, with the following differences:
 ### Qualification
 
 To qualify for the exam you are required to achieve at least 50% of
-the total number of points in the assignments (that is, 10 points at
+the total number of points in the assignments (that is, 12 points at
 minimum). You also need to get *at least* one point in each of the
 assignments.
 
