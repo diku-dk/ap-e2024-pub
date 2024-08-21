@@ -110,7 +110,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 3:**
 
-  - TA: TBD
+  - TA: [Therese Lyngby](https://github.com/thereseLyngby) (therese.lyngby@di.ku.dk)
 
   - 10-12: DIKU 1-0-04
 
