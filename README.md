@@ -150,7 +150,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 8:**
 
-  - TA: TBD
+  - TA: [Thomas Christensen](https://github.com/baconbreaker) (thomas.christensen@di.ku.dk)
 
   - 10-12: 1-0-10
 
