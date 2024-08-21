@@ -134,7 +134,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 6:**
 
-  - TA: Ian
+  - TA: Ian Orzel (iano@di.ku.dk)
 
   - 10-12: DIKU 1-0-18
 
