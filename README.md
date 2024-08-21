@@ -134,7 +134,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 6:**
 
-  - TA: TBD
+  - TA: Ian
 
   - 10-12: DIKU 1-0-18
 
