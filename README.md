@@ -102,7 +102,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 2:**
 
-  - TA: Mikkel
+  - TA: TBD
 
   - 10-12: DIKU 1-0-37
 
@@ -126,7 +126,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 5:**
 
-  - TA: TBD
+  - TA: Mikkel
 
   - 10-12: DIKU 1-0-30
 
@@ -142,7 +142,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 7:**
 
-  - TA: TBD
+  - TA: Rasmus Pallisgaard
 
   - 10-12: DIKU 1-0-22
 
