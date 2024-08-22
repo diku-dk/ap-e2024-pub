@@ -102,7 +102,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 2:**
 
-  - TA: Francisco (frco@di.ku.dk)
+  - TA: [Francisco Correia](https://github.com/XicoCorreia)(frco@di.ku.dk)
 
   - 10-12: DIKU 1-0-37
 
