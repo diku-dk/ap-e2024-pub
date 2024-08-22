@@ -118,7 +118,7 @@ The exercise classes are both on Thursday, at 10:00-12:00 and
 
 * **Hold 4:**
 
-  - TA: TBD
+  - TA: [Joachim Tilsted Kristensen](https://github.com/jtkristensen/) (tilsted@di.ku.dk)
 
   - 10-12: DIKU 1-0-26
 
