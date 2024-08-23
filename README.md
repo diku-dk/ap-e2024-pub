@@ -90,6 +90,8 @@ The lectures are on Tuesday 10:00-12:00 in Aud 01 at HCØ and Thursday
 The exercise classes are both on Thursday, at 10:00-12:00 and
 15:00-17:00 respectively.
 
+September 3rd, marks the beginning of the course, with the first lecture.
+
 ### Exercise class locations
 
 * **Hold 1:**
