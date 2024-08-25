@@ -122,9 +122,9 @@ September 3rd, marks the beginning of the course, with the first lecture.
 
   - TA: [Joachim Tilsted Kristensen](https://github.com/jtkristensen/) (tilsted@di.ku.dk)
 
-  - 10-12: DIKU 1-0-26
+  - 10-12: **Online only** (see below)
 
-  - 15-17: NBB NBB 2.3.I.164
+  - 15-17: **Online only** (see below)
 
 * **Hold 5:**
 
@@ -157,6 +157,13 @@ September 3rd, marks the beginning of the course, with the first lecture.
   - 10-12: 1-0-10
 
   - 15-17: 1-0-10
+
+### Online exercises
+
+One of the TAs (Joachim, hold 4) hosts online exercises (on Discord),
+not physical ones. If you are assigned to hold 4, feel free to enter
+any other classroom if you prefer physical teaching. Similarly, anyone
+is free to join the online exercises.
 
 ## Assignments
 
