@@ -97,7 +97,7 @@ instance (Functor e) => Monad (Free e) where
 
 ### Defining the evaluation monad
 
-In this task, you'll develop a free monad-based version of the `EvalM` evaluaion
+In this task, you'll develop a free monad-based version of the `EvalM` evaluation
 monad. The first thing to do is define an effect type for`EvalM`, which will
 include a constructor for each kind of effect operation we want the `EvalM`
 monad to support. To keep things simple, we'll add effects one-by-one. Let's
@@ -242,7 +242,7 @@ runEval = runEval' envEmpty stateInitial
 
 ### Some useful interfaces
 
-Just like in assignment 2, we write interface fucntions so we don't have to keep
+Just like in assignment 2, we write interface functions so we don't have to keep
 manually constructing `EvalM` effect terms. For example, to retrieve the
 environment we re-implement `askEnv` from assignment 2 to work with the free
 monad version of `EvalM`:
