@@ -25,11 +25,17 @@ Haskell compiler and tools. **Do not install GHC via the system
 package manager or similar unless you know what you are doing and can
 fix it yourself if it breaks.**
 
-Follow the instructions in the link above. When `ghcup` is installed,
-you can run `ghcup tui` to enter a menu where you can install and
-"set" (activate) which version of GHC and Cabal you want to use. We
-recommend GHC 9.6.6 and Cabal 3.10.2.1. Newer versions will probably
-work, but these are what we use for testing.
+Follow the instructions in the link above. Make sure to also check the
+[system
+requirements](https://www.haskell.org/ghcup/install/#system-requirements),
+as GHC requires a few system libraries to be installed, which is not
+automatically done by `ghcup`.
+
+When `ghcup` is installed, you can run `ghcup tui` to enter a menu
+where you can install and "set" (activate) which version of GHC and
+Cabal you want to use. We recommend GHC 9.6.6 and Cabal 3.10.2.1.
+Newer versions will probably work, but these are what we use for
+testing.
 
 ## If you use NixOS
 
