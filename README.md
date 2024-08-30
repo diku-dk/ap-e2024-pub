@@ -244,4 +244,8 @@ We still recommend you follow the course.
 
 ### Date
 
-TBD
+Week 45: 1st of November to 8th of November.
+
+You are not expected to work full time for the entire period. The
+intended exam workload is specified as 25 hours of work in the course
+description.
