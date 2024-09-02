@@ -128,7 +128,7 @@ September 3rd, marks the beginning of the course, with the first lecture.
 
 * **Hold 5:**
 
-  - TA: Mikkel
+  - TA: [Mikkel Willén](https://github.com/mikkelwillen/) (mw@di.ku.dk)
 
   - 10-12: DIKU 1-0-30
 
