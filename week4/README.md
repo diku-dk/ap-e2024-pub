@@ -18,7 +18,7 @@ interpreting them.
 
 Before you proceed with these exercises, it's important that you've read and
 understood the week 4 course notes on free monads. If you haven't, now's the
-time to pause and go read!
+time to pause and [go read](https://diku-dk.github.io/ap-notes/chapter_4.html)!
 
 Your starting point is found in [handout/](handout/) and complete solutions are
 in [solutions/](solutions/). For some of the tasks, partial or complete
@@ -50,8 +50,8 @@ handout
 - `src/APL/AST.hs`: AST definition. **Do not modify this file.**
 
 - `src/APL/Eval.hs`: An incomplete evaluator corresponding to the solution to
-  the week 2 exercises. You should replace this module with complete evaluator
-  from your solution to assignment 2.
+  the week 2 exercises. **You should replace this module the with complete evaluator
+  from your solution to assignment 2.**
   
 - `src/APL/InterpIO.hs`: Contains the incomplete IO-based `runEvalIO`
   interpreter.
@@ -99,9 +99,9 @@ instance (Functor e) => Monad (Free e) where
 
 In this task, you'll develop a free monad-based version of the `EvalM` evaluation
 monad. The first thing to do is define an effect type for`EvalM`, which will
-include a constructor for each kind of effect operation we want the `EvalM`
-monad to support. To keep things simple, we'll add effects one-by-one. Let's
-start with a `Reader` effect:
+include a constructor for each kind of effect we want the `EvalM` monad to
+support. To keep things simple, we'll add effects one-by-one. Let's start with a
+`Reader` effect:
 
 ```Haskell
 -- APL.Monad:
@@ -130,8 +130,8 @@ monads.
 #### Hints
 
 Test your `Reader` effect by adding some tests to `pureTests` in
-`APL.Interp_Tests`. It is probably easiest to construct `Exp` whose evaluation
-generates `Reader` effects, like `Let`-expressions:
+`APL.Interp_Tests`. It is probably easiest to construct an `Exp` whose
+evaluation generates `Reader` effects, like `Let`-expressions:
 
 ```hs
 testCase "Let" $
