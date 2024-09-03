@@ -17,7 +17,7 @@ information is still tentative.
 The teaching material for each week can be found in the `weekI`
 subdirectories.
 
-The assignments for each week can be found in the `assignmentI`
+The assignments for each week can be found in the `aI`
 subdirectories.
 
 ## Discord

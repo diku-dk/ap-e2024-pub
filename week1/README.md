@@ -9,7 +9,8 @@ this idea.
 
 ## Slides and material
 
-TBA
+* [Slides from *Meet the Teachers* event.](intro.pdf)
+* [Tuesday slides.](1a.pdf)
 
 ## Suggested Reading
 
