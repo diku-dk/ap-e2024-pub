@@ -165,6 +165,16 @@ not physical ones. If you are assigned to hold 4, feel free to enter
 any other classroom if you prefer physical teaching. Similarly, anyone
 is free to join the online exercises.
 
+In order to attend the online exercise classes, join the
+voice (and video) channel `exercise-class` on Discord at the
+appropriate times.
+
+During the online class students may join one of the rooms
+`room-0`, `room-1` and `room-2`, where they can share their
+screen, and wait. Then, the TA (Joachim) will join these rooms in
+a round-robin manner for as long as there are students in the
+rooms.
+
 ## Assignments
 
 There are 6 assignment in total during the course with deadlines every
