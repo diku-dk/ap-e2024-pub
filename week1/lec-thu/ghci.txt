@@ -1,0 +1,195 @@
+ghci> Pos3 0 0 == Pos3 1 1
+True
+ghci> oops (Pos3 0 0) == oops (Pos3 1 1)
+False
+ghci> :t (==)
+(==) :: Eq a => a -> a -> Bool
+ghci> :r
+[1 of 4] Compiling Eq               ( Eq.hs, interpreted ) [Source file changed]
+
+Eq.hs:19:10: error: [GHC-59692]
+    Duplicate instance declarations:
+      instance Eq Pos1 -- Defined at Eq.hs:19:10
+      instance Eq Pos1 -- Defined at Eq.hs:22:10
+   |
+19 | instance Eq Pos1 where
+   |          ^^^^^^^
+Failed, three modules loaded.
+ghci>
+ghci> 2 <> 3
+
+<interactive>:13:1: error: [GHC-39999]
+    • Ambiguous type variable ‘a0’ arising from a use of ‘print’
+      prevents the constraint ‘(Show a0)’ from being solved.
+      Probable fix: use a type annotation to specify what ‘a0’ should be.
+      Potentially matching instances:
+        instance Show Ordering -- Defined in ‘GHC.Show’
+        instance Show a => Show (List a) -- Defined at Functor.hs:32:14
+        ...plus 33 others
+        ...plus 21 instances involving out-of-scope types
+        (use -fprint-potential-instances to see them all)
+    • In a stmt of an interactive GHCi command: print it
+ghci> 2 <> (3 :: Integer)
+ghci> 2 <> (3 :: Integer)
+
+<interactive>:14:3: error: [GHC-39999]
+    • No instance for ‘Semigroup Integer’ arising from a use of ‘<>’
+    • In the expression: 2 <> (3 :: Integer)
+      In an equation for ‘it’: it = 2 <> (3 :: Integer)
+ghci> Add 2 <> Add 3
+Add 5
+ghci> Diff 2 <> (Diff 3 <> Diff 4)
+Diff 1
+ghci> (Diff 2 <> Diff 3) <> Diff 4
+Diff 3
+ghci> Mul 3 <> Mul 4
+Mul 12
+ghci> Pos1 0 0 == Pos2 0 0
+
+<interactive>:19:1: error: [GHC-88464]
+    Data constructor not in scope: Pos1 :: t2 -> t3 -> a0
+
+<interactive>:19:13: error: [GHC-88464]
+    Data constructor not in scope: Pos2 :: t0 -> t1 -> a0
+ghci> :t (==)
+(==) :: Eq a => a -> a -> Bool
+ghci> :t mempty
+mempty :: Monoid a => a
+ghci> mempty :: Diff
+Diff 0
+ghci> :t Diff
+Diff :: Integer -> Diff
+ghci> :t Mul
+Mul :: Integer -> Mul
+ghci> Mul 4
+Mul 4
+ghci> Mul 65
+Mul 65
+ghci> :t mconcat
+mconcat :: Monoid a => [a] -> a
+ghci> (Add 2, Mul 3) <> (Add 5, Mul 7)
+(Add 7,Mul 21)
+ghci> [1, 2] <> [4, 5]
+[1,2,4,5]
+ghci> mempty :: [a]
+[]
+ghci> mempty
+()
+ghci> :t mempty
+mempty :: Monoid a => a
+ghci> mempty ++ [1]
+[1]
+ghci> mempty :: Add
+Add 0
+ghci> (mempty :: Add) <> Add 2
+Add 2
+ghci> [1, 2] <> [3, 4]
+[1,2,3,4]
+ghci> Reverse [1, 2] <> Reverse [3, 4]
+
+<interactive>:37:1: error: [GHC-39999]
+    • No instance for ‘Show (Reverse [Integer])’
+        arising from a use of ‘print’
+    • In a stmt of an interactive GHCi command: print it
+ghci> :r
+[1 of 4] Compiling Eq               ( Eq.hs, interpreted )
+[3 of 4] Compiling Monoid           ( Monoid.hs, interpreted ) [Source file changed]
+Ok, four modules loaded.
+ghci> Reverse [1, 2] <> Reverse [3, 4]
+Reverse [3,4,1,2]
+ghci> [1, 2] <> [3, 4]
+[1,2,3,4]
+ghci> :k Maybe
+
+<interactive>:1:1: error:
+    Ambiguous occurrence ‘Maybe’
+    It could refer to
+       either ‘Prelude.Maybe’,
+              imported from ‘Prelude’ at Eq.hs:1:8-9
+              (and originally defined in ‘GHC.Maybe’)
+           or ‘Functor.Maybe’,
+              imported from ‘Functor’
+              (and originally defined at Functor.hs:(22,1)-(23,17))
+ghci> Pair 1 2
+Pair 1 2
+ghci> fmap id (Pair 1 2)
+Pair 2 1
+ghci> id (Pair 1 2)
+Pair 1 2
+ghci> :r
+[2 of 4] Compiling Functor          ( Functor.hs, interpreted ) [Source file changed]
+
+Functor.hs:59:39: error: [GHC-88464]
+    • Found hole: _ :: k
+      Where: ‘k’ is a rigid type variable bound by
+               the instance declaration
+               at Functor.hs:58:10-27
+    • In the first argument of ‘Contra’, namely ‘(\ x -> _)’
+      In the expression: Contra (\ x -> _)
+      In an equation for ‘fmap’: fmap f (Contra c) = Contra (\ x -> _)
+    • Relevant bindings include
+        x :: b (bound at Functor.hs:59:34)
+        c :: a -> k (bound at Functor.hs:59:20)
+        f :: a -> b (bound at Functor.hs:59:10)
+        fmap :: (a -> b) -> Contra k a -> Contra k b
+          (bound at Functor.hs:59:5)
+   |
+59 |     fmap f (Contra c) = Contra (\x -> _)
+   |                                       ^
+Failed, three modules loaded.
+ghci>
+ghci> [1 .. 100]
+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100]
+ghci> [1 .. 100] ++ [42]
+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,42]
+ghci> single 'a'
+"a"
+ghci> single 'a' <> single 'b'
+"ab"
+ghci> single  <> single 2
+
+<interactive>:50:12: error: [GHC-83865]
+    • Couldn't match expected type: a -> Sequence a
+                  with actual type: Sequence a0
+    • Possible cause: ‘single’ is applied to too many arguments
+      In the second argument of ‘(<>)’, namely ‘single 2’
+      In the expression: single <> single 2
+      In an equation for ‘it’: it = single <> single 2
+    • Relevant bindings include
+        it :: a -> Sequence a (bound at <interactive>:50:1)
+ghci> single  <> single (2 :: Integer)
+
+<interactive>:51:12: error: [GHC-83865]
+    • Couldn't match expected type: a -> Sequence a
+                  with actual type: Sequence Integer
+    • Possible cause: ‘single’ is applied to too many arguments
+      In the second argument of ‘(<>)’, namely ‘single (2 :: Integer)’
+      In the expression: single <> single (2 :: Integer)
+      In an equation for ‘it’: it = single <> single (2 :: Integer)
+    • Relevant bindings include
+        it :: a -> Sequence a (bound at <interactive>:51:1)
+ghci> single 1  <> single (2 :: Integer)
+[1,2]
+ghci> toMonoid Add
+
+<interactive>:53:1: error: [GHC-39999]
+    • No instance for ‘Show (Sequence Integer -> Add)’
+        arising from a use of ‘print’
+        (maybe you haven't applied a function to enough arguments?)
+    • In a stmt of an interactive GHCi command: print it
+ghci> toMonoid Add (single 1 <> single 2)
+Add 3
+ghci> toMonoid Add (fmap (\(Add n) -> Add (n + 1)) $ single 1 <> single 2)
+
+<interactive>:55:33: error: [GHC-83865]
+    • Couldn't match expected type ‘Integer’ with actual type ‘Add’
+    • In the expression: Add (n + 1)
+      In the first argument of ‘fmap’, namely
+        ‘(\ (Add n) -> Add (n + 1))’
+      In the first argument of ‘($)’, namely
+        ‘fmap (\ (Add n) -> Add (n + 1))’
+ghci> toMonoid Add (fmap (\n -> n + 1) $ single 1 <> single 2)
+Add 5
+ghci> :t (+)
+(+) :: Num a => a -> a -> a
+ghci>
