@@ -267,11 +267,18 @@ To evaluate an expression `e` in a completely different environment:
 newtype EvalM a = EvalM (Env -> Either Error a)
 
 instance Functor EvalM where
-  fmap = liftM
+  fmap f (EvalM x) =
+    EvalM $ \env -> case x env of
+      Right v -> Right $ f v
+      Left err -> Left err
 
 instance Applicative EvalM where
   pure x = EvalM $ \_env -> Right x
-  (<*>) = ap
+  EvalM ef <*> EvalM ex = EvalM $ \env ->
+    case (ef env, ex env) of
+      (Left err, _) -> Left err
+      (_, Left err) -> Left err
+      (Right f, Right x) -> Right (f x)
 
 instance Monad EvalM where
   EvalM x >>= f = EvalM $ \env ->
