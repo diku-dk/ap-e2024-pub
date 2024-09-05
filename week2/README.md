@@ -42,17 +42,18 @@ definitions that should be familiar to you from week 1. `APL.Eval`
 also contains some stub definitions for you to fill out.
 
 To start with, we will define `EvalM` such that it tracks evaluation
-failure.
+failure:
 
-Change the definition of `EvalM a` such that it can represent two
+1. Change the definition of `EvalM a` such that it can represent two
 cases: either a value of type `a`, or an error of type `Error`.
 
-Implement `Functor`, `Applicative`, and `Monad` instances for `EvalM`.
+2. Implement `Functor`, `Applicative`, and `Monad` instances for
+   `EvalM`.
 
-Implement `runEval`.
+3. Implement `runEval`.
 
-Implement a function `failure` that is used for signalling failure in
-the `EvalM` monad:
+4. Implement a function `failure` that is used for signalling failure
+in the `EvalM` monad:
 
 ```Haskell
 failure :: String -> EvalM a
