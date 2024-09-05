@@ -115,7 +115,7 @@ function.
 
 Skip `TryCatch` for now; we will implement that in the next task.
 
-When you are done, you can use `runEval (eval e)` to evaluate an
+When you are done, you can use `runEval (eval [] e)` to evaluate an
 expression `e`. Remember to add appropriate tests to `APL_Tests.hs`.
 
 #### Hints
