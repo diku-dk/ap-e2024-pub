@@ -154,9 +154,9 @@ September 3rd, marks the beginning of the course, with the first lecture.
 
   - TA: [Thomas Christensen](https://github.com/baconbreaker) (thomas.christensen@di.ku.dk)
 
-  - 10-12: 1-0-10
+  - 10-12: DIKU 1-0-10
 
-  - 15-17: 1-0-10
+  - 15-17: DIKU 1-0-10
 
 ### Online exercises
 
