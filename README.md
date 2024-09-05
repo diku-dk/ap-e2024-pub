@@ -171,7 +171,7 @@ appropriate times.
 
 During the online class students may join one of the rooms
 `room-0`, `room-1` and `room-2`, where they can share their
-screen, and wait. Then, the TA (Joachim) will join these rooms in
+screen, and wait. Then, the TA will join these rooms in
 a round-robin manner for as long as there are students in the
 rooms.
 
