@@ -17,5 +17,6 @@ pkgs.stdenv.mkDerivation {
     [
       haskell.compiler.ghc96
       cabal-install
+      haskell-language-server
     ];
 }
