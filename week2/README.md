@@ -208,8 +208,8 @@ catch (EvalM m1) (EvalM m2) = EvalM $
     Left _ -> m2
     Right x -> Right x
 
-eval (TryCatch e1 e2) =
-  eval e1 `catch` eval e2
+eval env (TryCatch e1 e2) =
+  eval env e1 `catch` eval env e2
 ```
 
 </details>
