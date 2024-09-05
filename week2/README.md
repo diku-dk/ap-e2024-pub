@@ -77,11 +77,18 @@ that failure.
 newtype EvalM a = EvalM (Either Error a)
 
 instance Functor EvalM where
-  fmap = liftM
+  fmap _ (Left e) = Left e
+  fmap f (Right x) = Right (f x)
+
+  -- Alternatively: fmap = liftM
 
 instance Applicative EvalM where
   pure x = EvalM $ Right x
-  (<*>) = ap
+  Left e  <*> _       = Left e
+  _       <*> Left e  = Left e
+  Right f <*> Right x = Right (f x)
+
+  -- Alternatively: (<*>) = ap
 
 instance Monad EvalM where
   EvalM x >>= f = EvalM $ case x of
