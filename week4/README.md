@@ -61,7 +61,10 @@ handout
 - `src/APL/Interp_Tests.hs`: An interpreter test suite where you will add
   plentiful tests.
   
-- `src/APL/Monad.hs`: Contains all things related to the evaluation monad.
+- `src/APL/Monad.hs`: Contains all things related to the evaluation monad. Note
+   that some definitions from assignment 2 have moved from `APL.Eval` to
+   `APL.Monad` in this assigment; e.g. `Val` and definitions related to the
+   environment.
   
 ### Getting Started
 
@@ -132,7 +135,7 @@ monads.
 
 - `APL.InterpPure`: Complete the skeleton code for `runEval`.
 
-- `APL.Interp_Tests`: Add tests to test your new effect.
+- `APL.Interp_Tests`: Add tests to `pureTests` to test your new effect.
 
 #### Hints
 
@@ -144,18 +147,6 @@ evaluation generates `Reader` effects, like `Let`-expressions:
 testCase "Let" $
   eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
     @?= ValInt 5,
-```
-
-But, of course, you can also test effects directly (`localEnv` isn't implemented
-yet and will be covered soon):
-
-```hs
-testCase "localEnv" $
-  runEval
-    ( localEnv (const [("x", ValInt 1)]) $
-             askEnv
-  )
-    @?= [("x", ValInt 1)]
 ```
 
 #### Solution 
@@ -209,7 +200,7 @@ data EvalOp a
 - `APL.InterpPure`: Extend the code for `runEval` to include support for the new
   state effects.
 
-- `APL.Interp_Tests`: Add tests to test your new effects.
+- `APL.Interp_Tests`: Add tests to `pureTests` to test your new effects.
 
 #### Hints
 
@@ -249,8 +240,8 @@ runEval = runEval' envEmpty stateInitial
 
 ### Some useful interfaces
 
-Just like in assignment 2, we write interface functions so we don't have to keep
-manually constructing `EvalM` effect terms. For example, to retrieve the
+Just like in assignment 2, we write interface functions so we don't have to
+manually construct`EvalM` effect terms. For example, to retrieve the
 environment we re-implement `askEnv` from assignment 2 to work with the free
 monad version of `EvalM`:
 
@@ -277,7 +268,7 @@ localEnv f m = ...
 This interface is a bit trickier. Somehow we have to take an `EvalM a`---which
 you can think of as *stack* of effects that returns some `a`---and modify every
 `ReadOp` effect within that stack using`f`. How do we do that? We're going to
-need some way to traverse the stack of effects and modify them:
+need some way to traverse the stack of effects and modify them:[^1]
 
 ```Haskell
 -- APL.Monad:
@@ -290,9 +281,19 @@ modifyEffects g (Free e) = ...
 
 - `APL.Monad`: Using `modifyEffects`, implement `localEnv`.
 
-- `APL.Interp_Tests`: Add tests to test your new interfaces. Interpreting `APL`
-  expressins that modify the state and/or generate local environments is
-  probably a good idea.
+- `APL.Interp_Tests`: Add tests to `pureTests` to test your new interfaces. Interpreting `APL`
+  expressions that modify the state and/or generate local environments is
+  probably a good idea, but you can also test interfaces
+  directly:
+  
+  ```hs
+  testCase "localEnv" $
+    runEval
+      ( localEnv (const [("x", ValInt 1)]) $
+               askEnv
+    )
+      @?= [("x", ValInt 1)]
+  ```
 
 #### Hints
 
@@ -360,7 +361,8 @@ runEval' :: Env -> State -> EvalM a -> ([String], a)
 ```
 
 You'll also have to modify the `Pure` case of `runEval` to play nice with the
-new output type.
+new output type. You'll also need to appropriately change the type signature of
+`eval'` in `APL.Interp_Tests`.
 
 On each `PrintOp s m` effect, `runEval` should include the string `s` in the
 final output.
@@ -369,7 +371,7 @@ final output.
 
 - `APL.InterpPure`: Extend `runEval` to support `PrintOp` effects. 
 
-- `APL.Interp_Tests`: Add tests for the `PrintOp` effect.
+- `APL.Interp_Tests`: Add tests to `pureTests` for the `PrintOp` effect.
 
 #### Solution 
 
@@ -446,11 +448,12 @@ runEval' :: Env -> State -> EvalM a -> ([String], Either Error a)
 ```
 
 You'll also need to update the `Pure x` case for `runEval'` to play nice with
-the new return type.
+the new return type. You'll also need to appropriately change the type signature
+of `eval'` in `APL.Interp_Tests`.
 
 - `APL.InterpPure`: Extend `runEval` to support `ErrorOp` effects. 
 
-- `APL.Interp_Tests`: Add tests for the `ErrorOp` effect.
+- `APL.Interp_Tests`: Add tests to `pureTests` for the `ErrorOp` effect.
 
 #### Solution 
 
@@ -493,8 +496,9 @@ runEval = runEval' envEmpty stateInitial
 ### Interpreting effects
 
 Since we've only changed the underlying workings of `EvalM`---and not its
-interface---your `eval` function from assignment 2 (which you should plop into
-the `APL.Eval` module if you haven't) works without modification.
+interface---your `eval` function from assignment 2 (which you should use to
+replace the version of `eval` given in the handout in the `APL.Eval` module if
+you haven't) works without modification.
 
 The important thing to understand here is that `eval` now produces a free
 monad-based stack of uninterpreted effects; it doesn't actually carry out the
@@ -502,7 +506,7 @@ effects and only produces the uninterpreted structure.
 
 So what actually does the computation/interprets the stack of effects?  The
 interpreters of course! So far, we've only worked on the pure interpreter
-`runEval`. Let's try it out in GHCi:
+`runEval` in `APL.InterpPure`. Let's try it out in GHCi:
 
 ```
 > m =  eval $ Let "x" (Add (CstInt 1) (CstInt 2)) $ Print ("The value of x is") (Var "x")
@@ -510,13 +514,13 @@ interpreters of course! So far, we've only worked on the pure interpreter
 (["The value of x is: 3"], Right (ValInt 3))
 ```
 
-But `runEval` is just one interpretation of `eval e`'s effect stack. The
-`APL.InterpIO` contains another interpreter, `runEvalIO`.  This interpreter
-has IO access and so can generate side effects.
+Now,`runEval` is just one interpretation of `eval e`'s effect stack. The
+`APL.InterpIO` module contains another interpreter, `runEvalIO`.  This
+interpreter has IO access and so can generate side effects.
 
 The verison of `runEvalIO` included in the handout mimics the workings of
-`runEval` so far (now's the time to uncomment the code in `APL.InterpIO`), except
-that its missing a case for `PrintOp`.
+`runEval` so far---now's the time to uncomment the code in
+`APL.InterpIO`---except that its missing a case for `PrintOp`.
 
 Instead of returning the printed string in the first component of our output,
 the `runEvalIO` interpretation of a `PrintOp` effect should print to the
@@ -528,7 +532,7 @@ The value of x is: 3
 Right (ValInt 3)
 ```
 
-Notice that this operation is reflected in the type of `runEvalIO`
+Notice that this operation is reflected in the type of `runEvalIO`:
 
 ```hs
 -- APL.InterpIO:
@@ -537,17 +541,47 @@ runEvalIO :: EvalM a -> IO (Either Error a)
 
 There's no need to return a list of printed statements (the `[String]` component
 in the return of `runEval`) because `PrintOp` effects will be directly printed
-to the terminal.
+to the terminal as a side effect.
 
 Also notice that in both the `runEval` and `runEvalIO` examples above we ran the
 interpreters on *the same* `m` computation. The only thing that changed is
 *how we interpreted* `m`.
 
 The point is that free monads afford us the flexibility to construct a
-computation just once using `eval` and then interpret the (effects of) the
-computation in different ways. Pretty cool!
+computation just once and then interpret the (effects of) the computation in
+different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
+
+To test IO-based interpretation of effects, a sepcial function `testIO` (*do not modify* it) is
+provided for you in `APL.Interp_Tests`:
+
+```hs
+testIO :: [String] -> IO a -> IO ([String], a)
+```
+
+You use `testIO` like this: `testIO inputs m`, where `inputs` is a list of
+inputs you'd like to write to `stdin` during the execution of the `m`
+action. `testIO` then runs `m` (using `inputs` as input to `stdin`) and captures
+any output to `stdout`, returning it as a list of strings (and also returns the
+result of the computation itself).
+
+We can use `testIO` to test `print` like so:
+
+```hs
+testCase "print" $ do
+     (out, res) <-
+       testIO [] $
+         evalIO' $
+             Print "This is 1" $ CstInt 1
+     (out, res) @?= (["This is 1: 1"], Right $ ValInt 1)
+```
+
+For print effects, we don't have any input to `stdin` so we just feed `testIO`
+an empty list (`[]`).  In the assignment, you'll add additional effects that do
+read from `stdin` and will have to add inputs for `testIO` in your testing.
+
+- `APL.Interp_Tests`: Add tests to `ioTests` for the `PrintOp` effect.
 
 #### Hints
 
@@ -576,3 +610,9 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 ```
 
 </details>
+
+[^1] This is an inefficient way to implement local environments (since you have
+     to traverse over the entire effect stack each time); a better way would be
+     to add a local environment effect. We do it this way for pedagogical
+     reasons---implementing `modifyEffects` forces you to think about what the
+     effect stack looks like and how to traverse it.
