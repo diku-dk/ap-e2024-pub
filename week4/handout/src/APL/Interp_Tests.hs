@@ -32,6 +32,7 @@ ioTests =
     "IO interpreter"
     []
 
+-- DO NOT MODIFY
 testIO :: [String] -> IO a -> IO ([String], a)
 testIO inputs m = do
   stdin' <- hDuplicate stdin
