@@ -580,7 +580,8 @@ testCase "print" $ do
 
 For print effects, we don't have any input to `stdin` so we just feed `testIO`
 an empty list (`[]`).  In the assignment, you'll add additional effects that do
-read from `stdin` and will have to add inputs for `testIO` in your testing.
+read from `stdin` and will have to add inputs for `testIO` to test these
+additional effects.
 
 - `APL.Interp_Tests`: Add tests to `ioTests` for the `PrintOp` effect.
 
