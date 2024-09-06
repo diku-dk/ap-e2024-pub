@@ -553,7 +553,7 @@ different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
 
-To test IO-based interpretation of effects, a sepcial function `testIO` (*do not modify* it) is
+To test IO-based interpretation of effects, a sepcial function `testIO` (**do not modify** it) is
 provided for you in `APL.Interp_Tests`:
 
 ```hs
