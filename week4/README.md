@@ -63,7 +63,7 @@ handout
   
 - `src/APL/Monad.hs`: Contains all things related to the evaluation monad. Note
    that some definitions from assignment 2 have moved from `APL.Eval` to
-   `APL.Monad` in this assigment; e.g. `Val` and definitions related to the
+   `APL.Monad` in this assignment; e.g. `Val` and definitions related to the
    environment.
   
 ### Getting Started
@@ -415,7 +415,7 @@ the computation fails and an error is returned as the result. Just like in the
 previous assignments, we'll use `Either` to be able represent both failure and
 success results and we'll use the existing `Error` type for errors.
 
-When `runEval` inteprets an `ErrorOp e` effect, the result of the
+When `runEval` interprets an `ErrorOp e` effect, the result of the
 entire computation should be `Left e`. For example,
 ```
 > runEval $ Free $ ErrorOp "Oh no!"
@@ -518,7 +518,7 @@ Now,`runEval` is just one interpretation of `eval e`'s effect stack. The
 `APL.InterpIO` module contains another interpreter, `runEvalIO`.  This
 interpreter has IO access and so can generate side effects.
 
-The verison of `runEvalIO` included in the handout mimics the workings of
+The version of `runEvalIO` included in the handout mimics the workings of
 `runEval` so far---now's the time to uncomment the code in
 `APL.InterpIO`---except that its missing a case for `PrintOp`.
 
@@ -553,7 +553,7 @@ different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
 
-To test IO-based interpretation of effects, a sepcial function `testIO` (do **not** modify it) is
+To test IO-based interpretation of effects, a special function `testIO` (do **not** modify it) is
 provided for you in `APL.Interp_Tests`:
 
 ```hs
@@ -566,7 +566,7 @@ action. `testIO` runs `m` using `inputs` as input to `stdin` and captures
 any output to `stdout`, returning it as a list of strings (and also returns the
 result of the computation itself).
 
-We can use `testIO` to test an IO-based intepretation of a `Print`-expression
+We can use `testIO` to test an IO-based interpretation of a `Print`-expression
 like so:
 
 ```hs
