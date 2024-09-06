@@ -566,7 +566,8 @@ action. `testIO` runs `m` using `inputs` as input to `stdin` and captures
 any output to `stdout`, returning it as a list of strings (and also returns the
 result of the computation itself).
 
-We can use `testIO` to test `print` like so:
+We can use `testIO` to test an IO-based intepretation of a `Print`-expression
+like so:
 
 ```hs
 testCase "print" $ do
