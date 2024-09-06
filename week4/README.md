@@ -68,7 +68,7 @@ handout
   
 ### Getting Started
 
-- `APL.Eval`: Replace the definition of `eval` with your complete evaluation
+- `APL.Eval`: Replace the definition of `eval` with your complete evaluator
   from your solution to assignment 2.
 
 ### `Functor` and `Monad` instances for `Free e a`
