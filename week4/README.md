@@ -25,6 +25,7 @@ in [solutions/](solutions/). For some of the tasks, partial or complete
 solutions are also included inline below.
 
 ### Handout Structure
+
 The handout has the following structure. This will be the same structure as the
 assignment (these exercises will form the starting basis of the assignment), so
 pay attention!
@@ -50,8 +51,7 @@ handout
 - `src/APL/AST.hs`: AST definition. **Do not modify this file.**
 
 - `src/APL/Eval.hs`: An incomplete evaluator corresponding to the solution to
-  the week 2 exercises. **You should replace this module the with complete evaluator
-  from your solution to assignment 2.**
+  the week 2 exercises. 
   
 - `src/APL/InterpIO.hs`: Contains the incomplete IO-based `runEvalIO`
   interpreter.
@@ -60,8 +60,15 @@ handout
   
 - `src/APL/Interp_Tests.hs`: An interpreter test suite where you will add
   plentiful tests.
-
+  
+- `src/APL/Monad.hs`: Contains all things related to the evaluation monad.
+  
 ### Getting Started
+
+- `APL.Eval`: Replace the definition of `eval` with your complete evaluation
+  from your solution to assignment 2.
+
+### `Functor` and `Monad` instances for `Free e a`
 
 - `APL.Monad`: Complete the skeleton code for the `Functor` and `Monad`
   instances of `Free e a`.
