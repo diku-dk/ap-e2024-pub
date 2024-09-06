@@ -613,8 +613,8 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 
 </details>
 
-[^1] This is an inefficient way to implement local environments (since you have
-     to traverse over the entire effect stack each time); a better way would be
-     to add a local environment effect. We do it this way for pedagogical
-     reasons---implementing `modifyEffects` forces you to think about what the
-     effect stack looks like and how to traverse it.
+[^1]: This is an inefficient way to implement local environments (since you have
+    to traverse over the entire effect stack each time); a better way would be
+    to add a local environment effect. We do it this way for pedagogical
+    reasons---implementing `modifyEffects` forces you to think about what the
+    effect stack looks like and how to traverse it.
