@@ -11,9 +11,6 @@ you.
 
 The programming language we will be using is **Haskell**.
 
-The website and course is currently under construction, and all
-information is still tentative.
-
 The teaching material for each week can be found in the `weekI`
 subdirectories.
 
