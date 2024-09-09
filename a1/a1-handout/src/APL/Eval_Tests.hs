@@ -133,4 +133,20 @@ tests =
               (CstInt 3)
           )
           @?= Right (ValInt 5)
+    , testCase "TryCatch Example 1" $
+        eval
+          envEmpty
+          ( TryCatch
+              (CstInt 0)
+              (CstInt 1)
+          )
+          @?= Right (ValInt 0)
+    , testCase "TryCatch Example 2" $
+        eval
+          envEmpty
+          ( TryCatch
+              (Var " missing ")
+              (CstInt 1)
+          )
+          @?= Right (ValInt 1)
     ]

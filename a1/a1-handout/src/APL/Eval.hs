@@ -93,3 +93,26 @@ eval env (Apply e1 e2) =
     (_, _) -> Left "No ValFun given"
  where
   evalFunc envFun var eOther eFun = eval (envExtend var eOther envFun) eFun
+eval env (TryCatch e1 e2) =
+  case eval env e1 of
+    Left _ -> eval env e2
+    Right e -> Right e
+
+printExp :: Exp -> String
+printExp e =
+  case e of
+    CstInt _ -> "x"
+    CstBool _ -> "True"
+    Add e1 e2 -> "(" ++ printExp e1 ++ "+" ++ printExp e2 ++ ")"
+    Sub e1 e2 -> "(" ++ printExp e1 ++ "-" ++ printExp e2 ++ ")"
+    Mul e1 e2 -> "(" ++ printExp e1 ++ "*" ++ printExp e2 ++ ")"
+    Div e1 e2 -> "(" ++ printExp e1 ++ "/" ++ printExp e2 ++ ")"
+    Pow e1 e2 -> "(" ++ printExp e1 ++ "**" ++ printExp e2 ++ ")"
+    Eql e1 e2 -> "(" ++ printExp e1 ++ "==" ++ printExp e2 ++ ")"
+    If e1 e2 e3 ->
+      "if "
+        ++ printExp e1
+        ++ " then"
+        ++ printExp e2
+        ++ " else"
+        ++ printExp e3
