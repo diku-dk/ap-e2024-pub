@@ -42,17 +42,18 @@ definitions that should be familiar to you from week 1. `APL.Eval`
 also contains some stub definitions for you to fill out.
 
 To start with, we will define `EvalM` such that it tracks evaluation
-failure.
+failure:
 
-Change the definition of `EvalM a` such that it can represent two
+1. Change the definition of `EvalM a` such that it can represent two
 cases: either a value of type `a`, or an error of type `Error`.
 
-Implement `Functor`, `Applicative`, and `Monad` instances for `EvalM`.
+2. Implement `Functor`, `Applicative`, and `Monad` instances for
+   `EvalM`.
 
-Implement `runEval`.
+3. Implement `runEval`.
 
-Implement a function `failure` that is used for signalling failure in
-the `EvalM` monad:
+4. Implement a function `failure` that is used for signalling failure
+in the `EvalM` monad:
 
 ```Haskell
 failure :: String -> EvalM a
@@ -76,11 +77,18 @@ that failure.
 newtype EvalM a = EvalM (Either Error a)
 
 instance Functor EvalM where
-  fmap = liftM
+  fmap _ (Left e) = Left e
+  fmap f (Right x) = Right (f x)
+
+  -- Alternatively: fmap = liftM
 
 instance Applicative EvalM where
   pure x = EvalM $ Right x
-  (<*>) = ap
+  EvalM (Left e)  <*> _               = Left e
+  _               <*> EvalM (Left e)  = Left e
+  EvalM (Right f) <*> EvalM (Right x) = Right (f x)
+
+  -- Alternatively: (<*>) = ap
 
 instance Monad EvalM where
   EvalM x >>= f = EvalM $ case x of
@@ -107,7 +115,7 @@ function.
 
 Skip `TryCatch` for now; we will implement that in the next task.
 
-When you are done, you can use `runEval (eval e)` to evaluate an
+When you are done, you can use `runEval (eval [] e)` to evaluate an
 expression `e`. Remember to add appropriate tests to `APL_Tests.hs`.
 
 #### Hints
@@ -200,8 +208,8 @@ catch (EvalM m1) (EvalM m2) = EvalM $
     Left _ -> m2
     Right x -> Right x
 
-eval (TryCatch e1 e2) =
-  eval e1 `catch` eval e2
+eval env (TryCatch e1 e2) =
+  eval env e1 `catch` eval env e2
 ```
 
 </details>
@@ -259,11 +267,18 @@ To evaluate an expression `e` in a completely different environment:
 newtype EvalM a = EvalM (Env -> Either Error a)
 
 instance Functor EvalM where
-  fmap = liftM
+  fmap f (EvalM x) =
+    EvalM $ \env -> case x env of
+      Right v -> Right $ f v
+      Left err -> Left err
 
 instance Applicative EvalM where
   pure x = EvalM $ \_env -> Right x
-  (<*>) = ap
+  EvalM ef <*> EvalM ex = EvalM $ \env ->
+    case (ef env, ex env) of
+      (Left err, _) -> Left err
+      (_, Left err) -> Left err
+      (Right f, Right x) -> Right (f x)
 
 instance Monad EvalM where
   EvalM x >>= f = EvalM $ \env ->
