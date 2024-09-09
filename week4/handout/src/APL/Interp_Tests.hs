@@ -5,6 +5,7 @@ import APL.Eval (eval)
 import APL.InterpIO (runEvalIO)
 import APL.InterpPure (runEval)
 import APL.Monad (Error, Val (..))
+import Control.Concurrent (threadDelay)
 import Control.Exception (bracket)
 import GHC.IO.Handle (hDuplicate, hDuplicateTo)
 import System.IO
@@ -39,6 +40,8 @@ ioTests =
 -- DO NOT MODIFY
 testIO :: [String] -> IO a -> IO ([String], a)
 testIO inputs m = do
+  hFlush stdout
+  threadDelay 10000 -- Needed to make sure things are actually flushed
   stdin' <- hDuplicate stdin
   stdout' <- hDuplicate stdout
 
