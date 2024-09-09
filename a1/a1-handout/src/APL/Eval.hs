@@ -104,12 +104,12 @@ printExp e =
   case e of
     CstInt x -> show x
     CstBool _ -> "True"
-    Add e1 e2 -> "(" ++ printExp e1 ++ "+" ++ printExp e2 ++ ")"
-    Sub e1 e2 -> "(" ++ printExp e1 ++ "-" ++ printExp e2 ++ ")"
-    Mul e1 e2 -> "(" ++ printExp e1 ++ "*" ++ printExp e2 ++ ")"
-    Div e1 e2 -> "(" ++ printExp e1 ++ "/" ++ printExp e2 ++ ")"
-    Pow e1 e2 -> "(" ++ printExp e1 ++ "**" ++ printExp e2 ++ ")"
-    Eql e1 e2 -> "(" ++ printExp e1 ++ "==" ++ printExp e2 ++ ")"
+    Add e1 e2 -> "(" ++ printExp e1 ++ " + " ++ printExp e2 ++ ")"
+    Sub e1 e2 -> "(" ++ printExp e1 ++ " - " ++ printExp e2 ++ ")"
+    Mul e1 e2 -> "(" ++ printExp e1 ++ " * " ++ printExp e2 ++ ")"
+    Div e1 e2 -> "(" ++ printExp e1 ++ " / " ++ printExp e2 ++ ")"
+    Pow e1 e2 -> "(" ++ printExp e1 ++ " ** " ++ printExp e2 ++ ")"
+    Eql e1 e2 -> "(" ++ printExp e1 ++ " == " ++ printExp e2 ++ ")"
     If e1 e2 e3 ->
       "if "
         ++ printExp e1
