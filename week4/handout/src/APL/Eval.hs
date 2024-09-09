@@ -3,7 +3,7 @@ module APL.Eval
   )
 where
 
-import APL.AST (Exp (..), VName)
+import APL.AST (Exp (..))
 import APL.Monad
 
 evalIntBinOp :: (Integer -> Integer -> EvalM Integer) -> Exp -> Exp -> EvalM Val

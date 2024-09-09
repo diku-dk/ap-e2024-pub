@@ -26,9 +26,9 @@ solutions are also included inline below.
 
 ### Handout Structure
 
-The handout has the following structure. This will be the same structure as the
-assignment (these exercises will form the starting basis of the assignment), so
-pay attention!
+The handout has the following structure. This will be a very similar structure
+as the assignment (these exercises will form the starting basis of the
+assignment), so pay attention!
 
 ```
 handout
@@ -220,8 +220,8 @@ runEval' :: Env -> State -> EvalM a -> a
 -- APL.Monad:
 instance Functor (EvalOp r s) where
   fmap f (ReadOp k) = ReadOp $ f . k
-  fmap f (StateGet k) = StateGet $ f . k
-  fmap f (StatePut s m) = StatePut s $ f m
+  fmap f (StateGetOp k) = StateGetOp $ f . k
+  fmap f (StatePutOp s m) = StatePutOp s $ f m
 ```
 
 ```Haskell
@@ -322,15 +322,15 @@ localEnv f = modifyEffects g
     g op = op
 
 getState :: EvalM State
-getState = Free $ StateGet $ \s -> pure s
+getState = Free $ StateGetOp $ \s -> pure s
 
 putState :: State -> EvalM ()
-putState state = Free $ StatePut state $ pure ()
+putState s = Free $ StatePutOp s $ pure ()
 
 modifyState :: (State -> State) -> EvalM ()
 modifyState f = do
-  state <- getState
-  putState $ f state
+  s <- getState
+  putState $ f s
 ```
 
 </details>
