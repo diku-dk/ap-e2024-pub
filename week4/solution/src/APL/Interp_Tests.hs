@@ -9,8 +9,9 @@ import Control.Exception (bracket)
 import GHC.IO.Handle (hDuplicate, hDuplicateTo)
 import System.IO
 import System.Process (createPipe)
-import Test.Tasty (TestTree, testGroup)
+import Test.Tasty (TestTree, localOption, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
+import Test.Tasty.Runners (NumThreads (..))
 
 eval' :: Exp -> ([String], Either Error Val)
 eval' = runEval . eval
@@ -19,7 +20,9 @@ evalIO' :: Exp -> IO (Either Error Val)
 evalIO' = runEvalIO . eval
 
 tests :: TestTree
-tests = testGroup "Free monad interpreters" [pureTests, ioTests]
+tests = testGroup "Free monad interpreters" [pureTests, ioTests']
+  where
+    ioTests' = localOption (NumThreads 1) ioTests
 
 pureTests :: TestTree
 pureTests =
