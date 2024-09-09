@@ -1,7 +1,7 @@
 module APL.Eval_Tests (tests) where
 
 import APL.AST (Exp (..))
-import APL.Eval (Val (..), envEmpty, eval)
+import APL.Eval (Val (..), envEmpty, eval, printExp)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
@@ -115,7 +115,8 @@ tests =
                     (Var "y")
                 )
             )
-    , testCase "Apply Example" $
+    , -- 
+    testCase "Apply Example" $
         eval
           envEmpty
           ( Apply
@@ -133,7 +134,8 @@ tests =
               (CstInt 3)
           )
           @?= Right (ValInt 5)
-    , testCase "TryCatch Example 1" $
+    , -- 
+    testCase "TryCatch Example 1" $
         eval
           envEmpty
           ( TryCatch
@@ -141,7 +143,8 @@ tests =
               (CstInt 1)
           )
           @?= Right (ValInt 0)
-    , testCase "TryCatch Example 2" $
+    , -- 
+    testCase "TryCatch Example 2" $
         eval
           envEmpty
           ( TryCatch
@@ -149,4 +152,52 @@ tests =
               (CstInt 1)
           )
           @?= Right (ValInt 1)
+    , --
+    testCase "printExp Add" $
+        printExp (Add (CstInt 2) (CstInt 5))
+          @?= "(2 + 5)"
+    , --
+    testCase "printExp Sub" $
+        printExp (Sub (CstInt 10) (CstInt 5))
+          @?= "(10 - 5)"
+    , --
+    testCase "printExp Mul" $
+        printExp (Mul (CstInt 6) (CstInt 2))
+          @?= "(6 * 2)"
+    , --
+    testCase "printExp Div" $
+        printExp (Div (CstInt 3) (CstInt 6))
+          @?= "(3 / 6)"
+    , --
+    testCase "printExp Pow" $
+        printExp (Pow (CstInt 2) (CstInt 5))
+          @?= "(2 ** 5)"
+    , --
+    testCase "printExp Eql" $
+        printExp (Eql (CstInt 2) (CstInt 5))
+          @?= "(2 == 5)"
+    , --
+    testCase "printExp If" $
+        printExp (If (CstBool True) (CstInt 2) (CstInt 5))
+          @?= "if True then 2 else 5"
+    , --
+    testCase "printExp Var" $
+        printExp (Var "x")
+          @?= "x"
+    , --
+    testCase "printExp Let" $
+        printExp (Let "x" (CstInt 2) (Var "x"))
+          @?= "let x = 2 in x"
+    , --
+    testCase "printExp Lambda" $
+        printExp (Lambda "x" (Add (Var "x") (CstInt 5)))
+          @?= "\\x -> (x + 5)"
+    , --
+    testCase "printExp Apply" $
+        printExp (Apply (Var "f") (CstInt 5))
+          @?= "(f)(5)"
+    , --
+    testCase "printExp TryCatch" $
+        printExp (TryCatch (CstInt 0) (CstInt 1))
+          @?= "try 0 catch 1"
     ]

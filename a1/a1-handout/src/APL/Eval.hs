@@ -113,9 +113,9 @@ printExp e =
     If e1 e2 e3 ->
       "if "
         ++ printExp e1
-        ++ " then"
+        ++ " then "
         ++ printExp e2
-        ++ " else"
+        ++ " else "
         ++ printExp e3
     Var var -> var
     Let var e1 e2 -> "let " ++ var ++ " = " ++ printExp e1 ++ " in " ++ printExp e2
