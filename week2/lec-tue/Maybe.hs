@@ -21,7 +21,8 @@ isTriple :: Maybe Age -> Maybe Age -> Maybe Age -> Maybe Bool
 isTriple Nothing _ _ = Nothing
 isTriple _ Nothing _ = Nothing
 isTriple _ _ Nothing = Nothing
-isTriple (Just age1) (Just age2) (Just age3) = Just (ordered age1 age2 age3)
+isTriple (Just age1) (Just age2) (Just age3) =
+    Just (ordered age1 age2 age3)
 
 
 
@@ -68,7 +69,16 @@ isTriple'' x y z = Just ordered `apply` x `apply` y `apply` z
 
 
 -- instances
+{-
+instance Functor Maybe where
+    fmap = mapMaybe
 
+    fmap f x = Just f `apply` x
+
+instance Applicative Maybe where
+    pure = Just
+    (<*>) = apply
+-}
 
 
 type Name = String
@@ -86,11 +96,17 @@ personCanVote (Just name) = canVote (people name)
 
 
 maybeBind :: Maybe a -> (a -> Maybe b) -> Maybe b
-maybeBind = undefined
+maybeBind Nothing _ = Nothing
+maybeBind (Just x) f = f x
 
 personCanVote' :: Maybe Name -> Maybe Bool
-personCanVote' x = undefined
+personCanVote' x =
+    maybeBind x $ \name -> canVote (people name)
 
 
 
 -- instance
+{-
+instance Monad Maybe where
+    (>>=) = maybeBind
+-}

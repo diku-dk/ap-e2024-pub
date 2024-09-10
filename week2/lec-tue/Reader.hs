@@ -60,6 +60,12 @@ canBothVote'' age1 age2 =
 
 
 -- instances
+instance Functor (Reader env) where
+    fmap = readerMap
+
+instance Applicative (Reader env) where
+    pure = constant
+    (<*>) = apply
 
 
 
@@ -78,7 +84,7 @@ numberOfVoters = Reader $ \country ->
 
 
 readerBind :: Reader env a -> (a -> Reader env b) -> Reader env b
-readerBind = undefined
+readerBind (Reader f) g = Reader $ \env -> runReader env (g (f env))
 
 numberOfVoters' :: Reader Country Int
 numberOfVoters' = undefined
