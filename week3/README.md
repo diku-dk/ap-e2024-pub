@@ -1,4 +1,4 @@
-# Week 4 - Monadic Parsing
+# Week 3 - Monadic Parsing
 
 ## Slides and Material
 
@@ -453,7 +453,7 @@ Atom ::= var
        | bool
        | "(" Exp ")"
 
-Exp ::=
+Exp ::= Atom
       | Exp "+" Exp
       | Exp "-" Exp
       | Exp "*" Exp
@@ -582,10 +582,10 @@ Atom ::= var
        | "(" Exp ")"
 
 Exp1' ::=            (* empty *)
-        | "*" Exp2 Exp1'
-        | "/" Exp2 Exp1'
+        | "*" Atom Exp1'
+        | "/" Atom Exp1'
 
-Exp1 ::= Exp2 Exp1'
+Exp1 ::= Atom Exp1'
 
 Exp0' ::=            (* empty *)
         | "+" Exp1 Exp0'
@@ -670,7 +670,8 @@ Atom ::= var
 
 LExp ::= "if" Exp "then" Exp "else" Exp
 
-Exp ::= LExp
+Exp ::= Atom
+      | LExp
       | Exp "+" Exp
       | Exp "-" Exp
       | Exp "*" Exp
