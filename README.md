@@ -11,9 +11,6 @@ you.
 
 The programming language we will be using is **Haskell**.
 
-The website and course is currently under construction, and all
-information is still tentative.
-
 The teaching material for each week can be found in the `weekI`
 subdirectories.
 
@@ -154,9 +151,9 @@ September 3rd, marks the beginning of the course, with the first lecture.
 
   - TA: [Thomas Christensen](https://github.com/baconbreaker) (thomas.christensen@di.ku.dk)
 
-  - 10-12: 1-0-10
+  - 10-12: DIKU 1-0-10
 
-  - 15-17: 1-0-10
+  - 15-17: DIKU 1-0-10
 
 ### Online exercises
 
@@ -164,6 +161,16 @@ One of the TAs (Joachim, hold 4) hosts online exercises (on Discord),
 not physical ones. If you are assigned to hold 4, feel free to enter
 any other classroom if you prefer physical teaching. Similarly, anyone
 is free to join the online exercises.
+
+In order to attend the online exercise classes, join the
+voice (and video) channel `exercise-class` on Discord at the
+appropriate times.
+
+During the online class students may join one of the rooms
+`room-0`, `room-1` and `room-2`, where they can share their
+screen, and wait. Then, the TA will join these rooms in
+a round-robin manner for as long as there are students in the
+rooms.
 
 ## Assignments
 
