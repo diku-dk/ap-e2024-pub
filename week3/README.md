@@ -475,12 +475,12 @@ Atom ::= var
        | "(" Exp ")"
 
 Exp0' ::=            (* empty *)
-        | "+" Exp1 Exp0'
-        | "-" Exp1 Exp0'
-        | "*" Exp1 Exp0'
-        | "/" Exp1 Exp0'
+        | "+" Atom Exp0'
+        | "-" Atom Exp0'
+        | "*" Atom Exp0'
+        | "/" Atom Exp0'
 
-Exp0 ::= Exp1 Exp0'
+Exp0 ::= Atom Exp0'
 
 Exp  ::= Exp0
 ```
