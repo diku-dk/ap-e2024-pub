@@ -31,4 +31,15 @@ tests :: TestTree
 tests =
   testGroup
     "Parsing"
-    []
+    [ testGroup
+        "Integer literals"
+        [ parserTest "0" (CstInt 0),
+          parserTest "1" (CstInt 1),
+          parserTest "123" (CstInt 123),
+          parserTest "123 " (CstInt 123),
+          parserTestFail "1a",
+          parserTestFail "1a1",
+          parserTestFail "1a 1",
+          parserTestFail "123 456"
+        ]
+    ]
