@@ -84,9 +84,9 @@ instance Functor EvalM where
 
 instance Applicative EvalM where
   pure x = EvalM $ Right x
-  EvalM (Left e)  <*> _               = Left e
-  _               <*> EvalM (Left e)  = Left e
-  EvalM (Right f) <*> EvalM (Right x) = Right (f x)
+  EvalM (Left e)  <*> _               = EvalM (Left e)
+  _               <*> EvalM (Left e)  = EvalM (Left e)
+  EvalM (Right f) <*> EvalM (Right x) = EvalM (Right (f x))
 
   -- Alternatively: (<*>) = ap
 
