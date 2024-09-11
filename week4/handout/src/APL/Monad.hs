@@ -25,7 +25,7 @@ module APL.Monad
 where
 
 import APL.AST (Exp (..), VName)
-import Control.Monad (ap, liftM)
+import Control.Monad (ap)
 
 data Val
   = ValInt Integer
