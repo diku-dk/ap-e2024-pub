@@ -5,31 +5,6 @@ import APL.Eval (Val (..), envEmpty, eval)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
--- -- Consider this example when you have added the necessary constructors.
--- -- The Y combinator in a form suitable for strict evaluation.
--- yComb :: Exp
--- yComb =
---   Lambda "f" $
---     Apply
---       (Lambda "g" (Apply (Var "g") (Var "g")))
---       ( Lambda
---           "g"
---           ( Apply
---               (Var "f")
---               (Lambda "a" (Apply (Apply (Var "g") (Var "g")) (Var "a")))
---           )
---       )
-
--- fact :: Exp
--- fact =
---   Apply yComb $
---     Lambda "rec" $
---       Lambda "n" $
---         If
---           (Eql (Var "n") (CstInt 0))
---           (CstInt 1)
---           (Mul (Var "n") (Apply (Var "rec") (Sub (Var "n") (CstInt 1))))
-
 tests :: TestTree
 tests =
   testGroup
@@ -101,13 +76,13 @@ tests =
           @?= Right (ValFun envEmpty "x" (Add (Var "x") (CstInt 1))),
       --
       testCase "App" $
-        eval envEmpty (App (Lambda "x" (Add (Var "x") (CstInt 1))) (CstInt 2))
+        eval envEmpty (Apply (Lambda "x" (Add (Var "x") (CstInt 1))) (CstInt 2))
           @?= Right (ValInt 3),
       --
       testCase "App (shadowing)" $
         eval
           envEmpty
-          ( App
+          ( Apply
               (Lambda "x" (Add (Var "x") (CstInt 1)))
               (Let "x" (CstInt 2) (Var "x"))
           )
@@ -117,7 +92,7 @@ tests =
         eval envEmpty (TryCatch (CstInt 2) (CstInt 3))
           @?= Right (ValInt 2),
       --
-      testCase "TryCatch (error)" $
+      testCase "TryCatch (catch)" $
         eval envEmpty (TryCatch (Div (CstInt 7) (CstInt 0)) (CstInt 3))
           @?= Right (ValInt 3)
     ]

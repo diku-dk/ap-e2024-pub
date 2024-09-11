@@ -62,7 +62,7 @@ tests =
         printExp (Lambda "x" (Add (Var "x") (CstInt 5))) @?= "(\\ x -> (x + 5))",
       --
       testCase "App" $
-        printExp (App (Lambda "x" (Add (Var "x") (CstInt 5))) (CstInt 2)) @?= "((\\ x -> (x + 5)) 2)",
+        printExp (Apply (Lambda "x" (Add (Var "x") (CstInt 5))) (CstInt 2)) @?= "((\\ x -> (x + 5)) 2)",
       --
       testCase "TryCatch" $
         printExp (TryCatch (CstInt 2) (CstInt 5)) @?= "(try 2 catch 5)"

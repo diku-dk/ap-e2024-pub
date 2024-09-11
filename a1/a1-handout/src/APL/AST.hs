@@ -20,7 +20,7 @@ data Exp
   | Var VName
   | Let VName Exp Exp
   | Lambda VName Exp
-  | App Exp Exp
+  | Apply Exp Exp
   | TryCatch Exp Exp
   deriving (Eq, Show)
 
@@ -37,5 +37,5 @@ printExp (Eql e1 e2) = "(" ++ printExp e1 ++ " == " ++ printExp e2 ++ ")"
 printExp (If e1 e2 e3) = "(" ++ "if " ++ printExp e1 ++ " then " ++ printExp e2 ++ " else " ++ printExp e3 ++ ")"
 printExp (Let v e1 e2) = "(let " ++ v ++ " = " ++ printExp e1 ++ " in " ++ printExp e2 ++ ")"
 printExp (Lambda v e) = "(\\ " ++ v ++ " -> " ++ printExp e ++ ")"
-printExp (App e1 e2) = "(" ++ printExp e1 ++ " " ++ printExp e2 ++ ")"
+printExp (Apply e1 e2) = "(" ++ printExp e1 ++ " " ++ printExp e2 ++ ")"
 printExp (TryCatch e1 e2) = "(try " ++ printExp e1 ++ " catch " ++ printExp e2 ++ ")"
