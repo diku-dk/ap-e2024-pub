@@ -259,8 +259,8 @@ description.
 
 ## AI Policy
 
-You are allowed to use AI-generated code in assignments and the exam
-in AP, but you must *explicitly* indicate which parts have been
-generated this way, and which tool you have used. If you do not cite
-properly, then you are conducting academic dishonesty (i.e.,
+You are allowed to use AI-generated code and text in assignments and
+the exam in AP, but you must *explicitly* indicate which parts have
+been generated this way, and which tool you have used. If you do not
+cite properly, then you are conducting academic dishonesty (i.e.,
 plagiarism), which is treated very seriously by the university.
