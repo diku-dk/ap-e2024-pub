@@ -115,8 +115,8 @@ tests =
                     (Var "y")
                 )
             )
-    , -- 
-    testCase "Apply Example" $
+    , --
+      testCase "Apply Example e1 Valfun" $
         eval
           envEmpty
           ( Apply
@@ -134,8 +134,56 @@ tests =
               (CstInt 3)
           )
           @?= Right (ValInt 5)
-    , -- 
-    testCase "TryCatch Example 1" $
+    , --
+      testCase "Apply Example e2 Valfun" $
+        eval
+          envEmpty
+          ( Apply
+              (CstInt 3)
+              ( Let
+                  "x"
+                  (CstInt 2)
+                  ( Lambda
+                      "y"
+                      ( Add
+                          (Var "x")
+                          (Var "y")
+                      )
+                  )
+              )
+          )
+          @?= Right (ValInt 5)
+    , testCase "Apply where e1 results in Left err" $
+        eval
+          envEmpty
+          ( Apply
+              (Div (CstInt 5) (CstInt 0))
+              (CstInt 2)
+          )
+          @?= Left "Division by zero"
+    , testCase "Apply where e2 results in Left err" $
+        eval
+          envEmpty
+          ( Apply
+              ( Lambda
+                  "x"
+                  (Add (Var "x") (CstInt 1))
+              )
+              (Div (CstInt 5) (CstInt 0))
+          )
+          @?= Left "Division by zero"
+    , testCase "Apply where no Valfun given" $
+        eval
+          envEmpty
+          (Apply (CstInt 10) (CstInt 2))
+          @?= Left "No ValFun given"
+    , testCase "Apply factorial 10" $
+        eval
+          envEmpty
+          ( Apply fact (CstInt 10)
+          )
+          @?= Right (ValInt 3628800)
+    , testCase "TryCatch no error" $
         eval
           envEmpty
           ( TryCatch
@@ -143,8 +191,8 @@ tests =
               (CstInt 1)
           )
           @?= Right (ValInt 0)
-    , -- 
-    testCase "TryCatch Example 2" $
+    , --
+      testCase "TryCatch with error" $
         eval
           envEmpty
           ( TryCatch
@@ -153,51 +201,57 @@ tests =
           )
           @?= Right (ValInt 1)
     , --
-    testCase "printExp Add" $
+      testCase "printExp Add" $
         printExp (Add (CstInt 2) (CstInt 5))
           @?= "(2 + 5)"
     , --
-    testCase "printExp Sub" $
+      testCase "printExp Sub" $
         printExp (Sub (CstInt 10) (CstInt 5))
           @?= "(10 - 5)"
     , --
-    testCase "printExp Mul" $
+      testCase "printExp Mul" $
         printExp (Mul (CstInt 6) (CstInt 2))
           @?= "(6 * 2)"
     , --
-    testCase "printExp Div" $
+      testCase "printExp Div" $
         printExp (Div (CstInt 3) (CstInt 6))
           @?= "(3 / 6)"
     , --
-    testCase "printExp Pow" $
+      testCase "printExp Pow" $
         printExp (Pow (CstInt 2) (CstInt 5))
           @?= "(2 ** 5)"
     , --
-    testCase "printExp Eql" $
+      testCase "printExp Eql" $
         printExp (Eql (CstInt 2) (CstInt 5))
           @?= "(2 == 5)"
     , --
-    testCase "printExp If" $
+      testCase "printExp If" $
         printExp (If (CstBool True) (CstInt 2) (CstInt 5))
           @?= "if True then 2 else 5"
     , --
-    testCase "printExp Var" $
+      testCase "printExp Var" $
         printExp (Var "x")
           @?= "x"
     , --
-    testCase "printExp Let" $
+      testCase "printExp Let" $
         printExp (Let "x" (CstInt 2) (Var "x"))
           @?= "let x = 2 in x"
     , --
-    testCase "printExp Lambda" $
+      testCase "printExp Lambda" $
         printExp (Lambda "x" (Add (Var "x") (CstInt 5)))
           @?= "\\x -> (x + 5)"
     , --
-    testCase "printExp Apply" $
+      testCase "printExp Apply" $
         printExp (Apply (Var "f") (CstInt 5))
           @?= "(f)(5)"
     , --
-    testCase "printExp TryCatch" $
+      testCase "printExp TryCatch" $
         printExp (TryCatch (CstInt 0) (CstInt 1))
           @?= "try 0 catch 1"
+          -- , testCase "factorial -1" $
+          --     eval
+          --       envEmpty
+          --       ( Apply fact (CstInt (-1))
+          --       )
+          --       @?= Right (ValInt 3628800)
     ]

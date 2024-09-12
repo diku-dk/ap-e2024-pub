@@ -50,7 +50,7 @@ failure s = EvalM $ Left s
 runEval :: EvalM a -> Either Error a
 runEval (EvalM x) = x
 
-bIntOp :: (Int -> Int -> Int) -> Env -> Exp -> Exp -> EvalM Val
+bIntOp :: (Integer -> Integer -> Integer) -> Env -> Exp -> Exp -> EvalM Val
 bIntOp f env e1 e2 =
   do
     x <- eval env e1
@@ -58,7 +58,7 @@ bIntOp f env e1 e2 =
     case (x, y) of
       (ValInt x', ValInt y') -> return $ ValInt $ f x' y'
       _ -> failure "non-Integer operand"
-bBoolOp :: (Int -> Int -> Bool) -> Env -> Exp -> Exp -> EvalM Val
+bBoolOp :: (Integer -> Integer -> Bool) -> Env -> Exp -> Exp -> EvalM Val
 bBoolOp f env e1 e2 =
   do
     x <- eval env e1
@@ -68,8 +68,8 @@ bBoolOp f env e1 e2 =
       _ -> failure "non-Integer operand"
 
 eval :: Env -> Exp -> EvalM Val
-eval env (CstInt x) = pure (ValInt x)
-eval env (CstBool x) = pure (ValBool x)
+eval _ (CstInt x) = pure (ValInt x)
+eval _ (CstBool x) = pure (ValBool x)
 eval env (Add e1 e2) =
   bIntOp (+) env e1 e2
 eval env (Sub e1 e2) =
@@ -77,7 +77,7 @@ eval env (Sub e1 e2) =
 eval env (Mul e1 e2) =
   bIntOp (*) env e1 e2
 eval env (Pow e1 e2) =
-  bIntOp (**) env e1 e2
+  bIntOp (^) env e1 e2
 eval env (Eql e1 e2) =
   bBoolOp (==) env e1 e2
 eval env (If e1 e2 e3) =
