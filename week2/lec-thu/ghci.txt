@@ -1,0 +1,126 @@
+ghci> :l State.hs
+[1 of 1] Compiling State            ( State.hs, interpreted )
+Ok, one module loaded.
+ghci> ex1
+Branch (Branch Leaf 33 (Branch Leaf 55 Leaf)) 77 (Branch Leaf 99 Leaf)
+ghci> :t fst
+fst :: (a, b) -> a
+ghci> :k State Integer
+State Integer :: * -> *
+ghci> :t State (\s -> ((), s))
+State (\s -> ((), s)) :: State s ()
+ghci> :t (<*>)
+(<*>) :: Applicative f => f (a -> b) -> f a -> f b
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> runState 0 $ (,) <$> put 10 <*> put 20
+(((),()),20)
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> runState 0 $ (,) <$> put 10 <*> put 20
+(((),()),20)
+ghci> runState 0 (put 10 >>= \_ -> put 20 >>= \_ -> pure ((), ()))
+(((),()),20)
+ghci> (,) <$> [1, 2] <*> [3, 4]
+[(1,3),(1,4),(2,3),(2,4)]
+ghci>
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> renumber' ex1
+Branch (Branch Leaf 0 (Branch Leaf 1 Leaf)) 2 (Branch Leaf 3 Leaf)
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> renumber' ex1
+Branch (Branch Leaf 0 (Branch Leaf 1 Leaf)) 2 (Branch Leaf 3 Leaf)
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+
+State.hs:92:41: error: [GHC-83865]
+    • Couldn't match expected type: State b0 [Tree]
+                  with actual type: [State Integer Tree]
+    • In the second argument of ‘($)’, namely ‘map renumberS trees’
+      In the expression: fst . runState 0 $ map renumberS trees
+      In an equation for ‘renumberMany’:
+          renumberMany trees = fst . runState 0 $ map renumberS trees
+   |
+92 | renumberMany trees = fst . runState 0 $ map renumberS trees
+   |                                         ^^^^^^^^^^^^^^^^^^^
+Failed, no modules loaded.
+ghci> :t map
+map :: (a -> b) -> [a] -> [b]
+ghci> :t map renumberSS
+
+<interactive>:1:5: error: [GHC-88464]
+    Variable not in scope: renumberSS :: a -> b
+ghci> :t map renumberS
+
+<interactive>:1:5: error: [GHC-88464]
+    Variable not in scope: renumberS :: a -> b
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted )
+
+State.hs:92:41: error: [GHC-83865]
+    • Couldn't match expected type: State b0 [Tree]
+                  with actual type: [State Integer Tree]
+    • In the second argument of ‘($)’, namely ‘map renumberS trees’
+      In the expression: fst . runState 0 $ map renumberS trees
+      In an equation for ‘renumberMany’:
+          renumberMany trees = fst . runState 0 $ map renumberS trees
+   |
+92 | renumberMany trees = fst . runState 0 $ map renumberS trees
+   |                                         ^^^^^^^^^^^^^^^^^^^
+Failed, no modules loaded.
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted )
+Ok, one module loaded.
+ghci> :t map renumberS
+map renumberS :: [Tree] -> [State Integer Tree]
+ghci> :t map
+map :: (a -> b) -> [a] -> [b]
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> :t mapM renumberS
+mapM renumberS :: [Tree] -> State Integer [Tree]
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> renumberMany [ex1, ex1]
+[Branch (Branch Leaf 0 (Branch Leaf 1 Leaf)) 2 (Branch Leaf 3 Leaf),Branch (Branch Leaf 4 (Branch Leaf 5 Leaf)) 6 (Branch Leaf 7 Leaf)]
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> renumberMany [ex1, ex1]
+[Branch (Branch Leaf 4 (Branch Leaf 5 Leaf)) 6 (Branch Leaf 7 Leaf),Branch (Branch Leaf 0 (Branch Leaf 1 Leaf)) 2 (Branch Leaf 3 Leaf)]
+ghci> :r
+[1 of 1] Compiling State            ( State.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> :l Maybe
+MaybeState.hs   Maybe.hs        MaybeReader.hs
+ghci> :l MaybeState.hs
+[1 of 1] Compiling MaybeState       ( MaybeState.hs, interpreted )
+Ok, one module loaded.
+ghci> ex1
+Choice (Choice DeadEnd DeadEnd) (Choice Exit DeadEnd)
+ghci> :t searchD ex1
+searchD ex1 :: Definite [Step] ()
+ghci> runDefinite [] $ searchD ex1
+(Just (),[First,First,Second,Second,First])
+ghci> runTentative [] $ searchT ex1
+Just ((),[Second,First])
+ghci> :t print 42
+print 42 :: IO ()
+ghci> getLine >>= \line -> putStrLn line
+hello
+hello
+ghci> getLine >> putStrLn "whatever"
+hello
+whatever
+ghci>
