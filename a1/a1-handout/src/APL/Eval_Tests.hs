@@ -201,6 +201,14 @@ tests =
           )
           @?= Right (ValInt 1)
     , --
+      testcase "printExp CstInt" $
+        printExp (CstInt 2)
+          @?= "2"
+    , -- 
+      testcase "printExp CstBool" $
+        printExp (CstBool True)
+          @?= "True"
+    , --
       testCase "printExp Add" $
         printExp (Add (CstInt 2) (CstInt 5))
           @?= "(2 + 5)"
