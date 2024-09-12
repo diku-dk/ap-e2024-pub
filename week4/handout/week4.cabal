@@ -14,6 +14,7 @@ library
         base
       , tasty
       , tasty-hunit
+      , process
     exposed-modules:
         APL.AST
         APL.Eval
@@ -30,3 +31,4 @@ test-suite week4-test
         base
       , tasty
       , week4
+      , process

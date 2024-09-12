@@ -16,7 +16,9 @@ If you follow this guide, you will install the right versions.
 ## If you use Windows
 
 Install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)
-and follow the instructions below.
+and follow the instructions below. Some students have reported trouble
+using `ghci` in the default terminal. Try using the new [Windows
+Terminal](https://github.com/microsoft/terminal) instead.
 
 ## If you use Linux, macOS, or other reasonably common Unix variant
 

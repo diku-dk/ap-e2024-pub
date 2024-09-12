@@ -1,4 +1,4 @@
-# Week 4 - Monadic Parsing
+# Week 3 - Monadic Parsing
 
 ## Slides and Material
 
@@ -56,7 +56,7 @@ capital letter.
 For the Haskell code we follow the convention discussed in the course
 notes where *lexer functions* are named with a leading `l`, and are
 the only functions that are allowed to directly manipulate whitespace.
-Parser functions are named with a leading `l`, and must not directly
+Parser functions are named with a leading `p`, and must not directly
 manipulate whitespace (such as by using the `spaces` parser).
 
 Implement a lexer function
@@ -162,7 +162,7 @@ problem later, but we might as well fix it immediately to establish
 good habits. To illustrate the example, suppose that we also have a
 parser for parsing identifiers like `xyz`. (We will write such a
 parser in a bit, but for now it will live only in our imagination). If
-then write a combined parser that parses *first* an integer, then a
+we then write a combined parser that parses *first* an integer, then an
 identifier, then a string such as `123xyz` would be parsed into an
 integer and a variable. This *may* be what we want, but it is not in
 accordance with normal conventions regarding syntax, where tokens must
@@ -453,7 +453,7 @@ Atom ::= var
        | bool
        | "(" Exp ")"
 
-Exp ::=
+Exp ::= Atom
       | Exp "+" Exp
       | Exp "-" Exp
       | Exp "*" Exp
@@ -475,12 +475,12 @@ Atom ::= var
        | "(" Exp ")"
 
 Exp0' ::=            (* empty *)
-        | "+" Exp1 Exp0'
-        | "-" Exp1 Exp0'
-        | "*" Exp1 Exp0'
-        | "/" Exp1 Exp0'
+        | "+" Atom Exp0'
+        | "-" Atom Exp0'
+        | "*" Atom Exp0'
+        | "/" Atom Exp0'
 
-Exp0 ::= Exp1 Exp0'
+Exp0 ::= Atom Exp0'
 
 Exp  ::= Exp0
 ```
@@ -582,10 +582,10 @@ Atom ::= var
        | "(" Exp ")"
 
 Exp1' ::=            (* empty *)
-        | "*" Exp2 Exp1'
-        | "/" Exp2 Exp1'
+        | "*" Atom Exp1'
+        | "/" Atom Exp1'
 
-Exp1 ::= Exp2 Exp1'
+Exp1 ::= Atom Exp1'
 
 Exp0' ::=            (* empty *)
         | "+" Exp1 Exp0'
@@ -670,7 +670,8 @@ Atom ::= var
 
 LExp ::= "if" Exp "then" Exp "else" Exp
 
-Exp ::= LExp
+Exp ::= Atom
+      | LExp
       | Exp "+" Exp
       | Exp "-" Exp
       | Exp "*" Exp
