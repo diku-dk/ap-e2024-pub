@@ -11,6 +11,7 @@ import APL.AST (Exp (..), VName)
 data Val
   = ValInt Integer
   | ValBool Bool
+  | ValFun Env VName Exp
   deriving (Eq, Show)
 
 type Env = [(VName, Val)]
@@ -78,5 +79,12 @@ eval env (Let var e1 e2) =
   case eval env e1 of
     Left err -> Left err
     Right v -> eval (envExtend var v env) e2
-
--- TODO: Add cases after extending Exp.
+eval env (Lambda var body) = Right $ ValFun env var body
+eval env (Apply funExpr argExpr) =
+  case eval env funExpr of
+    Left err -> Left err
+    Right (ValFun funEnv var body) ->
+      case eval env argExpr of
+        Left err -> Left err
+        Right argVal -> eval (envExtend var argVal funEnv) body
+    Right _ -> Left "Expected a function: Type error if not ValFun"

@@ -90,7 +90,29 @@ tests =
               (Add (CstInt 2) (CstInt 3))
               (Let "x" (CstBool True) (Var "x"))
           )
-          @?= Right (ValBool True)
-          --
-          -- TODO - add more
+          @?= Right
+            (ValBool True),
+      --
+      testCase "Lambda" $
+        eval
+          envEmpty
+          ( Let
+              "x"
+              (CstInt 2)
+              (Lambda "y" (Add (Var "x") (Var "y")))
+          )
+          @?= Right (ValFun [("x", ValInt 2)] "y" (Add (Var "x") (Var "y"))),
+      --
+      testCase "Apply" $
+        eval
+          envEmpty
+          ( Apply
+              ( Let
+                  "x"
+                  (CstInt 2)
+                  (Lambda "y" (Add (Var "x") (Var "y")))
+              )
+              (CstInt 3)
+          )
+          @?= Right (ValInt 5)
     ]

@@ -19,6 +19,8 @@ data Exp
   | If Exp Exp Exp
   | Var VName
   | Let VName Exp Exp
+  | Lambda VName Exp
+  | Apply Exp Exp
   -- TODO: add cases
   deriving (Eq, Show)
 
