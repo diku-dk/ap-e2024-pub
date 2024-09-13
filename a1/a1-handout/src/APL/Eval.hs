@@ -81,11 +81,11 @@ eval env (Let var e1 e2) =
     Left err -> Left err
     Right v -> eval (envExtend var v env) e2
 eval env (Lambda var body) = Right $ ValFun env var body
-eval env (Apply funExpr argExpr) =
-  case eval env funExpr of
+eval env (Apply funExp argExp) =
+  case eval env funExp of
     Left err -> Left err
     Right (ValFun funEnv var body) ->
-      case eval env argExpr of
+      case eval env argExp of
         Left err -> Left err
         Right argVal -> eval (envExtend var argVal funEnv) body
     Right _ -> Left "Expected a function: Type error if not ValFun"
