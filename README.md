@@ -230,6 +230,12 @@ Violation of these rules will result in points deductions. If you
 violate these rules at the exam, it will negatively influence your
 grade.
 
+### Assignment Café
+
+Every Friday at Lille UP-1 at DIKU from 13:00-15:00 (unless otherwise
+specified) we host an assignment café where you can get help with the
+assignment from a TA.
+
 ## Exam
 
 The exam will be a multi-day take-home exam held in one of the exam
