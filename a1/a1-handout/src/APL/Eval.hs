@@ -3,6 +3,7 @@ module APL.Eval
     Env,
     envEmpty,
     eval,
+    fact,
   )
 where
 
@@ -88,3 +89,30 @@ eval env (Apply funExpr argExpr) =
         Left err -> Left err
         Right argVal -> eval (envExtend var argVal funEnv) body
     Right _ -> Left "Expected a function: Type error if not ValFun"
+eval env (TryCatch e1 e2) =
+  case eval env e1 of
+    Left _ -> eval env e2
+    Right v -> Right v
+
+yComb :: Exp
+yComb =
+  Lambda "f" $
+    Apply
+      (Lambda "g" (Apply (Var "g") (Var "g")))
+      ( Lambda
+          "g"
+          ( Apply
+              (Var "f")
+              (Lambda "a" (Apply (Apply (Var "g") (Var "g")) (Var "a")))
+          )
+      )
+
+fact :: Exp
+fact =
+  Apply yComb $
+    Lambda "rec" $
+      Lambda "n" $
+        If
+          (Eql (Var "n") (CstInt 0))
+          (CstInt 1)
+          (Mul (Var "n") (Apply (Var "rec") (Sub (Var "n") (CstInt 1))))

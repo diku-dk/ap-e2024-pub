@@ -1,34 +1,9 @@
 module APL.Eval_Tests (tests) where
 
 import APL.AST (Exp (..))
-import APL.Eval (Val (..), envEmpty, eval)
+import APL.Eval (Val (..), envEmpty, eval, fact)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-
--- -- Consider this example when you have added the necessary constructors.
--- -- The Y combinator in a form suitable for strict evaluation.
--- yComb :: Exp
--- yComb =
---   Lambda "f" $
---     Apply
---       (Lambda "g" (Apply (Var "g") (Var "g")))
---       ( Lambda
---           "g"
---           ( Apply
---               (Var "f")
---               (Lambda "a" (Apply (Apply (Var "g") (Var "g")) (Var "a")))
---           )
---       )
-
--- fact :: Exp
--- fact =
---   Apply yComb $
---     Lambda "rec" $
---       Lambda "n" $
---         If
---           (Eql (Var "n") (CstInt 0))
---           (CstInt 1)
---           (Mul (Var "n") (Apply (Var "rec") (Sub (Var "n") (CstInt 1))))
 
 tests :: TestTree
 tests =
@@ -114,5 +89,32 @@ tests =
               )
               (CstInt 3)
           )
-          @?= Right (ValInt 5)
+          @?= Right (ValInt 5),
+      --
+      testCase "TryCatch 1" $
+        eval
+          envEmpty
+          ( TryCatch
+              (CstInt 0)
+              (CstInt 1)
+          )
+          @?= Right (ValInt 0),
+      --
+      testCase "TryCatch 2" $
+        eval
+          envEmpty
+          ( TryCatch
+              (Var "Missing")
+              (CstInt 1)
+          )
+          @?= Right (ValInt 1),
+      --
+      testCase "fact 5" $
+        eval
+          envEmpty
+          ( Apply
+              fact
+              (CstInt 5)
+          )
+          @?= Right (ValInt 120)
     ]

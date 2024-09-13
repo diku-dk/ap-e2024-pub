@@ -21,7 +21,7 @@ data Exp
   | Let VName Exp Exp
   | Lambda VName Exp
   | Apply Exp Exp
-  -- TODO: add cases
+  | TryCatch Exp Exp
   deriving (Eq, Show)
 
 printExp :: Exp -> String
