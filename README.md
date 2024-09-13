@@ -256,3 +256,11 @@ Week 45: 1st of November to 8th of November.
 You are not expected to work full time for the entire period. The
 intended exam workload is specified as 25 hours of work in the course
 description.
+
+## AI Policy
+
+You are allowed to use AI-generated code and text in assignments and
+the exam in AP, but you must *explicitly* indicate which parts have
+been generated this way, and which tool you have used. If you do not
+cite properly, then you are conducting academic dishonesty (i.e.,
+plagiarism), which is treated very seriously by the university.
