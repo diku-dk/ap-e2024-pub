@@ -87,6 +87,15 @@ The lectures are on Tuesday 10:00-12:00 in Aud 01 at HCØ and Thursday
 The exercise classes are both on Thursday, at 10:00-12:00 and
 15:00-17:00 respectively.
 
+There is also a study café, where you can get extra help on the assignments (or
+anything else related to the course) on Fridays at 13:00-15:00 in Lille UP1.
+
+|       | Monday | Tuesday | Wednesday | Thursday  | Friday |
+|-------|--------|---------|-----------|-----------|--------|
+| 10-12 |        | Lecture |           | Exercises |        |
+| 13-15 |        |         |           | Lecture   | Café   |
+| 15-17 |        |         |           | Exercises |        |
+
 September 3rd, marks the beginning of the course, with the first lecture.
 
 ### Exercise class locations
