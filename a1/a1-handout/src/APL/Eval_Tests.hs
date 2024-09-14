@@ -134,8 +134,7 @@ tests =
               (CstInt 3)
           )
           @?= Right (ValInt 5)
-    , --
-      testCase "Apply Example e2 Valfun" $
+    , testCase "Apply Example e2 Valfun" $
         eval
           envEmpty
           ( Apply
@@ -153,7 +152,8 @@ tests =
               )
           )
           @?= Right (ValInt 5)
-    , testCase "Apply where e1 results in Left err" $
+    , -- {- The next two tests were made with the help of openAIs chatGPT. The promt was simply to create a Left err for both e1 and e2. -}
+      testCase "Apply where e1 results in Left err" $
         eval
           envEmpty
           ( Apply
