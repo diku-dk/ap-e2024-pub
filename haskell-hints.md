@@ -75,4 +75,7 @@ your work:
 
 * [Data.List](https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-List.html)
 
+* [Data.Maybe](https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Maybe.html)
+
+
 * [Data.Ord](https://hackage.haskell.org/package/base-4.20.0.1/docs/Data-Ord.html)
