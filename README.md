@@ -87,7 +87,16 @@ The lectures are on Tuesday 10:00-12:00 in Aud 01 at HCØ and Thursday
 The exercise classes are both on Thursday, at 10:00-12:00 and
 15:00-17:00 respectively.
 
+There is also a study café, where you can get extra help on the assignments (or
+anything else related to the course), on Fridays at 13:00-15:00 in Lille UP1.
+
 September 3rd, marks the beginning of the course, with the first lecture.
+
+|       | Monday | Tuesday | Wednesday | Thursday  | Friday |
+|-------|--------|---------|-----------|-----------|--------|
+| 10-12 |        | Lecture |           | Exercises |        |
+| 13-15 |        |         |           | Lecture   | Café   |
+| 15-17 |        |         |           | Exercises |        |
 
 ### Exercise class locations
 
@@ -221,6 +230,12 @@ Violation of these rules will result in points deductions. If you
 violate these rules at the exam, it will negatively influence your
 grade.
 
+### Assignment Café
+
+Every Friday at Lille UP-1 at DIKU from 13:00-15:00 (unless otherwise
+specified) we host an assignment café where you can get help with the
+assignment from a TA.
+
 ## Exam
 
 The exam will be a multi-day take-home exam held in one of the exam
@@ -256,3 +271,11 @@ Week 45: 1st of November to 8th of November.
 You are not expected to work full time for the entire period. The
 intended exam workload is specified as 25 hours of work in the course
 description.
+
+## AI Policy
+
+You are allowed to use AI-generated code and text in assignments and
+the exam in AP, but you must *explicitly* indicate which parts have
+been generated this way, and which tool you have used. If you do not
+cite properly, then you are conducting academic dishonesty (i.e.,
+plagiarism), which is treated very seriously by the university.
