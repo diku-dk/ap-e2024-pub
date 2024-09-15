@@ -1,0 +1,375 @@
+ghci> Nothing
+Nothing
+ghci> Just 22
+Just 22
+ghci> :t map
+map :: (a -> b) -> [a] -> [b]
+ghci> map (\x -> x + 1) [2, 3]
+[3,4]
+ghci> :t votingAge
+
+<interactive>:1:1: error: [GHC-88464]
+    Variable not in scope: votingAge
+ghci> :l Maybe
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted )
+Ok, one module loaded.
+ghci> :t votingAge
+votingAge :: Age -> Bool
+ghci> :t maybeMap votingAge
+maybeMap votingAge :: Maybe Age -> Maybe Bool
+ghci> canVote' (Just 17)
+Just False
+ghci> canVote' (Just 18)
+Just True
+ghci> canVote' Nothing
+Nothing
+ghci> :t maybeMap (==)
+maybeMap (==) :: Eq a => Maybe a -> Maybe (a -> Bool)
+ghci> :t maybeMap ((==) :: Age -> Age -> Bool)
+maybeMap ((==) :: Age -> Age -> Bool)
+  :: Maybe Age -> Maybe (Age -> Bool)
+ghci> :t maybeMap ((==) :: Age -> Age -> Bool) (Just 42)
+maybeMap ((==) :: Age -> Age -> Bool) (Just 42)
+  :: Maybe (Age -> Bool)
+ghci> :t maybeMap2 ((==) :: Age -> Age -> Bool)
+maybeMap2 ((==) :: Age -> Age -> Bool)
+  :: Maybe Age -> Maybe Age -> Maybe Bool
+ghci> :t maybeMap ((==) :: Age -> Age -> Bool) (Just 42)
+maybeMap ((==) :: Age -> Age -> Bool) (Just 42)
+  :: Maybe (Age -> Bool)
+ghci> :t ($)
+($) :: (a -> b) -> a -> b
+ghci> length $ [1] ++ [2]
+2
+ghci> :t votingAge
+votingAge :: Age -> Bool
+ghci> :t Just votingAge
+Just votingAge :: Maybe (Age -> Bool)
+ghci> :t ma
+
+<interactive>:1:1: error: [GHC-88464]
+    Variable not in scope: ma
+    Suggested fix:
+      Perhaps use one of these:
+        ‘map’ (imported from Prelude), ‘max’ (imported from Prelude)
+ghci> :t max
+max :: Ord a => a -> a -> a
+ghci> max 1 3
+3
+ghci> 2 `max` 3
+3
+ghci> 2 + 3
+5
+ghci> :t Just (==)
+ghci> :t Just (==)
+Just (==) :: Eq a => Maybe (a -> a -> Bool)
+ghci> :t Just (==) `apply` Just 42
+Just (==) `apply` Just 42 :: (Eq a, Num a) => Maybe (a -> Bool)
+ghci> :t Just ((==) :: Age -> Age -> Bool) `apply` Just 42
+Just ((==) :: Age -> Age -> Bool) `apply` Just 42
+  :: Maybe (Age -> Bool)
+ghci> :t Just ((==) :: Age -> Age -> Bool) `apply` Just 42 `apply` Just 33
+Just ((==) :: Age -> Age -> Bool) `apply` Just 42 `apply` Just 33
+  :: Maybe Bool
+ghci> :t ordered
+ordered :: Age -> Age -> Age -> Bool
+ghci> :t Just ordered
+Just ordered :: Maybe (Age -> Age -> Age -> Bool)
+ghci> :t Just ordered `apply` Just 1
+Just ordered `apply` Just 1 :: Maybe (Age -> Age -> Bool)
+ghci> :t Just ordered `apply` Just 1 `apply` Just 2
+Just ordered `apply` Just 1 `apply` Just 2 :: Maybe (Age -> Bool)
+ghci> :t (Just ordered `apply` Just 1) `apply` Just 2
+ghci> :k Integer
+Integer :: *
+ghci> :k Maybe
+Maybe :: * -> *
+ghci> :k Maybe Bool
+Maybe Bool :: *
+ghci> :k []
+[] :: * -> *
+ghci> :k Either
+Either :: * -> * -> *
+ghci> :k Either Bool
+Either Bool :: * -> *
+ghci> True
+True
+ghci> :t True
+True :: Bool
+ghci> :k Bool
+Bool :: *
+ghci> :t Bool
+
+<interactive>:1:1: error: [GHC-31891]
+    • Illegal term-level use of the type constructor or class ‘Bool’
+    • imported from ‘Prelude’ at Maybe.hs:1:8-12
+      (and originally defined in ‘GHC.Types’)
+    • In the expression: Bool
+ghci> :k True
+
+<interactive>:1:1: error: [GHC-76037]
+    Not in scope: type constructor or class ‘True’
+    Suggested fix:
+      Perhaps you intended to use DataKinds
+      to refer to the data constructor of that name?
+ghci> :t apply
+apply :: Maybe (a -> b) -> Maybe a -> Maybe b
+ghci> :t Just
+Just :: a -> Maybe a
+ghci> :t pure votingAge
+pure votingAge :: Applicative f => f (Age -> Bool)
+ghci> :t pure votingAge <*> Just 42
+pure votingAge <*> Just 42 :: Maybe Bool
+ghci> pure ordered <*> Just 1 <*> Just 2 <*> Just 3
+Just True
+ghci> :t ($)
+($) :: (a -> b) -> a -> b
+ghci> :t (<$>)
+(<$>) :: Functor f => (a -> b) -> f a -> f b
+ghci> pure votingAge <*> Just 4
+Just False
+ghci> votingAge <$> Just 4
+Just False
+ghci> :t ordered
+ordered :: Age -> Age -> Age -> Bool
+ghci> :t ordered <$> Just 1
+ordered <$> Just 1 :: Maybe (Age -> Age -> Bool)
+ghci> :t ordered <$> Just 1 <*> Just 2 <*> Just 3
+ordered <$> Just 1 <*> Just 2 <*> Just 3 :: Maybe Bool
+ghci> ordered <$> Just 1 <*> Just 2 <*> Just 3
+Just True
+ghci> votingAge <$> Just 2
+Just False
+ghci> not <$> (votingAge <$> Just 2)
+Just True
+ghci> not . votingAge <$> Just 2
+Just True
+ghci> (&&) <$> ((==) <$> Just 1 <*> Just 2) <*> Just True
+Just False
+ghci> :t ordered
+ordered :: Age -> Age -> Age -> Bool
+ghci> ordered <*> Just 1
+
+<interactive>:68:1: error: [GHC-83865]
+    • Couldn't match expected type: Maybe (a0 -> b)
+                  with actual type: Age -> Age -> Age -> Bool
+    • Probable cause: ‘ordered’ is applied to too few arguments
+      In the first argument of ‘(<*>)’, namely ‘ordered’
+      In the expression: ordered <*> Just 1
+      In an equation for ‘it’: it = ordered <*> Just 1
+    • Relevant bindings include
+        it :: Maybe b (bound at <interactive>:68:1)
+ghci> :t Just ordered <*> Just 1
+Just ordered <*> Just 1 :: Maybe (Age -> Age -> Bool)
+ghci> :t ordered <$> Just 1
+ghci> :t ordered <$> Just 1
+ordered <$> Just 1 :: Maybe (Age -> Age -> Bool)
+ghci> :t mapMaybe (==) (Just 1)
+
+<interactive>:1:1: error: [GHC-88464]
+    Variable not in scope:
+      mapMaybe :: (a0 -> a0 -> Bool) -> Maybe a1 -> t
+ghci> :t maybeMap (==) (Just 1)
+maybeMap (==) (Just 1) :: (Eq a, Num a) => Maybe (a -> Bool)
+ghci> :t (==)
+(==) :: Eq a => a -> a -> Bool
+ghci> a = Age, b = Age -> Bool
+ghci> a -> (b -> c)
+ghci> :l Reader.hs
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted )
+Ok, one module loaded.
+ghci>
+ghci> :k Reader
+Reader :: * -> * -> *
+ghci> :k Reader Int
+Reader Int :: * -> *
+ghci> r :: env -> a
+ghci> :t readerMap (&&)
+readerMap (&&) :: Reader env Bool -> Reader env (Bool -> Bool)
+ghci> :t readerMap2 (&&)
+readerMap2 (&&)
+  :: Reader env Bool -> Reader env Bool -> Reader env Bool
+ghci> :k Reader
+Reader :: * -> * -> *
+ghci> :t not
+not :: Bool -> Bool
+ghci> :t constant not
+constant not :: Reader env (Bool -> Bool)
+ghci> :t constant (&&)
+constant (&&) :: Reader env (Bool -> Bool -> Bool)
+ghci> :t constant (&&) `apply` canVote 18
+constant (&&) `apply` canVote 18 :: Reader Country (Bool -> Bool)
+ghci> :t constant (&&) `apply` canVote 18 `apply` canVote 19
+constant (&&) `apply` canVote 18 `apply` canVote 19
+  :: Reader Country Bool
+ghci> runReader Brazil $ constant (&&) `apply` canVote 18 `apply` canVote 19
+True
+ghci> runReader Cameroon $ constant (&&) `apply` canVote 18 `apply` canVote 19
+False
+ghci> :r
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted ) [Source file changed]
+
+Reader.hs:66:30: error: [GHC-76037]
+    Not in scope: type constructor or class ‘Env’
+   |
+66 | instance Applicative (Reader Env) where
+   |                              ^^^
+Failed, no modules loaded.
+ghci> :r
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted )
+Ok, one module loaded.
+ghci> :t (&&) <$> canVote 18 <*> canVote 19
+ghci> :t (&&) <$> canVote 18 <*> canVote 19
+(&&) <$> canVote 18 <*> canVote 19 :: Reader Country Bool
+ghci> :t pure (&&) <*> canVote 18 <*> canVote 19
+pure (&&) <*> canVote 18 <*> canVote 19 :: Reader Country Bool
+ghci> :l Maybe
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted )
+Ok, one module loaded.
+ghci> people $ Just "Homer"
+
+<interactive>:95:10: error: [GHC-83865]
+    • Couldn't match type: Maybe String
+                     with: [Char]
+      Expected: Name
+        Actual: Maybe String
+    • In the second argument of ‘($)’, namely ‘Just "Homer"’
+      In the expression: people $ Just "Homer"
+      In an equation for ‘it’: it = people $ Just "Homer"
+ghci> people <$> Just "Homer"
+Just (Just 38)
+ghci> :t people <$> Just "Homer"
+people <$> Just "Homer" :: Maybe (Maybe Age)
+ghci> canVote $ people <$> Just "Homer"
+
+<interactive>:98:11: error: [GHC-83865]
+    • Couldn't match type ‘Maybe Age’ with ‘Integer’
+      Expected: Name -> Age
+        Actual: Name -> Maybe Age
+    • In the first argument of ‘(<$>)’, namely ‘people’
+      In the second argument of ‘($)’, namely ‘people <$> Just "Homer"’
+      In the expression: canVote $ people <$> Just "Homer"
+ghci> :t fmap canVote
+fmap canVote :: Functor f => f (Maybe Age) -> f (Maybe Bool)
+ghci> :t maybeMap canVote
+maybeMap canVote :: Maybe (Maybe Age) -> Maybe (Maybe Bool)
+ghci> canVote <$> (people <$> Just "Homer")
+Just (Just True)
+ghci> canVote <$> (people <$> Just "Nobody")
+Just Nothing
+ghci> canVote <$> (people <$> Nothing)
+Nothing
+ghci> :t maybeBind
+maybeBind :: Maybe a -> (a -> Maybe b) -> Maybe b
+ghci> :t maybeBind (Just "Homer")
+maybeBind (Just "Homer") :: (String -> Maybe b) -> Maybe b
+ghci> :t maybeBind (Just "Homer") people
+maybeBind (Just "Homer") people :: Maybe Age
+ghci> :)
+unknown command ':)'
+use :? for help.
+ghci> :r
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> maybeBind (Just "Homer") people
+Just 38
+ghci> :r
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted ) [Source file changed]
+Ok, one module loaded.
+ghci> personCanVote' (Just "Homer")
+Just True
+ghci> personCanVote' (Just "Bart")
+Just False
+ghci> personCanVote' (Just "iuae")
+Nothing
+ghci> :r
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted ) [Source file changed]
+
+Maybe.hs:109:10: error: [GHC-59692]
+    Duplicate instance declarations:
+      instance Monad Maybe -- Defined at Maybe.hs:109:10
+      instance Monad Maybe -- Defined in ‘GHC.Base’
+    |
+109 | instance Monad Maybe where
+    |          ^^^^^^^^^^^
+Failed, no modules loaded.
+ghci> :r
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted )
+Ok, one module loaded.
+ghci> Just "Homer" >>= \name -> canVote (people name)
+Just True
+ghci> :r
+Ok, one module loaded.
+ghci> :r
+Ok, one module loaded.
+ghci> :l Reader.hs
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted )
+
+Reader.hs:90:47: error: [GHC-88464]
+    • Found hole: _ :: Reader Country Int
+    • In the second argument of ‘($)’, namely ‘\ ppl -> _’
+      In the expression: readerBind people $ \ ppl -> _
+      In an equation for ‘numberOfVoters'’:
+          numberOfVoters' = readerBind people $ \ ppl -> _
+    • Relevant bindings include
+        ppl :: [Age] (bound at Reader.hs:90:40)
+        numberOfVoters' :: Reader Country Int (bound at Reader.hs:90:1)
+      Valid hole fits include
+        numberOfVoters' :: Reader Country Int (bound at Reader.hs:90:1)
+        numberOfVoters :: Reader Country Int (bound at Reader.hs:80:1)
+   |
+90 | numberOfVoters' = readerBind people $ \ppl -> _
+   |                                               ^
+Failed, no modules loaded.
+ghci> :r
+ghci> :r
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted )
+
+Reader.hs:21:44: error: [GHC-83865]
+    • Couldn't match expected type: Country -> Bool
+                  with actual type: Reader Country Bool
+    • The function ‘test’ is applied to one value argument,
+        but its type ‘Reader Country Bool’ has none
+      In the first argument of ‘not’, namely ‘(test country)’
+      In the expression: not (test country)
+   |
+21 | cannotVote age = Reader $ \country -> not (test country)
+   |                                            ^^^^^^^^^^^^
+
+Reader.hs:90:47: error: [GHC-88464]
+    • Found hole: _ :: Reader Country Int
+    • In the second argument of ‘($)’, namely ‘\ ppl -> _’
+      In the expression: readerBind people $ \ ppl -> _
+      In an equation for ‘numberOfVoters'’:
+          numberOfVoters' = readerBind people $ \ ppl -> _
+    • Relevant bindings include
+        ppl :: [Age] (bound at Reader.hs:90:40)
+        numberOfVoters' :: Reader Country Int (bound at Reader.hs:90:1)
+      Valid hole fits include
+        numberOfVoters' :: Reader Country Int (bound at Reader.hs:90:1)
+        numberOfVoters :: Reader Country Int (bound at Reader.hs:80:1)
+   |
+90 | numberOfVoters' = readerBind people $ \ppl -> _
+   |                                               ^
+Failed, no modules loaded.
+ghci> :r
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted )
+
+Reader.hs:21:44: error: [GHC-83865]
+    • Couldn't match expected type: Country -> Bool
+                  with actual type: Reader Country Bool
+    • The function ‘test’ is applied to one value argument,
+        but its type ‘Reader Country Bool’ has none
+      In the first argument of ‘not’, namely ‘(test country)’
+      In the expression: not (test country)
+   |
+21 | cannotVote age = Reader $ \country -> not (test country)
+   |                                            ^^^^^^^^^^^^
+Failed, no modules loaded.
+ghci> :r
+[1 of 1] Compiling Reader           ( Reader.hs, interpreted )
+Ok, one module loaded.
+ghci> :l Maybe
+[1 of 1] Compiling Maybe            ( Maybe.hs, interpreted )
+Ok, one module loaded.
+ghci>
