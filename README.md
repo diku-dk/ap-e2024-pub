@@ -226,6 +226,10 @@ you are asked to implement.
    ponder for each file whether it is something it makes sense to hand
    to your TA. At a *minimum*, run `cabal clean` before handing in.
 
+8. You are allowed to use any Haskell module that is available in the
+   packages specified in the `.cabal` file in the handout. You are not
+   allowed to add additional library dependencies.
+
 Violation of these rules will result in points deductions. If you
 violate these rules at the exam, it will negatively influence your
 grade.
