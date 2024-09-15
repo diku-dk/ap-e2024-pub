@@ -365,7 +365,7 @@ pExp =
   choice
     [ CstInt <$> lInteger,
       CstBool <$> lBool,
-      Var <$> lVName,
+      Var <$> lVName
     ]
 ```
 
