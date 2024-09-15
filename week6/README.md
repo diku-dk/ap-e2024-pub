@@ -6,7 +6,7 @@ TBA
 
 ## Suggested Reading
 
-TBA
+* [Concurrent Haskell](concurrent-haskell.pdf)
 
 ### Going Beyond
 
