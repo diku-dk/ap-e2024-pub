@@ -293,7 +293,7 @@ pExp :: Parser Exp
 pExp =
   choice
     [ CstInt <$> lInteger,
-      Var <$> lVName,
+      Var <$> lVName
     ]
 ```
 
