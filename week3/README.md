@@ -293,7 +293,7 @@ pExp :: Parser Exp
 pExp =
   choice
     [ CstInt <$> lInteger,
-      Var <$> lVName,
+      Var <$> lVName
     ]
 ```
 
@@ -365,7 +365,7 @@ pExp =
   choice
     [ CstInt <$> lInteger,
       CstBool <$> lBool,
-      Var <$> lVName,
+      Var <$> lVName
     ]
 ```
 
