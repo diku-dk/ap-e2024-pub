@@ -25,6 +25,7 @@ import Control.Concurrent
     threadDelay,
     writeChan,
   )
+import Control.Exception (SomeException, catch)
 import Control.Monad (ap, forM_, forever, liftM, void)
 import Data.List (partition)
 import System.Clock.Seconds (Clock (Monotonic), Seconds, getTime)
@@ -97,6 +98,8 @@ data SPCMsg
     MsgJobWait JobId (Chan JobDoneReason)
   | -- | Job has finished.
     MsgJobDone JobId
+  | -- | Job crashed.
+    MsgJobCrashed JobId
   | -- | Some time has passed.
     MsgTick
 
@@ -155,8 +158,13 @@ schedule = do
   case (spcJobRunning state, spcJobsPending state) of
     (Nothing, (jobid, job) : jobs) -> do
       t <- io $ forkIO $ do
-        void $ jobAction job
-        writeChan (spcChan state) $ MsgJobDone jobid
+        let doJob = do
+              jobAction job
+              writeChan (spcChan state) $ MsgJobDone jobid
+            onException :: SomeException -> IO ()
+            onException _ =
+              writeChan (spcChan state) $ MsgJobCrashed jobid
+        doJob `catch` onException
       now <- io $ getSeconds
       let deadline = now + fromIntegral (jobMaxSeconds job)
       put $
@@ -266,6 +274,13 @@ startSPC = do
             Just (jobid, _, tid) | jobid == cancel_jobid -> do
               io $ killThread tid
               jobDone jobid DoneCancelled
+            _ -> pure ()
+        MsgJobCrashed crashed_jobid -> do
+          state <- get
+          case spcJobRunning state of
+            Just (jobid, _, tid) | jobid == crashed_jobid -> do
+              io $ killThread tid
+              jobDone jobid DoneCrashed
             _ -> pure ()
         MsgTick ->
           pure ()
