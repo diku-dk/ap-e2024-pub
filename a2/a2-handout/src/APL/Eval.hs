@@ -33,44 +33,42 @@ stateEmpty = []
 
 type Error = String
 
-newtype EvalM a = EvalM (Env -> State -> Either Error a)
+newtype EvalM a = EvalM (Env -> State -> (State, Either Error a))
 
 instance Functor EvalM where
   fmap = liftM
 
 instance Applicative EvalM where
-  pure x = EvalM $ \_env _s -> Right x
+  pure x = EvalM $ \_env s -> (s, Right x)
   (<*>) = ap
 
 instance Monad EvalM where
   EvalM x >>= f = EvalM $ \env s ->
     case x env s of
-      Left err -> Left err
-      Right x' ->
+      (s', Left err) -> (s', Left err)
+      (s', Right x') ->
         let EvalM y = f x'
-         in y env s
-
-evalPrint :: String -> EvalM ()
-evalPrint str = EvalM $ \_env s ->
-  let _ns = s ++ [str]
-   in pure ()
+         in y env s'
 
 askEnv :: EvalM Env
-askEnv = EvalM $ \env _s -> Right env
+askEnv = EvalM $ \env s -> (s, Right env)
 
 localEnv :: (Env -> Env) -> EvalM a -> EvalM a
-localEnv f (EvalM m) = EvalM $ \env s -> m (f env) s
+localEnv f (EvalM m) = EvalM $ \env -> m (f env)
 
 failure :: String -> EvalM a
-failure s = EvalM $ \_env _state -> Left s
+failure s = EvalM $ \_env state -> (state, Left s)
+
+evalPrint :: String -> EvalM ()
+evalPrint s = EvalM $ \_env state -> (state ++ [s], Right ())
 
 catch :: EvalM a -> EvalM a -> EvalM a
 catch (EvalM m1) (EvalM m2) = EvalM $ \env s ->
   case m1 env s of
-    Left _ -> m2 env s
-    Right x -> Right x
+    (_, Left _) -> m2 env s
+    (s', Right x) -> (s', Right x)
 
-runEval :: EvalM a -> Either Error a
+runEval :: EvalM a -> ([String], Either Error a)
 runEval (EvalM m) = m envEmpty stateEmpty
 
 evalIntBinOp :: (Integer -> Integer -> EvalM Integer) -> Exp -> Exp -> EvalM Val

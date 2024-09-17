@@ -1,7 +1,7 @@
-module APL.AST (
-  VName,
-  Exp (..),
-)
+module APL.AST
+  ( VName,
+    Exp (..),
+  )
 where
 
 type VName = String
