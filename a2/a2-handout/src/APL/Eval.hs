@@ -26,42 +26,52 @@ envExtend v val env = (v, val) : env
 envLookup :: VName -> Env -> Maybe Val
 envLookup v env = lookup v env
 
+type State = [String]
+
+stateEmpty :: State
+stateEmpty = []
+
 type Error = String
 
-newtype EvalM s a = EvalM (s -> Either Error (a, s))
+newtype EvalM a = EvalM (Env -> State -> Either Error a)
 
-instance Functor (EvalM s) where
+instance Functor EvalM where
   fmap = liftM
 
-instance Applicative (EvalM s) where
-  pure x = EvalM $ \_env s -> Right (x, s)
+instance Applicative EvalM where
+  pure x = EvalM $ \_env _s -> Right x
   (<*>) = ap
 
-instance Monad (EvalM s) where
+instance Monad EvalM where
   EvalM x >>= f = EvalM $ \env s ->
     case x env s of
       Left err -> Left err
-      Right (x', s') ->
-        let EvalM f' = f x'
-         in f' env s'
+      Right x' ->
+        let EvalM y = f x'
+         in y env s
+
+evalPrint :: String -> EvalM ()
+evalPrint str = EvalM $ \_env s ->
+  let _ns = s ++ [str]
+   in pure ()
 
 askEnv :: EvalM Env
-askEnv = EvalM $ \env -> Right env
+askEnv = EvalM $ \env _s -> Right env
 
 localEnv :: (Env -> Env) -> EvalM a -> EvalM a
-localEnv f (EvalM m) = EvalM $ \env -> m (f env)
+localEnv f (EvalM m) = EvalM $ \env s -> m (f env) s
 
 failure :: String -> EvalM a
-failure s = EvalM $ \_env -> Left s
+failure s = EvalM $ \_env _state -> Left s
 
 catch :: EvalM a -> EvalM a -> EvalM a
-catch (EvalM m1) (EvalM m2) = EvalM $ \env ->
-  case m1 env of
-    Left _ -> m2 env
+catch (EvalM m1) (EvalM m2) = EvalM $ \env s ->
+  case m1 env s of
+    Left _ -> m2 env s
     Right x -> Right x
 
 runEval :: EvalM a -> Either Error a
-runEval (EvalM m) = m envEmpty
+runEval (EvalM m) = m envEmpty stateEmpty
 
 evalIntBinOp :: (Integer -> Integer -> EvalM Integer) -> Exp -> Exp -> EvalM Val
 evalIntBinOp f e1 e2 = do

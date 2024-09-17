@@ -1,13 +1,10 @@
 module APL.AST (
   VName,
   Exp (..),
-  State,
 )
 where
 
 type VName = String
-
-type State = [String]
 
 data Exp
   = CstInt Integer
