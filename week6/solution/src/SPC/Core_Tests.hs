@@ -37,5 +37,17 @@ tests =
           r1 @?= JobRunning
           jobCancel spc j
           r2 <- jobWait spc j
-          r2 @?= DoneCancelled
+          r2 @?= DoneCancelled,
+        testCase "crash" $ do
+          spc <- startSPC
+          j1 <- jobAdd spc $ Job (error "boom") 1
+          r1 <- jobWait spc j1
+          r1 @?= DoneCrashed
+          -- Ensure new jobs can still work.
+          ref <- newIORef False
+          j2 <- jobAdd spc $ Job (writeIORef ref True) 1
+          r2 <- jobWait spc j2
+          r2 @?= Done
+          v <- readIORef ref
+          v @?= True
       ]
