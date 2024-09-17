@@ -78,8 +78,7 @@ created channel and acts on them. To do this:
 
 ### Hints
 
-The `forever` function is a small convenience functions for writing
-infinite monadic loops.
+Use `forever` from `Control.Monad` to write infinite monadic loops.
 
 ### Solution
 
@@ -119,6 +118,177 @@ tests =
           spc <- startSPC
           x <- pingSPC spc
           x @?= 1337
+      ]
+
+```
+
+</details>
+
+## A Stateful Monadic Event Loop
+
+Most servers maintain some kind of state that is modified by the
+messages they receive. Eventually SPC will have a rather complicated
+notion of state, but to start out, we will simply have it track how
+many ping messages it has received, and reply to pings with that
+number.
+
+To make things interesting (and ultimately, more manageable), we will
+maintain the state using a monad. First, add a type repesenting the
+SPC state:
+
+```Haskell
+data SPCState = SPCState
+  { spcPingCounter :: Int
+  }
+```
+
+Then we define an SPC monad that is a state monad with a state of type
+`SPCState`, but which also supports `IO`:
+
+```Haskell
+newtype SPCM a = SPCM (SPCState -> IO (a, SPCState))
+```
+
+* Implement the `Functor`, `Applicative`, and `Monad` instances for
+  `SPCM`.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+instance Functor SPCM where
+  fmap = liftM
+
+instance Applicative SPCM where
+  pure x = SPCM $ \state -> pure (x, state)
+  (<*>) = ap
+
+instance Monad SPCM where
+  SPCM m >>= f = SPCM $ \state -> do
+    (x, state') <- m state
+    let SPCM f' = f x
+    f' state'
+```
+
+</details>
+
+We will also need the usual utility functions for managing the state:
+
+```Haskell
+get :: SPCM SPCState
+put :: SPCState -> SPCM ()
+```
+
+* Implement `get` and `put`.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+-- | Retrieve the state.
+get :: SPCM SPCState
+get = SPCM $ \state -> pure (state, state)
+
+-- | Overwrite the state.
+put :: SPCState -> SPCM ()
+put state = SPCM $ \_ -> pure ((), state)
+```
+
+</details>
+
+And we also need a function for lifting an arbitrary IO action into
+`SPCM`:
+
+```Haskell
+io :: IO a -> SPCM a
+```
+
+* Implement `io`.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+io m = SPCM $ \state -> do
+  x <- m
+  pure (x, state)
+```
+
+</details>
+
+Finally, we need a function for running an `SPCM` operation, which
+necessarily must be done in the `IO` monad:
+
+```Haskell
+runSPCM :: SPCState -> SPCM a -> IO a
+```
+
+* Implement `runSPCM`.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+runSPCM state (SPCM f) = fst <$> f state
+```
+
+</details>
+
+Now we are ready to use `SPCM`.
+
+* Modify `startSPC` such that the loop runs inside the `SPCM` monad.
+
+* Modify the handling of `MsgPing` such that it replies with the
+  `spcPingCounter` field from the state, and then increments the field
+  by one.
+
+* Add an appropriate test.
+
+### Hints
+
+* To read a message from a channel `c` inside `SPCM`: `io $ readChan c`.
+
+* `succ x` produces `x+1`.
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+startSPC :: IO SPC
+startSPC = do
+  c <- newChan
+  let initial_state =
+        SPCState
+          { spcPingCounter = 0
+          }
+  _ <- forkIO $ runSPCM initial_state $ forever $ handle c
+  pure $ SPC c
+  where
+    handle c = do
+      msg <- io $ readChan c
+      case msg of
+        MsgPing reply_chan -> do
+          state <- get
+          io $ writeChan reply_chan $ spcPingCounter state
+          put $ state {spcPingCounter = succ $ spcPingCounter state}
+
+-- And a test:
+
+tests :: TestTree
+tests =
+  localOption (mkTimeout 3000000) $
+    testGroup
+      "SPC (core)"
+      [ testCase "ping" $ do
+          spc <- startSPC
+          x <- pingSPC spc
+          x @?= 0
+          y <- pingSPC spc
+          y @?= 1
+          z <- pingSPC spc
+          z @?= 2
       ]
 
 ```
