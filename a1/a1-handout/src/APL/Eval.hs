@@ -80,7 +80,7 @@ eval env (Let var e1 e2) =
     Left err -> Left err
     Right v -> eval (envExtend var v env) e2
 eval env (Lambda var body) = Right $ ValFun env var body
-eval env (App fun arg) =
+eval env (Apply fun arg) =
   case eval env fun of
     Left err -> Left err
     Right (ValFun funEnv var body) ->
