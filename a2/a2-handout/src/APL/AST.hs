@@ -1,7 +1,7 @@
-module APL.AST
-  ( VName,
-    Exp (..),
-  )
+module APL.AST (
+  VName,
+  Exp (..),
+)
 where
 
 type VName = String
@@ -22,4 +22,6 @@ data Exp
   | Apply Exp Exp
   | TryCatch Exp Exp
   | Print String Exp
+  | KvPut Exp Exp
+  | KvGet Exp
   deriving (Eq, Show)
