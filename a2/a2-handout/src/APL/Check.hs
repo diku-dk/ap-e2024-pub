@@ -69,8 +69,8 @@ check e =
     (Var v) ->
       CheckM $ \env ->
         if v `elem` env
-          then (env, Left $ "Variable not in scope: " ++ v)
-          else (env, Right ())
+          then (env, Right ())
+          else (env, Left $ "Variable not in scope: " ++ v)
 
 runCheck :: CheckM a -> (Env, Either Error a)
 runCheck (CheckM m) = m envEmpty
