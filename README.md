@@ -249,6 +249,8 @@ Every Friday at Lille UP-1 at DIKU from 13:00-15:00 (unless otherwise
 specified) we host an assignment café where you can get help with the
 assignment from a TA.
 
+**Note:** on the 3rd of October, the café is from 14:00-16:00.
+
 ## Exam
 
 The exam will be a multi-day take-home exam held in one of the exam

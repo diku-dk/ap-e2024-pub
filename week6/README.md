@@ -20,10 +20,16 @@ implementing the [*Stateful Planning
 Committee*](https://en.wikipedia.org/wiki/Gosplan) (SPC), a *job
 scheduler* for managing the employment of workers and allocation of
 resources. A job is any Haskell computation in the `IO` monad,
-evaluated for its side effects. We can imagine using a job scheduler
-to enqueue thousands of jobs for downloading various files from the
-Internet, with the scheduler taking care of ensuring only a limited
-number of jobs run concurrently, handling timeouts, and so on.
+evaluated for its side effects. After a job is *enqueued* in SPC, we
+can ask for the status of the job. At some point, SPC will decide to
+actually execute the job.
+
+We can imagine using a job scheduler such as SPC to enqueue thousands
+of jobs for downloading various files from the Internet, with the
+scheduler taking care of ensuring only a limited number of jobs run
+concurrently, handling timeouts, performing logging, and so on. Our
+scheduler will be fairly simple, but will have a lot of the machinery
+you also need in a real scheduler.
 
 SPC will take the form of various Haskell threads that communicate
 through message passing. The main challenge is that the jobs are
@@ -290,6 +296,110 @@ tests =
           z <- pingSPC spc
           z @?= 2
       ]
+
+```
+
+</details>
+
+## Adding Jobs
+
+We have now constructed the skeleton of a stateful message passing
+server. Essentially all servers can start out this way, although the
+monadic approach to state handling may be overkill for very simple
+ones. We will now extend this skeleton with the actual job handling
+functionality that is the purpose of our server. Feel free to remove
+the `MsgPing` message and the related functions once you add more
+interesting messages.
+
+First we will implement a way to add jobs. Jobs are described by this
+type:
+
+```Haskell
+-- | A job that is to be enqueued in the glorious SPC.
+data Job = Job
+  { -- | The IO action that comprises the actual action of the job.
+    jobAction :: IO (),
+    -- | The maximum allowed runtime of the job, counting from when
+    -- the job begins executing (not when it is enqueued).
+    jobMaxSeconds :: Int
+  }
+```
+
+And are added by this function:
+
+```
+-- | A unique identifier of a job that has been enqueued.
+newtype JobId = JobId Int
+  deriving (Eq, Ord, Show)
+
+-- | Add a job for scheduling.
+jobAdd :: SPC -> Job -> IO JobId
+```
+
+The `Job` type (and its definition) should be exported, but the
+`JobId` should not have its constructor exported. It must be an
+abstract type from the point of view of users. This is achieved by
+putting respectively `Job(..)` and `JobId` in the module export list.
+
+When a job is enqueued, it is not executed immediately. Rather, it is
+added to a list of *pending* jobs. Each job is associated with a
+unique `JobId`, which is used to reference it later.
+
+* Extend `SPCState` with a field of type `[(JobId,Job)]` which tracks
+  pending jobs, and a field of type `JobId` which contains the next
+  available job identifier. Update other parts of the code as
+  necessary.
+
+* Add a synchronous message to `SPCMsg` for adding a new job. This
+  message must also provide a channel for the reply, which contains
+  the `JobId`. When handling this message, you must add the job to the
+  list that you added to the state.
+
+* Implement `jobAdd` by sending the message you added above.
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+data SPCState = SPCState
+  { spcJobsPending :: [(JobId, Job)],
+    spcJobCounter :: JobId
+  }
+
+
+startSPC :: IO SPC
+startSPC = do
+  c <- newChan
+  let initial_state =
+        SPCState
+          { spcJobCounter = JobId 0,
+            spcJobsPending = []
+          }
+  _ <- forkIO $ runSPCM initial_state $ forever $ handle c
+  pure $ SPC c
+  where
+    handle c = do
+      msg <- io $ readChan c
+      case msg of
+        MsgJobAdd job reply -> do
+          state <- get
+          let JobId jobid = spcJobCounter state
+          put $
+            state
+              { spcJobsPending =
+                  (spcJobCounter state, job) : spcJobsPending state,
+                spcJobCounter = JobId $ succ jobid
+              }
+          io $ writeChan reply $ JobId jobid
+
+-- | Add a job for scheduling.
+jobAdd :: SPC -> Job -> IO JobId
+jobAdd (SPC c) job = do
+  reply_chan <- newChan
+  writeChan c $ MsgJobAdd job reply_chan
+  readChan reply_chan
 
 ```
 
