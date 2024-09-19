@@ -30,28 +30,53 @@ instance Monad CheckM where
         let CheckM b = f a
          in b env'
 
-check2Exp :: Exp -> Exp -> CheckM ()
-check2Exp e1 e2 =
+envExtend :: VName -> CheckM ()
+envExtend v = CheckM $ \env ->
+  (v : env, Right ())
+
+checkListExp :: [Exp] -> CheckM ()
+checkListExp [] = pure ()
+checkListExp (x : xs) =
   do
-    _ <- check e1
-    _ <- check e2
-    pure ()
+    _ <- check x
+    checkListExp xs
 
 check :: Exp -> CheckM ()
 check e =
   case e of
     (CstInt _) -> pure ()
     (CstBool _) -> pure ()
-    (Add e1 e2) -> check2Exp e1 e2
-    (Sub e1 e2) -> check2Exp e1 e2
-    (Mul e1 e2) -> check2Exp e1 e2
-    (Div e1 e2) -> check2Exp e1 e2
-    (Pow e1 e2) -> check2Exp e1 e2
-    (Eql e1 e2) -> check2Exp e1 e2
-    (If e1 e2 e3) -> undefined
+    (KvGet e1) -> checkListExp [e1]
+    (Add e1 e2) -> checkListExp [e1, e2]
+    (Sub e1 e2) -> checkListExp [e1, e2]
+    (Mul e1 e2) -> checkListExp [e1, e2]
+    (Div e1 e2) -> checkListExp [e1, e2]
+    (Pow e1 e2) -> checkListExp [e1, e2]
+    (Apply e1 e2) -> checkListExp [e1, e2]
+    (TryCatch e1 e2) -> checkListExp [e1, e2]
+    (KvPut e1 e2) -> checkListExp [e1, e2]
+    (Eql e1 e2) -> checkListExp [e1, e2]
+    (If e1 e2 e3) -> checkListExp [e1, e2, e3]
+    (Print _ e1) -> checkListExp [e1]
+    (Let v e1 e2) ->
+      do
+        _ <- envExtend v
+        checkListExp [e1, e2]
+    (Lambda v e1) ->
+      do
+        _ <- envExtend v
+        checkListExp [e1]
+    (Var v) ->
+      CheckM $ \env ->
+        if v `elem` env
+          then (env, Left $ "Variable not in scope: " ++ v)
+          else (env, Right ())
 
 runCheck :: CheckM a -> (Env, Either Error a)
 runCheck (CheckM m) = m envEmpty
 
-checkExp :: Exp -> (Env, Either Error ())
-checkExp = runCheck . check
+checkExp :: Exp -> Maybe String
+checkExp e =
+  case runCheck (check e) of
+    (_, Left err) -> Just err
+    _ -> Nothing
