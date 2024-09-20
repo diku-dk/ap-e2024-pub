@@ -46,6 +46,10 @@ to shut down the entire process, or maliciously try to subvert SPC
 itself. Since jobs are (for now) arbitrary `IO` actions, there is not
 any true security in SPC.
 
+This exercise permits you somewhat more freedom than most others. In
+particular, you are expected to largely design the message types
+yourself.
+
 ## Creating the Event Loop
 
 You will find a skeletal code handout in [handout/](handout/). The
@@ -700,8 +704,43 @@ testCase "canceling job" $ do
 
 ## Job Execution
 
-This task adds support for actually executing a job. To begin with we
-will ignore the possibility of timeouts and crashes.
+This task adds support for actually executing a job. We will initially
+ignore the possibility of timeouts and crashes and return to these
+concerns in later tasks.
+
+When SPC executes a job, it spawns a new thread (with `forkIO`) which
+runs the `jobAction`. We call this a *job thread* When the action is
+done, the job thread will send a message to SPC. Only one job thread
+should be running at any given time. To support `jobCancel` and
+`jobStatus`, SPC must track the currently running job (if any).
+
+0. We will now have multiple ways that a job can finish, so add a
+   function `jobDone :: JobId -> JobDoneReason -> SPCM ()` that
+   contains the book-keeping code from in your handling of the
+   cancellation message. Modify `handleEvent` to use this function.
+   Ensure that your existing tests still work.
+
+1. Extend `SPCState` with a field tracking the currently running job,
+   which must contain a `JobId` and a `ThreadId`.
+
+2. Extend `SPCMsg` with a message that is sent a job thread when its
+   job is done.
+
+3. Define a function with signature `schedule :: SPCM ()`. When
+   `schedule` is executed, it checks whether a not is *not* currently
+   running, and if there are any *pending* jobs. If so, it launches a
+   thread as discussed above and updates the SPC state appropriately.
+
+4. Insert a call to `schedule` at an appropriate location (such as the
+   beginning of `handleMsg`).
+
+5. Handle the message you added in step (2) in `handleMsg`. Use the
+   `jobDone` function you added above.
+
+6. Write tests. Since jobs are executed only for side effects and do
+   not return any values, we need to write test jobs with observable
+   side effects. The easiest way is for the test to create an `IORef`
+   whose value is changed by the job.
 
 ### Solution
 
