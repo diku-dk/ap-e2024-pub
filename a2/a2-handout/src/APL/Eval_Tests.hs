@@ -94,7 +94,7 @@ evalTests =
           (Print "x" (Lambda "x" (Var "x")))
           @?= (["x: #<fun>"], Right (ValFun [] "x" (Var "x")))
     , -- KvPut
-      testCase "KvPut new" $
+      testCase "KvPut" $
         eval'
           (KvPut (CstInt 3) (CstInt 4))
           @?= ([], Right (ValInt 4))
