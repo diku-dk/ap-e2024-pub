@@ -276,13 +276,12 @@ startSPC = do
             spcChan = c
           }
   void $ forkIO $ runSPCM initial_state $ forever $ handleMsg c
-  void $ forkIO $ timerloop c
+  void $ forkIO $ forever $ timer c
   pure $ SPC c
   where
-    timerloop c = do
+    timer c = do
       threadDelay 1000000 -- 1 second
       writeChan c MsgTick
-      timerloop c
 
 -- | Add a job for scheduling.
 jobAdd :: SPC -> Job -> IO JobId

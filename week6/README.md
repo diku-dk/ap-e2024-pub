@@ -530,3 +530,180 @@ tests =
 ```
 
 </details>
+
+## Job cancellation
+
+This task is about implementing the following function, which cancels
+a job and receives no response (even of the job was invalid).
+
+```Haskell
+-- | Asynchronously cancel a job.
+jobCancel :: SPC -> JobId -> IO ()
+```
+
+When a pending job is cancelled, it should be moved to a separate list
+of done jobs, which should associate a `JobId` with a `JobDoneReason`.
+After a job has been cancelled, performing asking for its status
+should return `DoneCancelled`.
+
+1. Extend `SPCState` with a list of done jobs.
+
+2. Extend `SPCMsg` with an asynchronous message for cancelling a given
+   job.
+
+3. Handle the new message in `handleMsg`.
+
+4. Implement `jobCancel` by moving the job (if it exists) from the
+   list of pending jobs to the list of done jobs.
+
+5. Modify the handling of the `jobStatus` message such that it replies
+   `JobDone DoneCancelled` for cancelled jobs.
+
+6. Add a test.
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+data SPCMsg
+  = ...
+  | MsgJobCancel JobId
+
+data SPCState = SPCState
+  { ...
+    spcJobsDone :: [(JobId, JobDoneReason)]
+  }
+
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  msg <- io $ readChan c
+  case msg of
+    ...
+    MsgJobStatus jobid reply -> do
+      state <- get
+      io $ writeChan reply $ case ( lookup jobid $ spcJobsPending state,
+                                    lookup jobid $ spcJobsDone state
+                                  ) of
+        (Just _, _) -> JobPending
+        (_, Just _) -> JobDone DoneCancelled
+        _ -> JobUnknown
+    MsgJobCancel jobid -> do
+      state <- get
+      case lookup jobid $ spcJobsPending state of
+        Nothing -> pure ()
+        Just _ ->
+          put $
+            state
+              { spcJobsPending = removeAssoc jobid $ spcJobsPending state,
+                spcJobsDone = (jobid, DoneCancelled) : spcJobsDone state
+              }
+
+jobCancel :: SPC -> JobId -> IO ()
+jobCancel (SPC c) jobid =
+  writeChan c $ MsgJobCancel jobid
+```
+
+```Haskell
+testCase "canceling job" $ do
+  spc <- startSPC
+  j <- jobAdd spc $ Job (pure ()) 1
+  jobCancel spc j
+  r <- jobStatus spc j
+  r @?= JobDone DoneCancelled
+
+```
+
+</details>
+
+## Job waiting
+
+This task adds support for synchronously waiting for a job to finish,
+and receiving the `JobDoneReason` in response. Currently we can only
+wait for jobs to be cancelled, but this will be quite useful
+functionality once we implement actual job execution.
+
+```Haskell
+-- | Synchronously block until job is done and return the reason.
+jobWait :: SPC -> JobId -> IO JobDoneReason
+```
+
+This is more tricky to handle than the other messages. We must send a
+reply *eventually*, but we cannot do so until the job is done, which
+it may not be yet. This means we must maintain a list pairing `JobId`s
+with channels to send a message to once that job finishes. Then, when
+a job finishes (currently only possible when it is cancelled), we must
+send a response to all relevant channels.
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+data SPCMsg
+  = ...
+  | MsgJobWait JobId (Chan JobDoneReason)
+
+data SPCState = SPCState
+  { ...
+    spcWaiting :: [(JobId, Chan JobDoneReason)]
+  }
+
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  msg <- io $ readChan c
+  case msg of
+    ...
+    MsgJobCancel jobid -> do
+      state <- get
+      case lookup jobid $ spcJobsPending state of
+        Nothing -> pure ()
+        Just _ -> do
+          let (waiting_for_jobid, rest) =
+                partition ((== jobid) . fst) $ spcWaiting state
+          forM_ waiting_for_jobid $ \(_, waiter_chan) ->
+            io $ writeChan waiter_chan DoneCancelled
+          put $
+            state
+              { spcJobsPending = removeAssoc jobid $ spcJobsPending state,
+                spcJobsDone = (jobid, DoneCancelled) : spcJobsDone state,
+                spcWaiting = rest
+              }
+    MsgJobWait jobid reply -> do
+      state <- get
+      case lookup jobid $ spcJobsDone state of
+        Just reason -> do
+          io $ writeChan reply reason
+        Nothing ->
+          put $ state {spcWaiting = (jobid, reply) : spcWaiting state}
+
+jobWait :: SPC -> JobId -> IO JobDoneReason
+jobWait (SPC c) jobid = do
+  reply_chan <- newChan
+  writeChan c $ MsgJobWait jobid reply_chan
+  readChan reply_chan
+
+```
+
+```Haskell
+testCase "canceling job" $ do
+  spc <- startSPC
+  j <- jobAdd spc $ Job (pure ()) 1
+  jobCancel spc j
+  r <- jobWait spc j
+  r @?= DoneCancelled
+```
+
+</details>
+
+## Job execution
+
+This task adds support for actually executing a job.
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+</details>
