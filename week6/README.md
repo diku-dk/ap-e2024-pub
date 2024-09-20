@@ -352,6 +352,8 @@ When a job is enqueued, it is not executed immediately. Rather, it is
 added to a list of *pending* jobs. Each job is associated with a
 unique `JobId`, which is used to reference it later.
 
+### Hints
+
 * Extend `SPCState` with a field of type `[(JobId,Job)]` which tracks
   pending jobs, and a field of type `JobId` which contains the next
   available job identifier. Update other parts of the code as
@@ -474,6 +476,8 @@ signature:
 jobStatus :: SPC -> JobId -> IO JobStatus
 ```
 
+### Hints
+
 * Add a constructor to `SPCMsg` for requesting the status of a job.
 
 * Handle the new message in `handleMsg`. If the provided `JobId` is
@@ -549,6 +553,8 @@ When a pending job is cancelled, it should be moved to a separate list
 of done jobs, which should associate a `JobId` with a `JobDoneReason`.
 After a job has been cancelled, performing asking for its status
 should return `DoneCancelled`.
+
+### Hints
 
 1. Extend `SPCState` with a list of done jobs.
 
@@ -640,6 +646,20 @@ with channels to send a message to once that job finishes. Then, when
 a job finishes (currently only possible when it is cancelled), we must
 send a response to all relevant channels.
 
+### Hints
+
+1. Extend `SPCMsg` with a new message for waiting on a given job to finish.
+
+2. Extend `SPCState` with with a field of type `[(JobId, Chan
+   JobDoneReason)]`.
+
+3. Extend `handleMsg` to handle the new message added in step 1.
+
+4. Modify `handleMsg`'s logic for job cancellation to see if anyone is
+   waiting for the job to be done (by inspecting the state list added
+   in step 2). If so, send `DoneCancelled` on the corresponding
+   channels and remove the waiters from the list.
+
 ### Solution
 
 <details>
@@ -704,15 +724,23 @@ testCase "canceling job" $ do
 
 ## Job Execution
 
-This task adds support for actually executing a job. We will initially
-ignore the possibility of timeouts and crashes and return to these
-concerns in later tasks.
+In this task you will add support for actually executing a job. We
+will initially ignore the possibility of timeouts and crashes and
+return to these concerns in later tasks.
 
-When SPC executes a job, it spawns a new thread (with `forkIO`) which
-runs the `jobAction`. We call this a *job thread* When the action is
-done, the job thread will send a message to SPC. Only one job thread
-should be running at any given time. To support `jobCancel` and
-`jobStatus`, SPC must track the currently running job (if any).
+The semantics of job execution are simple: when a job is enqueued, it
+will eventually be executed. Only a single job is under execution at
+any given time. If the scheduler is idle, and there are pending jobs,
+a pending job should be chosen and begin execution.
+
+Operationally, when SPC executes a job, it spawns a new thread (with
+`forkIO`) which runs the `jobAction`. We call this a *job thread* When
+the action is done, the job thread will send a message to SPC. Only
+one job thread should be running at any given time. To support
+`jobCancel` and `jobStatus`, SPC must track the currently running job
+(if any).
+
+### Hints
 
 0. We will now have multiple ways that a job can finish, so add a
    function `jobDone :: JobId -> JobDoneReason -> SPCM ()` that
@@ -920,10 +948,35 @@ In this task we will enforce the timeout contained in the `Job`
 datatype. If a job runtime exceeds its timeout, it will be terminated,
 and its `JobDoneReason` set to `DoneTimeout`.
 
+The key trick is based on the observation that SPC is only able to
+take action in response to a message, but a task stuck in an infinite
+loop sends no messages. Therefore we will add a trivial message with
+no payload (called a "tick") and arrange for a thread to exist that
+does nothing but infinitely send these tick messages to SPC every
+second or so.
+
+We further augment the state field tracking the currently running job
+to contain a *deadline*. When the current time (as retrieved by
+`getSeconds`) exceeds the deadline, the task must be terminated.
+
 ### Hints
 
-* Use `getSeconds` to get the current time. Add the maximum job
-  runtime to find the *deadline* for the job.
+0. Extend `SPCMsg` with a tick message type.
+
+1. Modify `SPCState` such that a running job is associated with a
+   deadline of type `Seconds`.
+
+2. Modify `schedule` such that when a job begins execution, its
+   deadline is set to the current time plus `jobMaxSeconds` of the
+   job.
+
+3. Add a function with signature `checkTimeouts :: SPCM ()` that
+   checks whether the current job has exceeded its deadlne. If so,
+   destroy the job thread with `killThread` and use `jobDone` to
+   register the fact that the job is now done.
+
+4. Extend `handleMsg` to call `checkTimeouts` as appropriate and
+   handle the new tick message type.
 
 ### Solution
 
@@ -934,6 +987,12 @@ and its `JobDoneReason` set to `DoneTimeout`.
 data SPCMsg =
   ...
   | MsgTick
+
+data SPCState = SPCState
+  { ...
+    spcChan :: Chan SPCMsg,
+    spcJobRunning :: Maybe (JobId, Seconds, ThreadId)
+  }
 
 schedule :: SPCM ()
 schedule = do
