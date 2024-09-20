@@ -35,4 +35,23 @@ tests =
         Lambda "x" (Lambda "y" (Add (Var "x") (Var "y")))
     , testNeg $
         Lambda "z" (Lambda "y" (Add (Var "x") (Var "y")))
+    , testPos $ 
+    -- The following tests were based on the test cases from Eval_Tests.hs and modified using ChatGPT 
+        Let "x" (CstInt 3) (Var "x")
+    , testNeg $ 
+        Add (Var "x") (CstInt 2)
+    , testPos $
+        Let "x" (CstInt 1) (Add (Var "x") (CstInt 2)) 
+    , testNeg $
+        Let "x" (CstInt 1) (Var "y")
+    , testNeg $
+        Let "x" (Var "y") (Var "x")
+    , testPos $
+        Let "x" (Let "y" (CstInt 2) (Var "y")) (Var "x")
+    , testNeg $
+        Let "x" (CstInt 1) (Let "y" (Var "z") (Var "x"))
+    , testPos $
+        Lambda "x" (Let "y" (Var "x") (Var "y"))
+    , testNeg $
+        Lambda "x" (Let "y" (Var "z") (Var "y"))
     ]
