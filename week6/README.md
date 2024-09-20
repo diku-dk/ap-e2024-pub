@@ -248,6 +248,9 @@ Now we are ready to use `SPCM`.
   `spcPingCounter` field from the state, and then increments the field
   by one.
 
+* Move the handling of a message into a separate function with
+  signature `handleMsg :: Chan SPCMsg -> SPCM ()`.
+
 * Add an appropriate test.
 
 ### Hints
@@ -262,6 +265,15 @@ Now we are ready to use `SPCM`.
 <summary>Open this to see the implementation</summary>
 
 ```Haskell
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  msg <- io $ readChan c
+  case msg of
+    MsgPing reply_chan -> do
+      state <- get
+      io $ writeChan reply_chan $ spcPingCounter state
+      put $ state {spcPingCounter = succ $ spcPingCounter state}
+
 startSPC :: IO SPC
 startSPC = do
   c <- newChan
@@ -271,14 +283,6 @@ startSPC = do
           }
   _ <- forkIO $ runSPCM initial_state $ forever $ handle c
   pure $ SPC c
-  where
-    handle c = do
-      msg <- io $ readChan c
-      case msg of
-        MsgPing reply_chan -> do
-          state <- get
-          io $ writeChan reply_chan $ spcPingCounter state
-          put $ state {spcPingCounter = succ $ spcPingCounter state}
 
 -- And a test:
 
@@ -296,7 +300,6 @@ tests =
           z <- pingSPC spc
           z @?= 2
       ]
-
 ```
 
 </details>
@@ -350,12 +353,15 @@ unique `JobId`, which is used to reference it later.
   available job identifier. Update other parts of the code as
   necessary.
 
-* Add a synchronous message to `SPCMsg` for adding a new job. This
-  message must also provide a channel for the reply, which contains
-  the `JobId`. When handling this message, you must add the job to the
-  list that you added to the state.
+* Add a synchronous message to `SPCMsg` for adding a new job. You must
+  decide what payload this message should contain, but it must at
+  least provide a channel for the reply, which is a `JobId`. When
+  handling this message, you must add the job to the list that you
+  added to the state.
 
-* Implement `jobAdd` by sending the message you added above.
+* Implement `jobAdd` by using the message you added above.
+
+* Add an appropriate test.
 
 ### Solution
 
@@ -368,6 +374,20 @@ data SPCState = SPCState
     spcJobCounter :: JobId
   }
 
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  msg <- io $ readChan c
+  case msg of
+    MsgJobAdd job reply -> do
+      state <- get
+      let JobId jobid = spcJobCounter state
+      put $
+        state
+          { spcJobsPending =
+              (spcJobCounter state, job) : spcJobsPending state,
+            spcJobCounter = JobId $ succ jobid
+          }
+      io $ writeChan reply $ JobId jobid
 
 startSPC :: IO SPC
 startSPC = do
@@ -377,22 +397,8 @@ startSPC = do
           { spcJobCounter = JobId 0,
             spcJobsPending = []
           }
-  _ <- forkIO $ runSPCM initial_state $ forever $ handle c
+  _ <- forkIO $ runSPCM initial_state $ forever $ handleMsg c
   pure $ SPC c
-  where
-    handle c = do
-      msg <- io $ readChan c
-      case msg of
-        MsgJobAdd job reply -> do
-          state <- get
-          let JobId jobid = spcJobCounter state
-          put $
-            state
-              { spcJobsPending =
-                  (spcJobCounter state, job) : spcJobsPending state,
-                spcJobCounter = JobId $ succ jobid
-              }
-          io $ writeChan reply $ JobId jobid
 
 -- | Add a job for scheduling.
 jobAdd :: SPC -> Job -> IO JobId
@@ -400,6 +406,126 @@ jobAdd (SPC c) job = do
   reply_chan <- newChan
   writeChan c $ MsgJobAdd job reply_chan
   readChan reply_chan
+
+-- And a test:
+
+tests :: TestTree
+tests =
+  localOption (mkTimeout 3000000) $
+    testGroup
+      "SPC (core)"
+      [ testCase "adding job" $ do
+          spc <- startSPC
+          _ <- jobAdd spc $ Job (pure ()) 1
+          pure ()
+      ]
+
+```
+
+</details>
+
+## Job Status
+
+We will now add functionality for querying the status of a job. The
+status of the job is expressed by the following two types:
+
+```Haskell
+-- | How a job finished.
+data JobDoneReason
+  = -- | Normal termination.
+    Done
+  | -- | The job was killed because it ran for too long.
+    DoneTimeout
+  | -- | The job was explicitly cancelled.
+    DoneCancelled
+  | -- | The job crashed due to an exception.
+    DoneCrashed
+  deriving (Eq, Ord, Show)
+
+-- | The status of a job.
+data JobStatus
+  = -- | The job is done and this is why.
+    JobDone JobDoneReason
+  | -- | The job is still running.
+    JobRunning
+  | -- | The job is enqueued, but is waiting for an idle worker.
+    JobPending
+  | -- | A job with this ID is not known to this SPC instance.
+    JobUnknown
+  deriving (Eq, Ord, Show)
+```
+
+* Add these type definitions to `SPC.Core` and also add them to the
+  module export list.
+
+Initially a job has status `JobPending`. In fact, since we have yet to
+implement actual execution of jobs, that is the only constructor we
+will make use of.
+
+Your task is now to implement the function with the following
+signature:
+
+```Haskell
+-- | Query the job status.
+jobStatus :: SPC -> JobId -> IO JobStatus
+```
+
+* Add a constructor to `SPCMsg` for requesting the status of a job.
+
+* Handle the new message in `handleMsg`. If the provided `JobId` is
+  found in the list of pending jobs, then the response should be
+  `JobPending`, and otherwise `JobUnknown`.
+
+* Implement the `jobStatus` function and add it to the module export
+  list.
+
+* Add an appropriate test, or modify an existing one to make use of
+  `jobStatus`.
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+
+data SPCMsg
+  = ...
+  | -- | Immediately reply the status of the job.
+    MsgJobStatus JobId (Chan JobStatus)
+
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  msg <- io $ readChan c
+  case msg of
+    ...
+    MsgJobStatus jobid reply -> do
+      state <- get
+      io $ writeChan reply $ case lookup jobid $ spcJobsPending state of
+        Just _ -> JobPending
+        _ -> JobUnknown
+
+-- | Add a job for scheduling.
+jobAdd :: SPC -> Job -> IO JobId
+jobAdd (SPC c) job = do
+  reply_chan <- newChan
+  writeChan c $ MsgJobAdd job reply_chan
+  readChan reply_chan
+
+-- And a test
+
+tests :: TestTree
+tests =
+  localOption (mkTimeout 3000000) $
+    testGroup
+      "SPC (core)"
+      [ testCase "adding job" $ do
+          spc <- startSPC
+          j <- jobAdd spc $ Job (pure ()) 1
+          r <- jobStatus spc j
+          r @?= JobPending
+      ]
+
 
 ```
 
