@@ -330,7 +330,7 @@ data Job = Job
 
 And are added by this function:
 
-```
+```Haskell
 -- | A unique identifier of a job that has been enqueued.
 newtype JobId = JobId Int
   deriving (Eq, Ord, Show)
@@ -805,7 +805,8 @@ testCase "running job" $ do
 ## Handling Crashing Jobs
 
 In this task we will handle the situation where a job throws an
-exception during execution.
+exception during execution. When this occurs, the job should be
+considered done, with a `JobDoneReason` of `DoneCrashed`.
 
 ### Solution
 
@@ -877,13 +878,24 @@ testCase "crash" $ do
 ## Handling Timeouts
 
 In this task we will enforce the timeout contained in the `Job`
-datatype. If a job runtime exceeds its timeout, it will be terminated.
-For this we will make use of the `getSeconds` function.
+datatype. If a job runtime exceeds its timeout, it will be terminated,
+and its `JobDoneReason` set to `DoneTimeout`.
+
+### Hints
+
+* Use `getSeconds` to get the current time. Add the maximum job
+  runtime to find the *deadline* for the job.
+
+### Solution
 
 <details>
 <summary>Open this to see the implementation</summary>
 
 ```Haskell
+data SPCMsg =
+  ...
+  | MsgTick
+
 schedule :: SPCM ()
 schedule = do
   state <- get
@@ -922,6 +934,10 @@ handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
   checkTimeouts
   ...
+  case msg of
+    ...
+    MsgTick ->
+      pure ()
 ```
 
 Test case:
