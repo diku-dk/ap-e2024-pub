@@ -78,6 +78,61 @@ evalTests =
         eval'
           (TryCatch (Div (CstInt 7) (CstInt 0)) (CstBool True))
           @?= ([], Right (ValBool True))
+    , -- Print
+      testCase "Print int" $ 
+        eval' 
+          (Print "x" (CstInt 2))
+          @?= (["x: 2"], Right (ValInt 2))
+    , --
+      testCase "Print bool" $ 
+        eval' 
+          (Print "x" (CstBool True))
+          @?= (["x: True"], Right (ValBool True))
+    , --
+      testCase "Print fun" $
+        eval' 
+          (Print "x" (Lambda "x" (Var "x")))
+          @?= (["x: #<fun>"], Right (ValFun [] "x" (Var "x")))
+    , -- KvPut
+      testCase "KvPut new" $
+        eval'
+          (KvPut (CstInt 3) (CstInt 4))
+          @?= ([], Right (ValInt 4))
+    , --
+      testCase "KvPut replace existing key" $
+        eval'
+          (Let "x" (KvPut (CstInt 3) (CstInt 4)) (KvPut (CstInt 3) (CstInt 5)))
+          @?= ([], Right (ValInt 5))
+    , --
+      testCase "KvPut with expression" $
+        eval'
+          (KvPut (Add (CstInt 1 ) (CstInt 2)) (CstInt 4))
+          @?= ([], Right (ValInt 4))
+    , --
+      testCase "KvPut with expression value" $
+        eval'
+          (KvPut (CstInt 3) (Add (CstInt 2) (CstInt 2)))
+          @?= ([], Right (ValInt 4))
+    , -- 
+      testCase "KvPut (Shadowing)" $
+        eval'
+          (Let "x" (KvPut (CstInt 3) (CstInt 4)) (Let "x" (CstInt 5) (Var "x")))
+          @?= ([], Right (ValInt 5))
+    , -- KvGet
+      testCase "KvGet non-existing key" $
+        eval'
+          (KvGet (CstInt 5))
+          @?= ([], Left "Invalid key: ValInt 5")
+    , --
+      testCase "KvGet" $
+        eval'
+          (Let "x" (KvPut (CstInt 3) (CstInt 4)) (KvGet (CstInt 3)))
+          @?= ([], Right (ValInt 4))
+    , --
+      testCase "KvGet with expression key" $
+        eval'
+          (Let "x" (KvPut (CstInt 3) (CstInt 4)) (KvGet (Add (CstInt 1) (CstInt 2))))
+          @?= ([], Right (ValInt 4))
     ]
 
 tests :: TestTree
