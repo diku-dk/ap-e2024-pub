@@ -31,4 +31,8 @@ tests =
         Var "x"
     , testNeg $
         Lambda "y" (Var "x")
+    , testPos $
+        Lambda "x" (Lambda "y" (Add (Var "x") (Var "y")))
+    , testNeg $
+        Lambda "z" (Lambda "y" (Add (Var "x") (Var "y")))
     ]
