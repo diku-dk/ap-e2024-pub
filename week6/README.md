@@ -709,7 +709,6 @@ will ignore the possibility of timeouts and crashes.
 <summary>Open this to see the implementation</summary>
 
 ```Haskell
-
 data SPCMsg
   = ...
   | MsgJobDone JobId
@@ -760,6 +759,18 @@ handleMsg c = do
   msg <- io $ readChan c
   case msg of
     ...
+    MsgJobStatus jobid reply -> do
+      state <- get
+      io $ writeChan reply $ case ( lookup jobid $ spcJobsPending state,
+                                    spcJobRunning state,
+                                    lookup jobid $ spcJobsDone state
+                                  ) of
+        (Just _, _, _) -> JobPending
+        (_, Just (running_job, _, _), _)
+          | running_job == jobid ->
+              JobRunning
+        (_, _, Just r) -> JobDone r
+        _ -> JobUnknown
     MsgJobDone done_jobid -> do
       state <- get
       case spcJobRunning state of
@@ -774,19 +785,27 @@ handleMsg c = do
           io $ killThread tid
           jobDone jobid DoneCancelled
         _ -> pure ()
-    MsgJobCrashed crashed_jobid -> do
-      state <- get
-      case spcJobRunning state of
-        Just (jobi, tid) | jobid == crashed_jobid -> do
-          io $ killThread tid
-          jobDone jobid DoneCrashed
-        _ -> pure ()
+```
 
+Test case.
+
+```Haskell
+testCase "running job" $ do
+  ref <- newIORef False
+  spc <- startSPC
+  j <- jobAdd spc $ Job (writeIORef ref True) 1
+  r <- jobWait spc j
+  r @?= Done
+  x <- readIORef ref
+  x @?= True
 ```
 
 </details>
 
 ## Handling Crashing Jobs
+
+In this task we will handle the situation where a job throws an
+exception during execution.
 
 ### Solution
 
@@ -800,12 +819,71 @@ data SPCMsg
   | MsgJobDone JobId
   | MsgJobCrashed JobId
 
-data SPCState = SPCState
-  { ...
-    spcChan :: Chan SPCMsg,
-    spcJobRunning :: Maybe (JobId, Seconds, ThreadId)
-  }
+schedule :: SPCM ()
+schedule = do
+  state <- get
+  case (spcJobRunning state, spcJobsPending state) of
+    (Nothing, (jobid, job) : jobs) -> do
+      t <- io $ forkIO $ do
+        let doJob = do
+              jobAction job
+              writeChan (spcChan state) $ MsgJobDone jobid
+            onException :: SomeException -> IO ()
+            onException _ =
+              writeChan (spcChan state) $ MsgJobCrashed jobid
+        doJob `catch` onException
+      now <- io $ getSeconds
+      put $
+        state
+          { spcJobRunning = Just (jobid, t),
+            spcJobsPending = jobs
+          }
+    _ -> pure ()
 
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  schedule
+  msg <- io $ readChan c
+  case msg of
+    ...
+    MsgJobCrashed crashed_jobid -> do
+      state <- get
+      case spcJobRunning state of
+        Just (jobid, tid) | jobid == crashed_jobid ->
+          jobDone jobid DoneCrashed
+        _ -> pure ()
+
+```
+
+Test case:
+
+```Haskell
+testCase "crash" $ do
+  spc <- startSPC
+  j1 <- jobAdd spc $ Job (error "boom") 1
+  r1 <- jobWait spc j1
+  r1 @?= DoneCrashed
+  -- Ensure new jobs can still work.
+  ref <- newIORef False
+  j2 <- jobAdd spc $ Job (writeIORef ref True) 1
+  r2 <- jobWait spc j2
+  r2 @?= Done
+  v <- readIORef ref
+  v @?= True
+```
+
+</details>
+
+## Handling Timeouts
+
+In this task we will enforce the timeout contained in the `Job`
+datatype. If a job runtime exceeds its timeout, it will be terminated.
+For this we will make use of the `getSeconds` function.
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
 schedule :: SPCM ()
 schedule = do
   state <- get
@@ -828,20 +906,35 @@ schedule = do
           }
     _ -> pure ()
 
+checkTimeouts :: SPCM ()
+checkTimeouts = do
+  state <- get
+  now <- io getSeconds
+  case spcJobRunning state of
+    Just (jobid, deadline, tid)
+      | now >= deadline -> do
+          io $ killThread tid
+          put $ state {spcJobRunning = Nothing}
+          jobDone jobid DoneTimeout
+    _ -> pure ()
+
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
-  schedule
-  msg <- io $ readChan c
-  case msg of
-    ...
-    MsgJobCrashed crashed_jobid -> do
-      state <- get
-      case spcJobRunning state of
-        Just (jobid, _, tid) | jobid == crashed_jobid -> do
-          io $ killThread tid
-          jobDone jobid DoneCrashed
-        _ -> pure ()
+  checkTimeouts
+  ...
+```
 
+Test case:
+
+```
+testCase "timeout" $ do
+  spc <- startSPC
+  ref <- newIORef False
+  j <- jobAdd spc $ Job (threadDelay 2000000 >> writeIORef ref True) 1
+  r1 <- jobStatus spc j
+  r1 @?= JobRunning
+  r2 <- jobWait spc j
+  r2 @?= DoneTimeout,
 ```
 
 </details>
