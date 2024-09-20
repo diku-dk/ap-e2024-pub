@@ -531,7 +531,7 @@ tests =
 
 </details>
 
-## Job cancellation
+## Job Cancellation
 
 This task is about implementing the following function, which cancels
 a job and receives no response (even of the job was invalid).
@@ -617,7 +617,7 @@ testCase "canceling job" $ do
 
 </details>
 
-## Job waiting
+## Job Waiting
 
 This task adds support for synchronously waiting for a job to finish,
 and receiving the `JobDoneReason` in response. Currently we can only
@@ -698,12 +698,150 @@ testCase "canceling job" $ do
 
 </details>
 
-## Job execution
+## Job Execution
 
-This task adds support for actually executing a job.
+This task adds support for actually executing a job. To begin with we
+will ignore the possibility of timeouts and crashes.
 
 ### Solution
 
 <details>
 <summary>Open this to see the implementation</summary>
+
+```Haskell
+
+data SPCMsg
+  = ...
+  | MsgJobDone JobId
+
+data SPCState = SPCState
+  { ...
+    spcChan :: Chan SPCMsg,
+    spcJobRunning :: Maybe (JobId, ThreadId)
+  }
+
+schedule :: SPCM ()
+schedule = do
+  state <- get
+  case (spcJobRunning state, spcJobsPending state) of
+    (Nothing, (jobid, job) : jobs) -> do
+      t <- io $ forkIO $ do
+        jobAction job
+        writeChan (spcChan state) $ MsgJobDone jobid
+      put $
+        state
+          { spcJobRunning = Just (jobid, t),
+            spcJobsPending = jobs
+          }
+    _ -> pure ()
+
+jobDone :: JobId -> JobDoneReason -> SPCM ()
+jobDone jobid reason = do
+  state <- get
+  case lookup jobid $ spcJobsDone state of
+    Just _ ->
+      -- We already know this job is done.
+      pure ()
+    Nothing -> do
+      let (waiting_for_job, not_waiting_for_job) =
+            partition ((== jobid) . fst) (spcWaiting state)
+      forM_ waiting_for_job $ \(_, c) ->
+        io $ writeChan c reason
+      put $
+        state
+          { spcWaiting = not_waiting_for_job,
+            spcJobsDone = (jobid, reason) : spcJobsDone state,
+            spcJobsPending = removeAssoc jobid $ spcJobsPending state
+          }
+
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  schedule
+  msg <- io $ readChan c
+  case msg of
+    ...
+    MsgJobDone done_jobid -> do
+      state <- get
+      case spcJobRunning state of
+        Just (jobid, _)
+          | jobid == done_jobid ->
+              jobDone jobid Done
+        _ -> pure ()
+    MsgJobCancel cancel_jobid -> do
+      state <- get
+      case spcJobRunning state of
+        Just (jobid, tid) | jobid == cancel_jobid -> do
+          io $ killThread tid
+          jobDone jobid DoneCancelled
+        _ -> pure ()
+    MsgJobCrashed crashed_jobid -> do
+      state <- get
+      case spcJobRunning state of
+        Just (jobi, tid) | jobid == crashed_jobid -> do
+          io $ killThread tid
+          jobDone jobid DoneCrashed
+        _ -> pure ()
+
+```
+
+</details>
+
+## Handling Crashing Jobs
+
+### Solution
+
+<details>
+<summary>Open this to see the implementation</summary>
+
+```Haskell
+
+data SPCMsg
+  = ...
+  | MsgJobDone JobId
+  | MsgJobCrashed JobId
+
+data SPCState = SPCState
+  { ...
+    spcChan :: Chan SPCMsg,
+    spcJobRunning :: Maybe (JobId, Seconds, ThreadId)
+  }
+
+schedule :: SPCM ()
+schedule = do
+  state <- get
+  case (spcJobRunning state, spcJobsPending state) of
+    (Nothing, (jobid, job) : jobs) -> do
+      t <- io $ forkIO $ do
+        let doJob = do
+              jobAction job
+              writeChan (spcChan state) $ MsgJobDone jobid
+            onException :: SomeException -> IO ()
+            onException _ =
+              writeChan (spcChan state) $ MsgJobCrashed jobid
+        doJob `catch` onException
+      now <- io $ getSeconds
+      let deadline = now + fromIntegral (jobMaxSeconds job)
+      put $
+        state
+          { spcJobRunning = Just (jobid, deadline, t),
+            spcJobsPending = jobs
+          }
+    _ -> pure ()
+
+handleMsg :: Chan SPCMsg -> SPCM ()
+handleMsg c = do
+  schedule
+  msg <- io $ readChan c
+  case msg of
+    ...
+    MsgJobCrashed crashed_jobid -> do
+      state <- get
+      case spcJobRunning state of
+        Just (jobid, _, tid) | jobid == crashed_jobid -> do
+          io $ killThread tid
+          jobDone jobid DoneCrashed
+        _ -> pure ()
+
+```
+
 </details>
