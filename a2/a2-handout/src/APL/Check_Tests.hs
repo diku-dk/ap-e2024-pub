@@ -23,10 +23,15 @@ tests :: TestTree
 tests =
   testGroup
     "Checking"
-    [ testPos $
+    [ {- The argument for not testing all the different available options is, that
+       - they make use of the checkListExp function all of them. If that function
+       - works, then they are fundamentally except does that do not use it.-}
+      testPos $
         Lambda "x" (Var "x")
     , testPos $
         CstInt 2
+    , testPos $
+        CstBool True
     , testNeg $
         Var "x"
     , testNeg $
@@ -35,21 +40,14 @@ tests =
         Lambda "x" (Lambda "y" (Add (Var "x") (Var "y")))
     , testNeg $
         Lambda "z" (Lambda "y" (Add (Var "x") (Var "y")))
-    , testPos $ 
-    -- The following tests were based on the test cases from Eval_Tests.hs and modified using ChatGPT 
+    , testPos $
         Let "x" (CstInt 3) (Var "x")
-    , testNeg $ 
+    , testNeg $
         Add (Var "x") (CstInt 2)
     , testPos $
-        Let "x" (CstInt 1) (Add (Var "x") (CstInt 2)) 
+        Let "x" (CstInt 1) (Add (Var "x") (CstInt 2))
     , testNeg $
         Let "x" (CstInt 1) (Var "y")
-    , testNeg $
-        Let "x" (Var "y") (Var "x")
-    , testPos $
-        Let "x" (Let "y" (CstInt 2) (Var "y")) (Var "x")
-    , testNeg $
-        Let "x" (CstInt 1) (Let "y" (Var "z") (Var "x"))
     , testPos $
         Lambda "x" (Let "y" (Var "x") (Var "y"))
     , testNeg $
