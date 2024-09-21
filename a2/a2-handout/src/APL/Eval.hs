@@ -89,7 +89,7 @@ catch (EvalM m1) (EvalM m2) = EvalM $ \env s ->
 runEval :: EvalM a -> ([String], Either Error a)
 runEval (EvalM m) =
   case m envEmpty stateEmpty of
-    ((str, _), a) -> (str, a)
+    ((str, _), z) -> (str, z)
 
 evalIntBinOp :: (Integer -> Integer -> EvalM Integer) -> Exp -> Exp -> EvalM Val
 evalIntBinOp f e1 e2 = do
