@@ -40,7 +40,8 @@ handout
 │       ├── InterpIO.hs
 │       ├── InterpPure.hs
 │       ├── Interp_Tests.hs
-│       └── Monad.hs
+│       ├── Monad.hs
+│       └── Util.hs
 └── week4.cabal
 ```
 
@@ -65,6 +66,10 @@ handout
    that some definitions from assignment 2 have moved from `APL.Eval` to
    `APL.Monad` in this assignment; e.g. `Val` and definitions related to the
    environment.
+
+- `src/APL/Util.hs`: Utility functions needed for serialization, testing IO, and
+   making temporary database files. You can safely ignore this file. **Do not
+   modify this file.**
   
 ### Getting Started
 
