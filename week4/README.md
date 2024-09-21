@@ -72,8 +72,17 @@ handout
   
 ### Getting Started
 
-- `APL.Eval`: Replace the definition of `eval` with your complete evaluator
-  from your solution to assignment 2.
+- `APL.Eval`: To make testing easier, you should replace the definition of
+  `eval` with your complete evaluator from your solution to assignment 2.
+
+  Note that doing this isn't strictly required and you can fully solve and test
+  (by constructing the appropriate `EvalM` values directly or with the interface
+  functions in `APL.Monad`) both these exercises and the assignment without
+  replacing `eval`. But, we think it's probably nicer to have a complete version
+  of `eval` that can handle all of the different expression types. It's also
+  cool to see that you don't have to change your version of `eval` from
+  assignment 2 at all despite the fact that the underlying monad will change
+  rather significantly.
 
 ### `Functor` and `Monad` instances for `Free e a`
 
