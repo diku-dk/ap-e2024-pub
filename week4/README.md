@@ -67,9 +67,8 @@ handout
    `APL.Monad` in this assignment; e.g. `Val` and definitions related to the
    environment.
 
-- `src/APL/Util.hs`: Utility functions needed for serialization, testing IO, and
-   making temporary database files. You can safely ignore this file. **Do not
-   modify this file.**
+- `src/APL/Util.hs`: Utility functions needed for testing IO and some other
+   stuff. You can safely ignore this file. **Do not modify this file.**
   
 ### Getting Started
 
