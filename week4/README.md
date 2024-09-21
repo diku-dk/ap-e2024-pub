@@ -575,6 +575,7 @@ We can use `captureIO` to test an IO-based interpretation of a `Print`-expressio
 like so:
 
 ```hs
+-- APL.Interp_Tests
 testCase "print" $ do
      let s1 = "Not me chaining monads while you still tryna chain texts to your ex"
          s2 = "Bro, this effect stack is higher than your chances of not getting ghosted again"
