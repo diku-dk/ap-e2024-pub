@@ -72,15 +72,24 @@ ioTests :: TestTree
 ioTests =
   testGroup
     "IO interpreter"
-    [ -- NOTE: This test will give a runtime error unless you replace the
-      -- version of `eval` in `APL.Eval` with a complete version that supports
-      -- `Print`-expressions.
-      testCase "print" $ do
+    [ testCase "print" $ do
+        let s1 = "Not me chaining monads while you still tryna chain texts to your ex"
+            s2 = "Bro, this effect stack is higher than your chances of not getting ghosted again"
         (out, res) <-
           captureIO [] $
-            evalIO' $
-              Print "This is also 1" $
-                Print "This is 1" $
-                  CstInt 1
-        (out, res) @?= (["This is 1: 1", "This is also 1: 1"], Right $ ValInt 1)
+            runEvalIO $ do
+              evalPrint s1
+              evalPrint s2
+        (out, res) @?= ([s1, s2], Right ())
+        -- NOTE: This test will give a runtime error unless you replace the
+        -- version of `eval` in `APL.Eval` with a complete version that supports
+        -- `Print`-expressions. Uncomment at your own risk.
+        -- testCase "print 2" $ do
+        --    (out, res) <-
+        --      captureIO [] $
+        --        evalIO' $
+        --          Print "This is also 1" $
+        --            Print "This is 1" $
+        --              CstInt 1
+        --    (out, res) @?= (["This is 1: 1", "This is also 1: 1"], Right $ ValInt 1)
     ]

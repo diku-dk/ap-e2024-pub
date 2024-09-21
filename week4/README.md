@@ -571,11 +571,14 @@ like so:
 
 ```hs
 testCase "print" $ do
+     let s1 = "Not me chaining monads while you still tryna chain texts to your ex."
+         s2 = "Bro, this effect stack is higher than your chances of not getting ghosted again."
      (out, res) <-
        captureIO [] $
-         evalIO' $
-             Print "This is 1" $ CstInt 1
-     (out, res) @?= (["This is 1: 1"], Right $ ValInt 1)
+         runEvalIO $ do
+           evalPrint s1
+           evalPrint s2
+     (out, res) @?= ([s1, s2], Right ())
 ```
 
 For print effects, we don't have any input to `stdin` so we just feed `captureIO`
