@@ -553,34 +553,34 @@ different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
 
-To test IO-based interpretation of effects, a special function `testIO` (do **not** modify it) is
-provided for you in `APL.Interp_Tests`:
+To test IO-based interpretation of effects, a special function `captureIO` is
+provided for you:
 
 ```hs
-testIO :: [String] -> IO a -> IO ([String], a)
+captureIO :: [String] -> IO a -> IO ([String], a)
 ```
 
-You use `testIO` like this: `testIO inputs m`, where `inputs` is a list of
+You use `captureIO` like this: `captureIO inputs m`, where `inputs` is a list of
 inputs you'd like to write to `stdin` during the execution of the `m`
-action. `testIO` runs `m` using `inputs` as input to `stdin` and captures
+action. `captureIO` runs `m` using `inputs` as input to `stdin` and captures
 any output to `stdout`, returning it as a list of strings (and also returns the
 result of the computation itself).
 
-We can use `testIO` to test an IO-based interpretation of a `Print`-expression
+We can use `captureIO` to test an IO-based interpretation of a `Print`-expression
 like so:
 
 ```hs
 testCase "print" $ do
      (out, res) <-
-       testIO [] $
+       captureIO [] $
          evalIO' $
              Print "This is 1" $ CstInt 1
      (out, res) @?= (["This is 1: 1"], Right $ ValInt 1)
 ```
 
-For print effects, we don't have any input to `stdin` so we just feed `testIO`
+For print effects, we don't have any input to `stdin` so we just feed `captureIO`
 an empty list (`[]`).  In the assignment, you'll add additional effects that do
-read from `stdin` and will have to add inputs for `testIO` to test these
+read from `stdin` and will have to add inputs for `captureIO` to test these
 additional effects.
 
 - `APL.Interp_Tests`: Add tests to `ioTests` for the `PrintOp` effect.
