@@ -594,6 +594,8 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 
 </details>
 
+### Testing `runEvalIO`
+
 To test IO-based interpretation of effects, a special function `captureIO` is
 provided for you:
 
