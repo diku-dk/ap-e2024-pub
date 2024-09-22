@@ -3,6 +3,7 @@ module APL.Eval
     eval,
     runEval,
     Error,
+    runEvalTest,
   )
 where
 
@@ -62,7 +63,7 @@ failure s = EvalM $ \_env state -> (state, Left s)
 catch :: EvalM a -> EvalM a -> EvalM a
 catch (EvalM m1) (EvalM m2) = EvalM $ \env (state, store) ->
   case m1 env (state, store) of
-    ((state', _), Left _) -> m2 env (state', store)
+    ((state', store'), Left _) -> m2 env (state', store')
     (state', Right x) -> (state', Right x)
 
 runEval :: EvalM a -> ([String], Either Error a)
@@ -71,6 +72,9 @@ runEval (EvalM m) =
    in case result of
         ((state, _), Left err) -> (state, Left err)
         ((state, _), Right x) -> (state, Right x)
+
+runEvalTest :: EvalM a -> (State, Either Error a)
+runEvalTest (EvalM m) = m envEmpty stateEmpty
 
 evalIntBinOp :: (Integer -> Integer -> EvalM Integer) -> Exp -> Exp -> EvalM Val
 evalIntBinOp f e1 e2 = do
@@ -142,12 +146,12 @@ eval (Print s e) = do
     ValFun {} -> evalPrint (s ++ ": #<fun>")
     ValInt x -> evalPrint (s ++ ": " ++ show x)
     ValBool b -> evalPrint (s ++ ": " ++ show b)
-  EvalM $ \_env state -> (state, Right v)
+  pure v
 eval (KvPut e1 e2) = do
   v1 <- eval e1
   v2 <- eval e2
   evalKvPut v1 v2
-  EvalM $ \_env state -> (state, Right v2)
+  pure v2
 eval (KvGet e) = do
   v <- eval e
   evalKvGet v

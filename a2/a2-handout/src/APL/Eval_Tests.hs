@@ -1,12 +1,15 @@
 module APL.Eval_Tests (tests) where
 
 import APL.AST (Exp (..))
-import APL.Eval (Error, Val (..), eval, runEval)
+import APL.Eval (Error, Val (..), eval, runEval, runEvalTest)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
 eval' :: Exp -> ([String], Either Error Val)
 eval' = runEval . eval
+
+evalTest :: Exp -> (([String], [(Val, Val)]), Either Error Val)
+evalTest = runEvalTest . eval
 
 evalTests :: TestTree
 evalTests =
@@ -79,6 +82,16 @@ evalTests =
           (TryCatch (Div (CstInt 7) (CstInt 0)) (CstBool True))
           @?= ([], Right (ValBool True)),
       --
+      testCase "TryCatch with print effect in e1" $
+        eval'
+          (TryCatch (Div (CstInt 7) (Print "Foo" (CstBool True))) (CstBool False))
+          @?= (["Foo: True"], Right (ValBool False)),
+      --
+      testCase "TryCatch with KvPut effect in e1" $
+        evalTest
+          (TryCatch (Div (CstInt 7) (KvPut (CstInt 0) (CstBool True))) (CstBool False))
+          @?= (([], [(ValInt 0, ValBool True)]), Right (ValBool False)),
+      --
       testCase "Print Int" $
         eval'
           (Print "Hello" (CstInt 42))
@@ -131,17 +144,7 @@ evalTests =
                   (KvGet (CstInt 0))
               )
           )
-          @?= ([], Right (ValBool False)),
-      --
-      testCase "TryCatch with store" $
-        eval'
-          ( Let
-              "x"
-              (KvPut (CstInt 0) (CstBool True))
-              ( TryCatch (Let "x" (KvPut (CstInt 0) (CstBool False)) (Div (CstInt 7) (CstInt 0))) (KvGet (CstInt 0))
-              )
-          )
-          @?= ([], Right (ValBool True))
+          @?= ([], Right (ValBool False))
     ]
 
 tests :: TestTree
