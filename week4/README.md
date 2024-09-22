@@ -8,6 +8,11 @@
 
 * Chapter 10 in *Programming in Haskell*.
 
+### Going Beyond
+
+* [Free Monads for Less part 1](http://comonad.com/reader/2011/free-monads-for-less/)
+* [Free Monads for Less part 2](http://comonad.com/reader/2011/free-monads-for-less-2/)
+
 ## Exercises
 
 In these exercises, you will construct a monadic interpreter similar in
