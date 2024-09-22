@@ -73,8 +73,8 @@ ioTests =
   testGroup
     "IO interpreter"
     [ testCase "print" $ do
-        let s1 = "Not me chaining monads while you still tryna chain texts to your ex"
-            s2 = "Bro, this effect stack is higher than your chances of not getting ghosted again"
+        let s1 = "Lalalalala"
+            s2 = "Weeeeeeeee"
         (out, res) <-
           captureIO [] $
             runEvalIO $ do
