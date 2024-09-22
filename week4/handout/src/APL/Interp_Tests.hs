@@ -4,7 +4,7 @@ import APL.AST (Exp (..))
 import APL.Eval (eval)
 import APL.InterpIO (runEvalIO)
 import APL.InterpPure (runEval)
-import APL.Monad (Error, Val (..))
+import APL.Monad (Error, Val (..), askEnv, localEnv)
 import Control.Concurrent (threadDelay)
 import Control.Exception (bracket)
 import GHC.IO.Handle (hDuplicate, hDuplicateTo)
@@ -29,7 +29,18 @@ pureTests :: TestTree
 pureTests =
   testGroup
     "Pure interpreter"
-    []
+    [ testGroup
+        "ReaderOp"
+        [ testCase "Let" $
+            eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
+              @?= ValInt 5,
+          testCase
+            "LocalEnv"
+            $ runEval
+              (localEnv (const [("x", ValInt 1)]) $ askEnv)
+              @?= [("x", ValInt 1)]
+        ]
+    ]
 
 ioTests :: TestTree
 ioTests =
