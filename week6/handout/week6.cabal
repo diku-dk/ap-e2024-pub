@@ -1,5 +1,5 @@
 cabal-version:      3.0
-name:               week4
+name:               week6
 version:            1.0.0.0
 build-type:         Simple
 
@@ -14,23 +14,16 @@ library
         base
       , tasty
       , tasty-hunit
-      , process
-      , directory
+      , clock
     exposed-modules:
-        APL.AST
-        APL.Eval
-        APL.InterpPure
-        APL.InterpIO
-        APL.Interp_Tests
-        APL.Monad
-        APL.Util
+        SPC.Core
+        SPC.Core_Tests
 
-test-suite week4-test
+test-suite week6-tests
     import: common
     type: exitcode-stdio-1.0
     main-is: runtests.hs
     build-depends:
         base
       , tasty
-      , week4
-      , process
+      , week6

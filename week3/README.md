@@ -146,7 +146,7 @@ lexeme p = p <* space
 </details>
 
 Now use `lexeme` to modify `lInteger` to consume trailing whitespace
-such that the `parseTest` example above.
+such as in the `parseTest` example above.
 
 <details>
 <summary>Open this to see the answer</summary>
@@ -293,7 +293,7 @@ pExp :: Parser Exp
 pExp =
   choice
     [ CstInt <$> lInteger,
-      Var <$> lVName,
+      Var <$> lVName
     ]
 ```
 
@@ -365,7 +365,7 @@ pExp =
   choice
     [ CstInt <$> lInteger,
       CstBool <$> lBool,
-      Var <$> lVName,
+      Var <$> lVName
     ]
 ```
 

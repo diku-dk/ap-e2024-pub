@@ -15,6 +15,7 @@ library
       , tasty
       , tasty-hunit
       , process
+      , directory
     exposed-modules:
         APL.AST
         APL.Eval
@@ -22,6 +23,7 @@ library
         APL.InterpIO
         APL.Interp_Tests
         APL.Monad
+        APL.Util
 
 test-suite week4-test
     import: common
@@ -31,3 +33,4 @@ test-suite week4-test
         base
       , tasty
       , week4
+      , process
