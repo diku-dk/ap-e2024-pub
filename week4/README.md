@@ -6,6 +6,8 @@
 
 * [Course Notes Chapter 4](https://diku-dk.github.io/ap-notes/chapter_4.html)
 
+  * Optional: [Introduction to Free Monads](https://serokell.io/blog/introduction-to-free-monads)
+
 * Chapter 10 in *Programming in Haskell*.
 
 ### Going Beyond
