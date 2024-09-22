@@ -604,7 +604,7 @@ captureIO :: [String] -> IO a -> IO ([String], a)
 ```
 
 You use `captureIO` like this: `captureIO inputs m`, where `inputs` is a list of
-inputs you'd like to write to `stdin` during the execution of the `m`
+inputs (lines) you'd like to write to `stdin` during the execution of the `m`
 action. `captureIO` runs `m` using `inputs` as input to `stdin` and captures
 any output to `stdout`, returning it as a list of strings (and also returns the
 result of the computation itself).
