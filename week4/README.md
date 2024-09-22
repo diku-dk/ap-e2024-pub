@@ -566,6 +566,34 @@ different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
 
+#### Hints
+
+You can use `putStrLn` to print strings to the terminal.
+
+#### Solution
+
+<details>
+<summary>Open this to see the answer</summary>
+
+
+```hs
+-- APL.InterpIO:
+runEvalIO :: EvalM a -> IO (Either Error a)
+runEvalIO = runEvalIO' envEmpty stateInitial
+  where
+    runEvalIO' :: Env -> State -> EvalM a -> IO (Either Error a)
+    runEvalIO' _ _ (Pure x) = pure $ pure x
+    runEvalIO' r s (Free (ReadOp k)) = runEvalIO' r s $ k r
+    runEvalIO' r s (Free (StateGetOp k)) = runEvalIO' r s $ k s
+    runEvalIO' r _ (Free (StatePutOp s' m)) = runEvalIO' r s' m
+    runEvalIO' r s (Free (PrintOp p m)) = do
+      putStrLn p
+      runEvalIO' r s m
+    runEvalIO' _ _ (Free (ErrorOp e)) = pure $ Left e
+```
+
+</details>
+
 To test IO-based interpretation of effects, a special function `captureIO` is
 provided for you:
 
@@ -602,33 +630,6 @@ additional effects.
 
 - `APL.Interp_Tests`: Add tests to `ioTests` for the `PrintOp` effect.
 
-#### Hints
-
-You can use `putStrLn` to print strings to the terminal.
-
-#### Solution 
-
-<details>
-<summary>Open this to see the answer</summary>
-
-
-```hs
--- APL.InterpIO:
-runEvalIO :: EvalM a -> IO (Either Error a)
-runEvalIO = runEvalIO' envEmpty stateInitial
-  where
-    runEvalIO' :: Env -> State -> EvalM a -> IO (Either Error a)
-    runEvalIO' _ _ (Pure x) = pure $ pure x
-    runEvalIO' r s (Free (ReadOp k)) = runEvalIO' r s $ k r
-    runEvalIO' r s (Free (StateGetOp k)) = runEvalIO' r s $ k s
-    runEvalIO' r _ (Free (StatePutOp s' m)) = runEvalIO' r s' m
-    runEvalIO' r s (Free (PrintOp p m)) = do
-      putStrLn p
-      runEvalIO' r s m
-    runEvalIO' _ _ (Free (ErrorOp e)) = pure $ Left e
-```
-
-</details>
 
 [^1]: This is an inefficient way to implement local environments (since you have
     to traverse over the entire effect stack each time); a better way would be
