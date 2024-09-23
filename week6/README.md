@@ -543,7 +543,7 @@ tests =
 ## Job Cancellation
 
 This task is about implementing the following function, which cancels
-a job and receives no response (even of the job was invalid).
+a job and receives no response (even if the job was invalid).
 
 ```Haskell
 -- | Asynchronously cancel a job.
