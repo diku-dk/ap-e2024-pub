@@ -24,54 +24,72 @@ envExtend :: VName -> Val -> Env -> Env
 envExtend v val env = (v, val) : env
 
 envLookup :: VName -> Env -> Maybe Val
-envLookup v env = lookup v env
+envLookup = lookup
 
-type State = [String]
+type State = ([String], [(Val, Val)])
 
 stateEmpty :: State
-stateEmpty = []
+stateEmpty = ([], [])
 
 type Error = String
 
-newtype EvalM a = EvalM (Env -> State -> Either Error a)
+newtype EvalM a = EvalM (Env -> State -> (State, Either Error a))
 
 instance Functor EvalM where
   fmap = liftM
 
 instance Applicative EvalM where
-  pure x = EvalM $ \_env _s -> Right x
+  pure x = EvalM $ \_env s -> (s, Right x)
   (<*>) = ap
 
 instance Monad EvalM where
   EvalM x >>= f = EvalM $ \env s ->
     case x env s of
-      Left err -> Left err
-      Right x' ->
+      (s', Left err) -> (s', Left err)
+      (s', Right x') ->
         let EvalM y = f x'
-         in y env s
-
-evalPrint :: String -> EvalM ()
-evalPrint str = EvalM $ \_env s ->
-  let _ns = s ++ [str]
-   in pure ()
+         in y env s'
 
 askEnv :: EvalM Env
-askEnv = EvalM $ \env _s -> Right env
+askEnv = EvalM $ \env s -> (s, Right env)
 
 localEnv :: (Env -> Env) -> EvalM a -> EvalM a
-localEnv f (EvalM m) = EvalM $ \env s -> m (f env) s
+localEnv f (EvalM m) = EvalM $ \env -> m (f env)
 
 failure :: String -> EvalM a
-failure s = EvalM $ \_env _state -> Left s
+failure s = EvalM $ \_env state -> (state, Left s)
+
+evalKvGet :: Val -> EvalM Val
+evalKvGet v = EvalM $ \_env (str, hash) ->
+  case lookup v hash of
+    Nothing -> ((str, hash), Left $ "Invalid key: " ++ show v)
+    Just b -> ((str, hash), Right b)
+
+evalKvPut :: Val -> Val -> EvalM ()
+evalKvPut v1 v2 = EvalM $ \_env (str, hash) ->
+  case lookup v1 hash of
+    Nothing -> ((str, (v1, v2) : hash), Right ())
+    Just _ ->
+      ((str, (v1, v2) : hash2), Right ())
+     where
+      -- We remove the item, where the key is with filter.
+      hash2 = filter (\(k, _) -> k /= v1) hash
+
+evalPrint :: String -> EvalM ()
+evalPrint s = EvalM $ \_env state ->
+  case state of
+    (str, hash) -> ((str ++ [s], hash), Right ())
 
 catch :: EvalM a -> EvalM a -> EvalM a
 catch (EvalM m1) (EvalM m2) = EvalM $ \env s ->
   case m1 env s of
-    Left _ -> m2 env s
-    Right x -> Right x
+    (_, Left _) -> m2 env s
+    (s', Right x) -> (s', Right x)
 
-runEval :: EvalM a -> Either Error a
-runEval (EvalM m) = m envEmpty stateEmpty
+runEval :: EvalM a -> ([String], Either Error a)
+runEval (EvalM m) =
+  case m envEmpty stateEmpty of
+    ((str, _), z) -> (str, z)
 
 evalIntBinOp :: (Integer -> Integer -> EvalM Integer) -> Exp -> Exp -> EvalM Val
 evalIntBinOp f e1 e2 = do
@@ -137,3 +155,29 @@ eval (Apply e1 e2) = do
       failure "Cannot apply non-function"
 eval (TryCatch e1 e2) =
   eval e1 `catch` eval e2
+eval (Print s e) =
+  do
+    v1 <- eval e
+    case v1 of
+      ValInt a ->
+        do
+          _ <- evalPrint (s ++ ": " ++ show a)
+          pure $ ValInt a
+      ValBool a ->
+        do
+          _ <- evalPrint (s ++ ": " ++ show a)
+          pure $ ValBool a
+      ValFun env v b ->
+        do
+          _ <- evalPrint (s ++ ": " ++ "#<fun>")
+          pure $ ValFun env v b
+eval (KvPut e1 e2) =
+  do
+    k <- eval e1
+    v <- eval e2
+    _ <- evalKvPut k v
+    pure v
+eval (KvGet e) =
+  do
+    v1 <- eval e
+    evalKvGet v1

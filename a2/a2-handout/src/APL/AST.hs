@@ -22,4 +22,6 @@ data Exp
   | Apply Exp Exp
   | TryCatch Exp Exp
   | Print String Exp
+  | KvPut Exp Exp
+  | KvGet Exp
   deriving (Eq, Show)
