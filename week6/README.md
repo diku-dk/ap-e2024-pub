@@ -19,10 +19,11 @@ In these exercises, and the associated assignment, you will be
 implementing the [*Stateful Planning
 Committee*](https://en.wikipedia.org/wiki/Gosplan) (SPC), a *job
 scheduler* for managing the employment of workers and allocation of
-resources. A job is any Haskell computation in the `IO` monad,
-evaluated for its side effects. After a job is *enqueued* in SPC, we
-can ask for the status of the job. At some point, SPC will decide to
-actually execute the job.
+resources. A job is any Haskell computation in the `IO` monad. A job
+does not return any value, but is executed solely for to its side
+effects. After a job is *enqueued* in SPC, we can ask for the status
+of the job. At some point, SPC will decide to actually execute the
+job.
 
 We can imagine using a job scheduler such as SPC to enqueue thousands
 of jobs for downloading various files from the Internet, with the
