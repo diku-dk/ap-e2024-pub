@@ -6,7 +6,14 @@
 
 * [Course Notes Chapter 4](https://diku-dk.github.io/ap-notes/chapter_4.html)
 
+  * Optional: [Introduction to Free Monads](https://serokell.io/blog/introduction-to-free-monads)
+
 * Chapter 10 in *Programming in Haskell*.
+
+### Going Beyond
+
+* [Free Monads for Less part 1](http://comonad.com/reader/2011/free-monads-for-less/)
+* [Free Monads for Less part 2](http://comonad.com/reader/2011/free-monads-for-less-2/)
 
 ## Exercises
 
@@ -26,9 +33,9 @@ solutions are also included inline below.
 
 ### Handout Structure
 
-The handout has the following structure. This will be a very similar structure
-as the assignment (these exercises will form the starting basis of the
-assignment), so pay attention!
+The handout has the following structure. This will be a very similar
+structure as A3 (these exercises will form the starting basis of A3),
+so pay attention!
 
 ```
 handout
@@ -63,7 +70,7 @@ handout
   plentiful tests.
   
 - `src/APL/Monad.hs`: Contains all things related to the evaluation monad. Note
-   that some definitions from assignment 2 have moved from `APL.Eval` to
+   that some definitions from A2 have moved from `APL.Eval` to
    `APL.Monad` in this assignment; e.g. `Val` and definitions related to the
    environment.
 
@@ -73,7 +80,7 @@ handout
 ### Getting Started
 
 - `APL.Eval`: To make testing easier, you should replace the definition of
-  `eval` with your complete evaluator from your solution to assignment 2.
+  `eval` with your complete evaluator from your solution to A2.
 
   Note that doing this isn't strictly required and you can fully solve and test
   (by constructing the appropriate `EvalM` values directly or with the interface
@@ -81,7 +88,7 @@ handout
   replacing `eval`. But, we think it's probably nicer to have a complete version
   of `eval` that can handle all of the different expression types. It's also
   cool to see that you don't have to change your version of `eval` from
-  assignment 2 at all despite the fact that the underlying monad will change
+  A2 at all despite the fact that the underlying monad will change
   rather significantly.
 
 ### `Functor` and `Monad` instances for `Free e a`
@@ -253,9 +260,9 @@ runEval = runEval' envEmpty stateInitial
 
 ### Some useful interfaces
 
-Just like in assignment 2, we write interface functions so we don't have to
+Just like in A2, we write interface functions so we don't have to
 manually construct`EvalM` effect terms. For example, to retrieve the
-environment we re-implement `askEnv` from assignment 2 to work with the free
+environment we re-implement `askEnv` from A2 to work with the free
 monad version of `EvalM`:
 
 ```Haskell
@@ -509,7 +516,7 @@ runEval = runEval' envEmpty stateInitial
 ### Interpreting effects
 
 Since we've only changed the underlying workings of `EvalM`---and not its
-interface---your `eval` function from assignment 2 (which you should use to
+interface---your `eval` function from A2 (which you should use to
 replace the version of `eval` given in the handout in the `APL.Eval` module if
 you haven't) works without modification.
 
@@ -533,7 +540,7 @@ interpreter has IO access and so can generate side effects.
 
 The version of `runEvalIO` included in the handout mimics the workings of
 `runEval` so far---now's the time to uncomment the code in
-`APL.InterpIO`---except that its missing a case for `PrintOp`.
+`APL.InterpIO`---except that it is missing a case for `PrintOp`.
 
 Instead of returning the printed string in the first component of our output,
 the `runEvalIO` interpretation of a `PrintOp` effect should print to the
@@ -597,7 +604,7 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 ### Testing `runEvalIO`
 
 To test IO-based interpretation of effects, a special function `captureIO` is
-provided for you:
+provided for you in the `APL.Util` module:
 
 ```hs
 captureIO :: [String] -> IO a -> IO ([String], a)
