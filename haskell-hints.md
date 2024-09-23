@@ -74,15 +74,8 @@ command, as follows:
 The asterisk makes unexported definitions available as well, which is
 usually desirable when testing.
 
-Another command that serves the same purpose is `:l`, which requires
-the *filename*, not just the module name. For example:
-
-```
-> :l src/Foo/Bar.hs
-```
-
-The `:l` command will also reload your code, which is convenient while
-developing it.
+After modifying the module, use `:r` (without arguments) to reload any
+changes.
 
 ## Useful modules
 
