@@ -833,7 +833,7 @@ handleMsg c = do
                                     lookup jobid $ spcJobsDone state
                                   ) of
         (Just _, _, _) -> JobPending
-        (_, Just (running_job, _, _), _)
+        (_, Just (running_job, _), _)
           | running_job == jobid ->
               JobRunning
         (_, _, Just r) -> JobDone r
