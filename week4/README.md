@@ -40,7 +40,8 @@ handout
 │       ├── InterpIO.hs
 │       ├── InterpPure.hs
 │       ├── Interp_Tests.hs
-│       └── Monad.hs
+│       ├── Monad.hs
+│       └── Util.hs
 └── week4.cabal
 ```
 
@@ -65,11 +66,23 @@ handout
    that some definitions from assignment 2 have moved from `APL.Eval` to
    `APL.Monad` in this assignment; e.g. `Val` and definitions related to the
    environment.
+
+- `src/APL/Util.hs`: Utility functions needed for testing IO and some other
+   stuff. You can safely ignore this file. **Do not modify this file.**
   
 ### Getting Started
 
-- `APL.Eval`: Replace the definition of `eval` with your complete evaluator
-  from your solution to assignment 2.
+- `APL.Eval`: To make testing easier, you should replace the definition of
+  `eval` with your complete evaluator from your solution to assignment 2.
+
+  Note that doing this isn't strictly required and you can fully solve and test
+  (by constructing the appropriate `EvalM` values directly or with the interface
+  functions in `APL.Monad`) both these exercises and the assignment without
+  replacing `eval`. But, we think it's probably nicer to have a complete version
+  of `eval` that can handle all of the different expression types. It's also
+  cool to see that you don't have to change your version of `eval` from
+  assignment 2 at all despite the fact that the underlying monad will change
+  rather significantly.
 
 ### `Functor` and `Monad` instances for `Free e a`
 
@@ -553,43 +566,11 @@ different ways. Pretty cool!
 
 - `APL.InterpIO`: Add support for `PrintOp` effects to `runEvalIO'`.
 
-To test IO-based interpretation of effects, a special function `testIO` (do **not** modify it) is
-provided for you in `APL.Interp_Tests`:
-
-```hs
-testIO :: [String] -> IO a -> IO ([String], a)
-```
-
-You use `testIO` like this: `testIO inputs m`, where `inputs` is a list of
-inputs you'd like to write to `stdin` during the execution of the `m`
-action. `testIO` runs `m` using `inputs` as input to `stdin` and captures
-any output to `stdout`, returning it as a list of strings (and also returns the
-result of the computation itself).
-
-We can use `testIO` to test an IO-based interpretation of a `Print`-expression
-like so:
-
-```hs
-testCase "print" $ do
-     (out, res) <-
-       testIO [] $
-         evalIO' $
-             Print "This is 1" $ CstInt 1
-     (out, res) @?= (["This is 1: 1"], Right $ ValInt 1)
-```
-
-For print effects, we don't have any input to `stdin` so we just feed `testIO`
-an empty list (`[]`).  In the assignment, you'll add additional effects that do
-read from `stdin` and will have to add inputs for `testIO` to test these
-additional effects.
-
-- `APL.Interp_Tests`: Add tests to `ioTests` for the `PrintOp` effect.
-
 #### Hints
 
 You can use `putStrLn` to print strings to the terminal.
 
-#### Solution 
+#### Solution
 
 <details>
 <summary>Open this to see the answer</summary>
@@ -612,6 +593,45 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 ```
 
 </details>
+
+### Testing `runEvalIO`
+
+To test IO-based interpretation of effects, a special function `captureIO` is
+provided for you:
+
+```hs
+captureIO :: [String] -> IO a -> IO ([String], a)
+```
+
+You use `captureIO` like this: `captureIO inputs m`, where `inputs` is a list of
+inputs (lines) you'd like to write to `stdin` during the execution of the `m`
+action. `captureIO` runs `m` using `inputs` as input to `stdin` and captures
+any output to `stdout`, returning it as a list of strings (and also returns the
+result of the computation itself).
+
+We can use `captureIO` to test an IO-based interpretation of a `Print`-expression
+like so:
+
+```hs
+-- APL.Interp_Tests
+testCase "print" $ do
+     let s1 = "Lalalalala"
+         s2 = "Weeeeeeeee"
+     (out, res) <-
+       captureIO [] $
+         runEvalIO $ do
+           evalPrint s1
+           evalPrint s2
+     (out, res) @?= ([s1, s2], Right ())
+```
+
+For print effects, we don't have any input to `stdin` so we just feed `captureIO`
+an empty list (`[]`).  In the assignment, you'll add additional effects that do
+read from `stdin` and will have to add inputs for `captureIO` to test these
+additional effects.
+
+- `APL.Interp_Tests`: Add tests to `ioTests` for the `PrintOp` effect.
+
 
 [^1]: This is an inefficient way to implement local environments (since you have
     to traverse over the entire effect stack each time); a better way would be

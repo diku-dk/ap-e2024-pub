@@ -195,6 +195,15 @@ We strongly encourage you not to work alone. Each group must make
 their own solutions and cannot share implementations and report with
 other. You may discuss material and ideas.
 
+### Handin
+
+Assignment handins are on Absalon. You *must* join an Assignment
+Group, even when handing in alone. This is done on Absalon by going to
+*People*, then *Groups* and picking either an empty one, or one where
+the existing members have agreed to let you join. When one member of
+an Assignment Group hands in the assignment, it counts as a handin for
+the entire group.
+
 ### General assignment rules
 
 The following rules apply to all assignments. They are intended to
@@ -226,6 +235,10 @@ you are asked to implement.
    ponder for each file whether it is something it makes sense to hand
    to your TA. At a *minimum*, run `cabal clean` before handing in.
 
+8. You are allowed to use any Haskell module that is available in the
+   packages specified in the `.cabal` file in the handout. You are not
+   allowed to add additional library dependencies.
+
 Violation of these rules will result in points deductions. If you
 violate these rules at the exam, it will negatively influence your
 grade.
@@ -235,6 +248,8 @@ grade.
 Every Friday at Lille UP-1 at DIKU from 13:00-15:00 (unless otherwise
 specified) we host an assignment café where you can get help with the
 assignment from a TA.
+
+**Note:** on the 3rd of October, the café is from 14:00-16:00.
 
 ## Exam
 
