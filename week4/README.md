@@ -604,7 +604,7 @@ runEvalIO = runEvalIO' envEmpty stateInitial
 ### Testing `runEvalIO`
 
 To test IO-based interpretation of effects, a special function `captureIO` is
-provided for you:
+provided for you in the `APL.Util` module:
 
 ```hs
 captureIO :: [String] -> IO a -> IO ([String], a)
