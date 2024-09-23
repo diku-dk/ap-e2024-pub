@@ -58,6 +58,32 @@ follows:
 λ> :set -Wno-type-defaults
 ```
 
+## Accessing modules in `cabal repl`
+
+Plain `ghci` works only when you use exclusively the standard library.
+In other cases, we must use `cabal repl` to also load any dependencies
+specified in the `.cabal` file. After running `cabal repl`, your
+modules have been *loaded*, but their definitions are not available at
+the REPL. A module `Foo.Bar` can be made available via the `:m`
+command, as follows:
+
+```
+> :m *Foo.Bar
+```
+
+The asterisk makes unexported definitions available as well, which is
+usually desirable when testing.
+
+Another command that serves the same purpose is `:l`, which requires
+the *filename*, not just the module name. For example:
+
+```
+> :l src/Foo/Bar.hs
+```
+
+The `:l` command will also reload your code, which is convenient while
+developing it.
+
 ## Useful modules
 
 AP is not a course that requires much knowledge about [the Haskell
