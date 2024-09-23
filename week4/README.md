@@ -540,7 +540,7 @@ interpreter has IO access and so can generate side effects.
 
 The version of `runEvalIO` included in the handout mimics the workings of
 `runEval` so far---now's the time to uncomment the code in
-`APL.InterpIO`---except that its missing a case for `PrintOp`.
+`APL.InterpIO`---except that it is missing a case for `PrintOp`.
 
 Instead of returning the printed string in the first component of our output,
 the `runEvalIO` interpretation of a `PrintOp` effect should print to the
