@@ -1,9 +1,5 @@
 # Week 6 - Concurrency
 
-## Slides and Material
-
-TBA
-
 ## Suggested Reading
 
 * [Concurrent Haskell](concurrent-haskell.pdf)

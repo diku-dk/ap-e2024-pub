@@ -1,7 +1,5 @@
 # Week 4 - Free Monads
 
-## Slides and Material
-
 ## Suggested Reading
 
 * [Course Notes Chapter 4](https://diku-dk.github.io/ap-notes/chapter_4.html)
