@@ -31,9 +31,8 @@ solutions are also included inline below.
 
 ### Handout Structure
 
-The handout has the following structure. This will be a very similar
-structure as A3 (these exercises will form the starting basis of A3),
-so pay attention!
+The handout has the following structure. These exercises will form the starting
+basis of A4, so pay attention!
 
 ```
 handout
