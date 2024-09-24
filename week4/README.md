@@ -528,7 +528,7 @@ interpreters of course! So far, we've only worked on the pure interpreter
 
 ```
 > m =  eval $ Let "x" (Add (CstInt 1) (CstInt 2)) $ Print ("The value of x is") (Var "x")
-> runEval envEmpty stateInitial m
+> runEval m
 (["The value of x is: 3"], Right (ValInt 3))
 ```
 
