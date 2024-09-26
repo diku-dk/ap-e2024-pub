@@ -239,6 +239,9 @@ you are asked to implement.
    packages specified in the `.cabal` file in the handout. You are not
    allowed to add additional library dependencies.
 
+9. Your zip file, should contain a single top-level folder with an
+   appropriate name (e.g. `handin`). 
+
 Violation of these rules will result in points deductions. If you
 violate these rules at the exam, it will negatively influence your
 grade.
