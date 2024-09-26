@@ -28,6 +28,7 @@ pExp =
   choice
     [ CstInt <$> lInteger
     , Var <$> lVName
+    , CstBool <$> lBool
     ]
 
 -- Do not change this definition.
@@ -48,3 +49,15 @@ lVName = lexeme $
     c <- satisfy isAlpha
     cs <- many (satisfy isAlphaNum)
     pure $ c : cs
+
+lKeyword :: String -> Parser ()
+lKeyword s = lexeme $ void $ try $ chunk s <* notFollowedBy (satisfy isAlphaNum)
+
+lBool :: Parser Bool
+lBool =
+  try $
+    lexeme $
+      choice
+        [ True <$ lKeyword "true"
+        , False <$ lKeyword "false"
+        ]
