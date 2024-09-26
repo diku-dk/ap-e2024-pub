@@ -303,28 +303,28 @@ Booleans follow this grammar in APL:
 bool ::= "true" | "false";
 ```
 
-Implement a lexer function
+Implement a parser function
 
 ```Haskell
-lBool :: Parser Bool
+pBool :: Parser Bool
 ```
 
-that parses boleans. As with numbers, it is important that inputs such
+that parses booleans. As with numbers, it is important that inputs such
 as `truee` are not parsed as `true` followed by another character.
 Also add a case for `CstBool` to `pExp`.
 
 #### Examples
 
 ```
-> parseTest lBool "true"
+> parseTest pBool "true"
 True
-> parseTest lBool "truee"
+> parseTest pBool "truee"
 1:5:
   |
 1 | truee
   |     ^
 unexpected 'e'
-> parseTest lBool "true e"
+> parseTest pBool "true e"
 True
 ```
 
@@ -336,7 +336,7 @@ Consider defining a function
 lKeyword :: String -> Parser ()
 ```
 
-that parse a given alphanumeric string, and uses `notFollowedBy` to
+that parses a given alphanumeric string, and uses `notFollowedBy` to
 require that it is not followed by another alphanumeric character.
 
 #### Solution
@@ -348,19 +348,18 @@ require that it is not followed by another alphanumeric character.
 lKeyword :: String -> Parser ()
 lKeyword s = lexeme $ void $ try $ chunk s <* notFollowedBy (satisfy isAlphaNum)
 
-lBool :: Parser Bool
-lBool =
-  try $ lexeme $
-    choice
-      [ const True <$> lKeyword "true",
-        const False <$> lKeyword "false"
-      ]
+pBool :: Parser Bool
+pBool =
+  choice $
+    [ const True <$> lKeyword "true",
+      const False <$> lKeyword "false"
+    ]
 
 pExp :: Parser Exp
 pExp =
   choice
     [ CstInt <$> lInteger,
-      CstBool <$> lBool,
+      CstBool <$> pBool,
       Var <$> lVName
     ]
 ```
