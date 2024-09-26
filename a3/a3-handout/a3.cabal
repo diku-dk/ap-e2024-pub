@@ -1,0 +1,39 @@
+cabal-version:      3.0
+name:               a3
+version:            1.0.0.0
+build-type:         Simple
+
+common common
+    default-language: Haskell2010
+    ghc-options: -Wall
+
+library
+    import: common
+    hs-source-dirs: src
+    build-depends:
+        base
+      , tasty
+      , tasty-hunit
+      , megaparsec
+    exposed-modules:
+        APL.AST
+        APL.Eval
+        APL.Parser
+        APL.Parser_Tests
+
+executable apl
+    import: common
+    main-is: apl.hs
+    build-depends:
+        base
+      , a3
+
+test-suite a3-test
+    import: common
+    type: exitcode-stdio-1.0
+    main-is: runtests.hs
+    build-depends:
+        base
+      , tasty
+      , a3
+
