@@ -152,20 +152,6 @@ monads.
 
 - `APL.InterpPure`: Complete the skeleton code for `runEval`.
 
-- `APL.Interp_Tests`: Add tests to `pureTests` to test your new effect.
-
-#### Hints
-
-Test your `Reader` effect by adding some tests to `pureTests` in
-`APL.Interp_Tests`. It is probably easiest to construct an `Exp` whose
-evaluation generates `Reader` effects, like `Let`-expressions:
-
-```hs
-testCase "Let" $
-  eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
-    @?= ValInt 5,
-```
-
 #### Solution 
 
 <details>
@@ -303,14 +289,21 @@ modifyEffects g (Free e) = ...
   probably a good idea, but you can also test interfaces
   directly:
   
-  ```hs
-  testCase "localEnv" $
-    runEval
-      ( localEnv (const [("x", ValInt 1)]) $
-               askEnv
-    )
-      @?= [("x", ValInt 1)]
-  ```
+```hs
+testCase "Let" $
+  eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
+    @?= ValInt 5,
+```
+
+
+```hs
+testCase "localEnv" $
+  runEval
+    ( localEnv (const [("x", ValInt 1)]) $
+             askEnv
+  )
+    @?= [("x", ValInt 1)]
+```
 
 #### Hints
 
