@@ -47,6 +47,11 @@ This exercise permits you somewhat more freedom than most others. In
 particular, you are expected to largely design the message types
 yourself.
 
+You must use the abstractions provided by `GenServer`, as discussed in
+the course notes. However, for some functionality, you will need to
+move beyond this abstraction, and directly launch threads with
+`forkIO`.
+
 ## Creating the Event Loop
 
 You will find a skeletal code handout in [handout/](handout/). The
@@ -66,9 +71,9 @@ The first thing you must do is to extend `startSPC` such that it
 launches a new thread that runs a loop that reads messages from the
 created channel and acts on them. To do this:
 
-1. Add a constructor `MsgPing (Chan Int)` to `SPCMsg`. We will remove
-   this later, but it is useful for testing that we get the event loop
-   right.
+1. Add a constructor `MsgPing (ReplyWith Int)` to `SPCMsg`. We will
+   remove this later, but it is useful for testing that we get the
+   event loop right.
 
 2. Modify `startSPC` such that it creates a thread that runs in an
    infinite loop. This thread runs in an infinite loop and reads
@@ -78,8 +83,8 @@ created channel and acts on them. To do this:
 
 3. Write a function `pingSPC :: SPC -> IO Int` that sends a `MsgPing`
    message to SPC, waits for a response, then returns the integer in
-   the response. You must also add `pingSPC` to the module export
-   list.
+   the response. Use `requestReply`. You must also add `pingSPC` to
+   the module export list.
 
 4. Add a test to `SPC.Core_Tests` that exercises `pingSPC`.
 
@@ -94,25 +99,22 @@ Use `forever` from `Control.Monad` to write infinite monadic loops.
 
 ```Haskell
 
-data SPCMsg = MsgPing (Chan Int)
+data SPCMsg = MsgPing (ReplyWith Int)
 
 startSPC :: IO SPC
 startSPC = do
-  c <- newChan
-  _ <- forkIO $ forever $ handle c
-  pure $ SPC c
+  server <- spawn $ \c -> forever $ handle c
+  pure $ SPC server
   where
     handle c = do
-      msg <- readChan c
+      msg <- receive c
       case msg of
-        MsgPing reply_chan ->
-          writeChan reply_chan 1337
+        MsgPing rsvp ->
+          reply rsvp 1337
 
 pingSPC :: SPC -> IO Int
-pingSPC (SPC c) = do
-  reply_chan <- newChan
-  writeChan c $ MsgPing reply_chan
-  readChan reply_chan
+pingSPC (SPC c) =
+  requestReply c MsgPing
 
 -- And in SPC.Core_Tests:
 
@@ -256,7 +258,7 @@ Now we are ready to use `SPCM`.
 
 ### Hints
 
-* To read a message from a channel `c` inside `SPCM`: `io $ readChan c`.
+* To read a message from a channel `c` inside `SPCM`: `io $ receive c`.
 
 * `succ x` produces `x+1`.
 
@@ -268,22 +270,21 @@ Now we are ready to use `SPCM`.
 ```Haskell
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
-    MsgPing reply_chan -> do
+    MsgPing rsvp -> do
       state <- get
-      io $ writeChan reply_chan $ spcPingCounter state
+      io $ reply rsvp $ spcPingCounter state
       put $ state {spcPingCounter = succ $ spcPingCounter state}
 
 startSPC :: IO SPC
 startSPC = do
-  c <- newChan
   let initial_state =
         SPCState
           { spcPingCounter = 0
           }
-  _ <- forkIO $ runSPCM initial_state $ forever $ handle c
-  pure $ SPC c
+  server <- spawn $ \c -> runSPCM initial_state $ forever $ handleMsg c
+  pure $ SPC server
 
 -- And a test:
 
@@ -372,6 +373,11 @@ unique `JobId`, which is used to reference it later.
 <summary>Open this to see the implementation</summary>
 
 ```Haskell
+data SPCMsg
+  = ...
+    -- | Add the job, and reply with the job ID.
+    MsgJobAdd Job (ReplyWith JobId)
+
 data SPCState = SPCState
   { spcJobsPending :: [(JobId, Job)],
     spcJobCounter :: JobId
@@ -379,9 +385,9 @@ data SPCState = SPCState
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
-    MsgJobAdd job reply -> do
+    MsgJobAdd job rsvp -> do
       state <- get
       let JobId jobid = spcJobCounter state
       put $
@@ -390,25 +396,22 @@ handleMsg c = do
               (spcJobCounter state, job) : spcJobsPending state,
             spcJobCounter = JobId $ succ jobid
           }
-      io $ writeChan reply $ JobId jobid
+      io $ reply rsvp $ JobId jobid
 
 startSPC :: IO SPC
 startSPC = do
-  c <- newChan
   let initial_state =
         SPCState
           { spcJobCounter = JobId 0,
             spcJobsPending = []
           }
-  _ <- forkIO $ runSPCM initial_state $ forever $ handleMsg c
-  pure $ SPC c
+  server <- spawn $ \c -> runSPCM initial_state $ forever $ handleMsg c
+  pure $ SPC server
 
 -- | Add a job for scheduling.
 jobAdd :: SPC -> Job -> IO JobId
-jobAdd (SPC c) job = do
-  reply_chan <- newChan
-  writeChan c $ MsgJobAdd job reply_chan
-  readChan reply_chan
+jobAdd (SPC c) job =
+  requestReply $ MsgJobAdd job
 
 -- And a test:
 
@@ -497,25 +500,23 @@ jobStatus :: SPC -> JobId -> IO JobStatus
 data SPCMsg
   = ...
   | -- | Immediately reply the status of the job.
-    MsgJobStatus JobId (Chan JobStatus)
+    MsgJobStatus JobId (ReplyWith JobStatus)
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
     ...
-    MsgJobStatus jobid reply -> do
+    MsgJobStatus jobid rsvp -> do
       state <- get
-      io $ writeChan reply $ case lookup jobid $ spcJobsPending state of
+      io $ reply rsvp $ case lookup jobid $ spcJobsPending state of
         Just _ -> JobPending
         _ -> JobUnknown
 
 -- | Add a job for scheduling.
 jobAdd :: SPC -> Job -> IO JobId
-jobAdd (SPC c) job = do
-  reply_chan <- newChan
-  writeChan c $ MsgJobAdd job reply_chan
-  readChan reply_chan
+jobAdd (SPC c) job =
+  requestReply c $ MsgJobAdd job reply_chan
 
 -- And a test
 
@@ -530,7 +531,6 @@ tests =
           r <- jobStatus spc j
           r @?= JobPending
       ]
-
 
 ```
 
@@ -585,14 +585,14 @@ data SPCState = SPCState
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
     ...
-    MsgJobStatus jobid reply -> do
+    MsgJobStatus jobid rsvp -> do
       state <- get
-      io $ writeChan reply $ case ( lookup jobid $ spcJobsPending state,
-                                    lookup jobid $ spcJobsDone state
-                                  ) of
+      io $ reply rsvp $ case ( lookup jobid $ spcJobsPending state,
+                               lookup jobid $ spcJobsDone state
+                             ) of
         (Just _, _) -> JobPending
         (_, Just _) -> JobDone DoneCancelled
         _ -> JobUnknown
@@ -609,7 +609,7 @@ handleMsg c = do
 
 jobCancel :: SPC -> JobId -> IO ()
 jobCancel (SPC c) jobid =
-  writeChan c $ MsgJobCancel jobid
+  sendTo c $ MsgJobCancel jobid
 ```
 
 ```Haskell
@@ -665,16 +665,16 @@ send a response to all relevant channels.
 ```Haskell
 data SPCMsg
   = ...
-  | MsgJobWait JobId (Chan JobDoneReason)
+  | MsgJobWait JobId (ReplyWith JobDoneReason)
 
 data SPCState = SPCState
   { ...
-    spcWaiting :: [(JobId, Chan JobDoneReason)]
+    spcWaiting :: [(JobId, ReplyWith JobDoneReason)]
   }
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
     ...
     MsgJobCancel jobid -> do
@@ -684,27 +684,25 @@ handleMsg c = do
         Just _ -> do
           let (waiting_for_jobid, rest) =
                 partition ((== jobid) . fst) $ spcWaiting state
-          forM_ waiting_for_jobid $ \(_, waiter_chan) ->
-            io $ writeChan waiter_chan DoneCancelled
+          forM_ waiting_for_jobid $ \(_, rsvp) ->
+            io $ reply rsvp DoneCancelled
           put $
             state
               { spcJobsPending = removeAssoc jobid $ spcJobsPending state,
                 spcJobsDone = (jobid, DoneCancelled) : spcJobsDone state,
                 spcWaiting = rest
               }
-    MsgJobWait jobid reply -> do
+    MsgJobWait jobid rsvp -> do
       state <- get
       case lookup jobid $ spcJobsDone state of
         Just reason -> do
-          io $ writeChan reply reason
+          io $ reply rsvp reason
         Nothing ->
-          put $ state {spcWaiting = (jobid, reply) : spcWaiting state}
+          put $ state {spcWaiting = (jobid, rsvp) : spcWaiting state}
 
 jobWait :: SPC -> JobId -> IO JobDoneReason
-jobWait (SPC c) jobid = do
-  reply_chan <- newChan
-  writeChan c $ MsgJobWait jobid reply_chan
-  readChan reply_chan
+jobWait (SPC c) jobid =
+  requestReply c $ MsgJobWait jobid reply_chan
 
 ```
 
@@ -790,7 +788,7 @@ schedule = do
     (Nothing, (jobid, job) : jobs) -> do
       t <- io $ forkIO $ do
         jobAction job
-        writeChan (spcChan state) $ MsgJobDone jobid
+        send (spcChan state) $ MsgJobDone jobid
       put $
         state
           { spcJobRunning = Just (jobid, t),
@@ -808,8 +806,8 @@ jobDone jobid reason = do
     Nothing -> do
       let (waiting_for_job, not_waiting_for_job) =
             partition ((== jobid) . fst) (spcWaiting state)
-      forM_ waiting_for_job $ \(_, c) ->
-        io $ writeChan c reason
+      forM_ waiting_for_job $ \(_, rsvp) ->
+        io $ reply rsvp reason
       put $
         state
           { spcWaiting = not_waiting_for_job,
@@ -820,15 +818,15 @@ jobDone jobid reason = do
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
   schedule
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
     ...
-    MsgJobStatus jobid reply -> do
+    MsgJobStatus jobid rsvp -> do
       state <- get
-      io $ writeChan reply $ case ( lookup jobid $ spcJobsPending state,
-                                    spcJobRunning state,
-                                    lookup jobid $ spcJobsDone state
-                                  ) of
+      io $ reply rsvp $ case ( lookup jobid $ spcJobsPending state,
+                               spcJobRunning state,
+                               lookup jobid $ spcJobsDone state
+                             ) of
         (Just _, _, _) -> JobPending
         (_, Just (running_job, _), _)
           | running_job == jobid ->
@@ -892,10 +890,10 @@ schedule = do
       t <- io $ forkIO $ do
         let doJob = do
               jobAction job
-              writeChan (spcChan state) $ MsgJobDone jobid
+              send (spcChan state) $ MsgJobDone jobid
             onException :: SomeException -> IO ()
             onException _ =
-              writeChan (spcChan state) $ MsgJobCrashed jobid
+              send (spcChan state) $ MsgJobCrashed jobid
         doJob `catch` onException
       now <- io $ getSeconds
       put $
@@ -908,7 +906,7 @@ schedule = do
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
   schedule
-  msg <- io $ readChan c
+  msg <- io $ receive c
   case msg of
     ...
     MsgJobCrashed crashed_jobid -> do
@@ -999,10 +997,10 @@ schedule = do
       t <- io $ forkIO $ do
         let doJob = do
               jobAction job
-              writeChan (spcChan state) $ MsgJobDone jobid
+              send (spcChan state) $ MsgJobDone jobid
             onException :: SomeException -> IO ()
             onException _ =
-              writeChan (spcChan state) $ MsgJobCrashed jobid
+              send (spcChan state) $ MsgJobCrashed jobid
         doJob `catch` onException
       now <- io $ getSeconds
       let deadline = now + fromIntegral (jobMaxSeconds job)

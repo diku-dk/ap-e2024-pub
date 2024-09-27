@@ -18,6 +18,7 @@ library
     exposed-modules:
         SPC.Core
         SPC.Core_Tests
+        GenServer
 
 test-suite week6-tests
     import: common
