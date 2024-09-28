@@ -2,6 +2,7 @@
 
 ## Suggested Reading
 
+* [Course Notes Chapter 6](https://diku-dk.github.io/ap-notes/chapter_6.html)
 * [Concurrent Haskell](concurrent-haskell.pdf)
 
 ### Going Beyond
