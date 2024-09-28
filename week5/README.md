@@ -18,6 +18,8 @@ This week we will look at testing based on properties. It also serves as an exam
 
 * [How to Specify it - Guide to writing properties of pure functions](HowToSpecifyIt.pdf)
 
+* [The sad state of property-based testing libraries](https://stevana.github.io/the_sad_state_of_property-based_testing_libraries.html)
+
 ## Exercises
 
 In these exercises you will develop QuickCheck generators for expressions and
