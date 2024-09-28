@@ -5,7 +5,7 @@ module GenServer
     send,
     sendTo,
     spawn,
-    ReplyWith,
+    ReplyChan,
     requestReply,
     reply,
   )
@@ -16,7 +16,7 @@ import qualified Control.Concurrent as CC
 
 data Server msg = Server CC.ThreadId (Chan msg)
 
-data ReplyWith a = ReplyWith (Chan a)
+data ReplyChan a = ReplyChan (Chan a)
 
 send :: Chan a -> a -> IO ()
 send chan msg =
@@ -35,11 +35,11 @@ spawn server = do
   tid <- CC.forkIO $ server input
   pure $ Server tid input
 
-requestReply :: Server a -> (ReplyWith b -> a) -> IO b
+requestReply :: Server a -> (ReplyChan b -> a) -> IO b
 requestReply serv con = do
   reply_chan <- CC.newChan
-  sendTo serv $ con $ ReplyWith reply_chan
+  sendTo serv $ con $ ReplyChan reply_chan
   receive reply_chan
 
-reply :: ReplyWith a -> a -> IO ()
-reply (ReplyWith chan) x = send chan x
+reply :: ReplyChan a -> a -> IO ()
+reply (ReplyChan chan) x = send chan x

@@ -85,13 +85,13 @@ data JobStatus
 -- Messages sent to SPC.
 data SPCMsg
   = -- | Add the job, and reply with the job ID.
-    MsgJobAdd Job (ReplyWith JobId)
+    MsgJobAdd Job (ReplyChan JobId)
   | -- | Cancel the given job.
     MsgJobCancel JobId
   | -- | Immediately reply the status of the job.
-    MsgJobStatus JobId (ReplyWith JobStatus)
+    MsgJobStatus JobId (ReplyChan JobStatus)
   | -- | Reply when the job is done.
-    MsgJobWait JobId (ReplyWith JobDoneReason)
+    MsgJobWait JobId (ReplyChan JobDoneReason)
   | -- | Job has finished.
     MsgJobDone JobId
   | -- | Job crashed.
@@ -109,7 +109,7 @@ data SPCState = SPCState
     spcJobRunning :: Maybe (JobId, Seconds, ThreadId),
     spcJobsDone :: [(JobId, JobDoneReason)],
     -- | These are waiting for this job to terminate.
-    spcWaiting :: [(JobId, ReplyWith JobDoneReason)],
+    spcWaiting :: [(JobId, ReplyChan JobDoneReason)],
     spcJobCounter :: JobId
   }
 
