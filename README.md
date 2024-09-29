@@ -150,7 +150,7 @@ September 3rd, marks the beginning of the course, with the first lecture.
 
 * **Hold 7:**
 
-  - TA: Rasmus Pallisgaard
+  - TA: Rasmus Pallisgaard (rpa@di.ku.dk)
 
   - 10-12: DIKU 1-0-22
 
