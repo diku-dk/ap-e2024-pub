@@ -133,8 +133,6 @@ Then run `sample (sized genExp)` in ghci.
 Extend `genExp` so that it can produce all possible expressions. Declare `Exp`
 to be an instance of `Arbitrary` with `arbitrary = sized genExp`.
 
-TODO solution
-
 ### Associativity
 
 Addition of integers obeys associativity, meaning that `(n1 + n2) + n3 == n1 + (n2 + n3)`
