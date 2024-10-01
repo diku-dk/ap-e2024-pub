@@ -1,7 +1,5 @@
 # Week 4 - Free Monads
 
-## Slides and Material
-
 ## Suggested Reading
 
 * [Course Notes Chapter 4](https://diku-dk.github.io/ap-notes/chapter_4.html)
@@ -33,9 +31,8 @@ solutions are also included inline below.
 
 ### Handout Structure
 
-The handout has the following structure. This will be a very similar
-structure as A3 (these exercises will form the starting basis of A3),
-so pay attention!
+The handout has the following structure. These exercises will form the starting
+basis of A4, so pay attention!
 
 ```
 handout
@@ -154,20 +151,6 @@ The next step is to begin building the pure interpretation function to run `Eval
 monads.
 
 - `APL.InterpPure`: Complete the skeleton code for `runEval`.
-
-- `APL.Interp_Tests`: Add tests to `pureTests` to test your new effect.
-
-#### Hints
-
-Test your `Reader` effect by adding some tests to `pureTests` in
-`APL.Interp_Tests`. It is probably easiest to construct an `Exp` whose
-evaluation generates `Reader` effects, like `Let`-expressions:
-
-```hs
-testCase "Let" $
-  eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
-    @?= ValInt 5,
-```
 
 #### Solution 
 
@@ -306,14 +289,21 @@ modifyEffects g (Free e) = ...
   probably a good idea, but you can also test interfaces
   directly:
   
-  ```hs
-  testCase "localEnv" $
-    runEval
-      ( localEnv (const [("x", ValInt 1)]) $
-               askEnv
-    )
-      @?= [("x", ValInt 1)]
-  ```
+```hs
+testCase "Let" $
+  eval' (Let "x" (Add (CstInt 2) (CstInt 3)) (Var "x"))
+    @?= ValInt 5,
+```
+
+
+```hs
+testCase "localEnv" $
+  runEval
+    ( localEnv (const [("x", ValInt 1)]) $
+             askEnv
+  )
+    @?= [("x", ValInt 1)]
+```
 
 #### Hints
 
@@ -530,7 +520,7 @@ interpreters of course! So far, we've only worked on the pure interpreter
 
 ```
 > m =  eval $ Let "x" (Add (CstInt 1) (CstInt 2)) $ Print ("The value of x is") (Var "x")
-> runEval envEmpty stateInitial m
+> runEval m
 (["The value of x is: 3"], Right (ValInt 3))
 ```
 

@@ -150,7 +150,7 @@ September 3rd, marks the beginning of the course, with the first lecture.
 
 * **Hold 7:**
 
-  - TA: Rasmus Pallisgaard
+  - TA: Rasmus Pallisgaard (rpa@di.ku.dk)
 
   - 10-12: DIKU 1-0-22
 
@@ -238,6 +238,9 @@ you are asked to implement.
 8. You are allowed to use any Haskell module that is available in the
    packages specified in the `.cabal` file in the handout. You are not
    allowed to add additional library dependencies.
+
+9. Your zip file, should contain a single top-level folder with an
+   appropriate name (e.g. `handin`). 
 
 Violation of these rules will result in points deductions. If you
 violate these rules at the exam, it will negatively influence your
