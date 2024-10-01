@@ -1,5 +1,5 @@
-import qualified SPC.Core_Tests
+import qualified SPC_Tests
 import Test.Tasty (defaultMain)
 
 main :: IO ()
-main = defaultMain SPC.Core_Tests.tests
+main = defaultMain SPC_Tests.tests

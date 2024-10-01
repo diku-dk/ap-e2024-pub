@@ -56,7 +56,7 @@ move beyond this abstraction, and directly launch threads with
 ## Creating the Event Loop
 
 You will find a skeletal code handout in [handout/](handout/). The
-module `SPC.Core` contains two utility functions that will become
+module `SPC` contains two utility functions that will become
 useful later (`getSeconds` and `removeAssoc`). It also contains two
 types (`SPCMsg`, `SPC`) and one value definition (`startSPC`). It also
 contains a bunch of imports that will become necessary, but adds a lot
@@ -87,7 +87,7 @@ created channel and acts on them. To do this:
    the response. Use `requestReply`. You must also add `pingSPC` to
    the module export list.
 
-4. Add a test to `SPC.Core_Tests` that exercises `pingSPC`.
+4. Add a test to `SPC_Tests` that exercises `pingSPC`.
 
 ### Hints
 
@@ -117,13 +117,13 @@ pingSPC :: SPC -> IO Int
 pingSPC (SPC c) =
   requestReply c MsgPing
 
--- And in SPC.Core_Tests:
+-- And in SPC_Tests:
 
 tests :: TestTree
 tests =
   localOption (mkTimeout 3000000) $
     testGroup
-      "SPC (core)"
+      "SPC"
       [ testCase "ping" $ do
           spc <- startSPC
           x <- pingSPC spc
@@ -293,7 +293,7 @@ tests :: TestTree
 tests =
   localOption (mkTimeout 3000000) $
     testGroup
-      "SPC (core)"
+      "SPC"
       [ testCase "ping" $ do
           spc <- startSPC
           x <- pingSPC spc
@@ -420,7 +420,7 @@ tests :: TestTree
 tests =
   localOption (mkTimeout 3000000) $
     testGroup
-      "SPC (core)"
+      "SPC"
       [ testCase "adding job" $ do
           spc <- startSPC
           _ <- jobAdd spc $ Job (pure ()) 1
@@ -462,7 +462,7 @@ data JobStatus
   deriving (Eq, Ord, Show)
 ```
 
-* Add these type definitions to `SPC.Core` and also add them to the
+* Add these type definitions to `SPC` and also add them to the
   module export list.
 
 Initially a job has status `JobPending`. In fact, since we have yet to
@@ -525,7 +525,7 @@ tests :: TestTree
 tests =
   localOption (mkTimeout 3000000) $
     testGroup
-      "SPC (core)"
+      "SPC"
       [ testCase "adding job" $ do
           spc <- startSPC
           j <- jobAdd spc $ Job (pure ()) 1

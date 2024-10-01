@@ -16,8 +16,8 @@ library
       , tasty-hunit
       , clock
     exposed-modules:
-        SPC.Core
-        SPC.Core_Tests
+        SPC
+        SPC_Tests
         GenServer
 
 test-suite week6-tests

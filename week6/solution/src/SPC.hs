@@ -1,4 +1,4 @@
-module SPC.Core
+module SPC
   ( -- * SPC startup
     SPC,
     startSPC,
