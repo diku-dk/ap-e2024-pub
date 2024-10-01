@@ -667,9 +667,9 @@ Atom ::= var
        | "(" Exp ")"
 
 LExp ::= "if" Exp "then" Exp "else" Exp
+       | Atom
 
-Exp ::= Atom
-      | LExp
+Exp ::= LExp
       | Exp "+" Exp
       | Exp "-" Exp
       | Exp "*" Exp
