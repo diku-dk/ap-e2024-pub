@@ -482,7 +482,10 @@ instance Functor EvalOp where
 
 failure :: String -> EvalM a
 failure = Free . ErrorOp
+```
 
+```Haskell
+-- APL.InterpPure:
 runEval :: EvalM a -> ([String], Either Error a)
 runEval = runEval' envEmpty stateInitial
   where
@@ -495,10 +498,6 @@ runEval = runEval' envEmpty stateInitial
       let (ps, res) = runEval' r s m
        in (p : ps, res)
     runEval' _ _ (Free (ErrorOp e)) = ([], Left e)
-```
-
-`APL.InterpPure`:
-```Haskell
 ```
 
 </details>
