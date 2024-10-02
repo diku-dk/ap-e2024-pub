@@ -237,7 +237,7 @@ you are asked to implement.
 
 8. You are allowed to use any Haskell module that is available in the
    packages specified in the `.cabal` file in the handout. You are not
-   allowed to add additional library dependencies.
+   allowed to add additional package dependencies.
 
 9. Your zip file, should contain a single top-level folder with an
    appropriate name (e.g. `handin`). 
