@@ -262,7 +262,8 @@ assignments in content and form, with the following differences:
 
 * It is strictly individual.
 
-* It is roughly the size of two assignments.
+* It is roughly the size of three assignments (the exam is allotted a
+  workload of 25 hours in the course description).
 
 * You receive only summative feedback (i.e., a grade).
 
