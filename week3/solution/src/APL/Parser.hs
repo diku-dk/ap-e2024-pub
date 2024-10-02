@@ -59,9 +59,9 @@ lString s = lexeme $ void $ chunk s
 lKeyword :: String -> Parser ()
 lKeyword s = lexeme $ void $ try $ chunk s <* notFollowedBy (satisfy isAlphaNum)
 
-lBool :: Parser Bool
-lBool =
-  lexeme . try . choice $
+pBool :: Parser Bool
+pBool =
+  choice $
     [ const True <$> lKeyword "true",
       const False <$> lKeyword "false"
     ]
@@ -70,7 +70,7 @@ pAtom :: Parser Exp
 pAtom =
   choice
     [ CstInt <$> lInteger,
-      CstBool <$> lBool,
+      CstBool <$> pBool,
       Var <$> lVName,
       lString "(" *> pExp <* lString ")"
     ]

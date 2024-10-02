@@ -3,10 +3,6 @@
 This week we will begin studying monadic programming in Haskell. This
 topic is foundational to the remainder of the course.
 
-## Slides and Material
-
-## TBA
-
 ## Suggested Reading
 
 * Philip Wadler's [The Essence of Functional Programming](essence-of-functional-programming.pdf).

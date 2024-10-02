@@ -6,18 +6,15 @@ module SPC.Core
 where
 
 import Control.Concurrent
-  ( Chan,
-    ThreadId,
+  ( ThreadId,
     forkIO,
     killThread,
-    newChan,
-    readChan,
     threadDelay,
-    writeChan,
   )
 import Control.Exception (SomeException, catch)
 import Control.Monad (ap, forM_, forever, liftM, void)
 import Data.List (partition)
+import GenServer
 import System.Clock.Seconds (Clock (Monotonic), Seconds, getTime)
 
 -- First some general utility functions.
@@ -42,7 +39,7 @@ removeAssoc _ [] = []
 data SPCMsg -- TODO: add messages.
 
 -- | A Handle to the SPC instance.
-data SPC = SPC (Chan SPCMsg)
+data SPC = SPC (Server SPCMsg)
 
 -- | The central state. Must be protected from the bourgeoisie.
 data SPCState = SPCState
@@ -51,5 +48,5 @@ data SPCState = SPCState
 
 startSPC :: IO SPC
 startSPC = do
-  c <- newChan
-  pure $ SPC c
+  server <- spawn undefined
+  pure $ SPC server
