@@ -290,6 +290,18 @@ You are not expected to work full time for the entire period. The
 intended exam workload is specified as 25 hours of work in the course
 description.
 
+## Reexam
+
+The reexam takes the same form as the ordinary exam (with the
+possibility of switching to an oral exam if there are very few
+attendees, but this is highly unlikely) and is held at a currently
+unknown time - probably after block 2.
+
+If you did not qualify for the ordinary exam, qualification for the
+re-exam can be achieved by (re)submission and approval of the
+mandatory assignments. The assignments must be submitted on Absalon no
+later than three weeks before the re-exam date.
+
 ## AI Policy
 
 You are allowed to use AI-generated code and text in assignments and
