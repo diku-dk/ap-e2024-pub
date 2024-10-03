@@ -221,7 +221,7 @@ runEval' :: Env -> State -> EvalM a -> a
 
 ```Haskell
 -- APL.Monad:
-instance Functor (EvalOp r s) where
+instance Functor EvalOp where
   fmap f (ReadOp k) = ReadOp $ f . k
   fmap f (StateGetOp k) = StateGetOp $ f . k
   fmap f (StatePutOp s m) = StatePutOp s $ f m
