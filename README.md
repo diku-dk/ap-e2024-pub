@@ -237,7 +237,7 @@ you are asked to implement.
 
 8. You are allowed to use any Haskell module that is available in the
    packages specified in the `.cabal` file in the handout. You are not
-   allowed to add additional library dependencies.
+   allowed to add additional package dependencies.
 
 9. Your zip file, should contain a single top-level folder with an
    appropriate name (e.g. `handin`). 
@@ -252,7 +252,7 @@ Every Friday at Lille UP-1 at DIKU from 13:00-15:00 (unless otherwise
 specified) we host an assignment café where you can get help with the
 assignment from a TA.
 
-**Note:** on the 3rd of October, the café is from 14:00-16:00.
+**Note:** on the 4th of October, the café is from 14:00-16:00.
 
 ## Exam
 
@@ -262,7 +262,8 @@ assignments in content and form, with the following differences:
 
 * It is strictly individual.
 
-* It is roughly the size of two assignments.
+* It is roughly the size of three assignments (the exam is allotted a
+  workload of 25 hours in the course description).
 
 * You receive only summative feedback (i.e., a grade).
 
