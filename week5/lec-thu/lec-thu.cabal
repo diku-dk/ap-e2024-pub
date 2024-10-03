@@ -1,0 +1,14 @@
+cabal-version:      3.0
+name:               lec-thu
+version:            1.0.0.0
+build-type:         Simple
+
+common common
+    default-language: Haskell2010
+    ghc-options: -Wall
+
+library
+    import: common
+    build-depends:
+        base
+      , QuickCheck
