@@ -1,0 +1,41 @@
+cabal-version:      3.0
+name:               a5
+version:            1.0.0.0
+build-type:         Simple
+
+common common
+    default-language: Haskell2010
+    ghc-options: -Wall -Wno-orphans
+
+library
+    import: common
+    hs-source-dirs: src
+    build-depends:
+        base
+      , megaparsec
+      , QuickCheck
+    exposed-modules:
+        APL.AST
+        APL.Parser
+        APL.Error
+        APL.Eval
+        APL.Check
+        APL.Tests
+
+executable apl
+    import: common
+    main-is: apl.hs
+    build-depends:
+        base
+      , a5
+
+test-suite a5-test
+    import: common
+    type: exitcode-stdio-1.0
+    main-is: runtests.hs
+    build-depends:
+        base
+      , tasty
+      , tasty-quickcheck
+      , a5
+
