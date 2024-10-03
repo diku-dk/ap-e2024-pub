@@ -98,6 +98,12 @@ September 3rd, marks the beginning of the course, with the first lecture.
 | 13-15 |        |         |           | Lecture   | Café   |
 | 15-17 |        |         |           | Exercises |        |
 
+**Note:** the lecture on the 10th of October is cancelled, due to the
+auditorium being occupied by one of the student revues. The exercise
+classes will still be held.
+
+There are no lectures in week 42, on account of the fall holiday.
+
 ### Exercise class locations
 
 * **Hold 1:**
