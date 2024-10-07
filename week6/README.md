@@ -377,7 +377,7 @@ unique `JobId`, which is used to reference it later.
 data SPCMsg
   = ...
     -- | Add the job, and reply with the job ID.
-    MsgJobAdd Job (ReplyWith JobId)
+    MsgJobAdd Job (ReplyChan JobId)
 
 data SPCState = SPCState
   { spcJobsPending :: [(JobId, Job)],
@@ -501,7 +501,7 @@ jobStatus :: SPC -> JobId -> IO JobStatus
 data SPCMsg
   = ...
   | -- | Immediately reply the status of the job.
-    MsgJobStatus JobId (ReplyWith JobStatus)
+    MsgJobStatus JobId (ReplyChan JobStatus)
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
@@ -666,11 +666,11 @@ send a response to all relevant channels.
 ```Haskell
 data SPCMsg
   = ...
-  | MsgJobWait JobId (ReplyWith JobDoneReason)
+  | MsgJobWait JobId (ReplyChan JobDoneReason)
 
 data SPCState = SPCState
   { ...
-    spcWaiting :: [(JobId, ReplyWith JobDoneReason)]
+    spcWaiting :: [(JobId, ReplyChan JobDoneReason)]
   }
 
 handleMsg :: Chan SPCMsg -> SPCM ()
@@ -705,15 +705,6 @@ jobWait :: SPC -> JobId -> IO JobDoneReason
 jobWait (SPC c) jobid =
   requestReply c $ MsgJobWait jobid reply_chan
 
-```
-
-```Haskell
-testCase "canceling job" $ do
-  spc <- startSPC
-  j <- jobAdd spc $ Job (pure ()) 1
-  jobCancel spc j
-  r <- jobWait spc j
-  r @?= DoneCancelled
 ```
 
 </details>
@@ -973,6 +964,9 @@ to contain a *deadline*. When the current time (as retrieved by
 
 4. Extend `handleMsg` to call `checkTimeouts` as appropriate and
    handle the new tick message type.
+ 
+5. Modify `startSPC` to launch a thread that sends a tick message
+   to SPC every second.
 
 ### Solution
 
@@ -986,7 +980,6 @@ data SPCMsg =
 
 data SPCState = SPCState
   { ...
-    spcChan :: Chan SPCMsg,
     spcJobRunning :: Maybe (JobId, Seconds, ThreadId)
   }
 
@@ -1032,6 +1025,17 @@ handleMsg c = do
     ...
     MsgTick ->
       pure ()
+
+startSPC :: IO SPC
+startSPC = do
+  ...
+  server <- spawn $ \c -> runSPCM (initial_state c) $ forever $ handleMsg c
+  void $ spawn $ timer server
+  pure $ SPC server
+  where
+    timer server _ = forever $ do
+      threadDelay 1000000 -- 1 second
+      sendTo server MsgTick
 ```
 
 Test case:
