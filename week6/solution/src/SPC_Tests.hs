@@ -16,9 +16,9 @@ tests =
           ref <- newIORef False
           j <- jobAdd spc $ Job (writeIORef ref True) 1
           r1 <- jobStatus spc j
-          r1 @?= JobRunning
+          r1 @?= Just JobRunning
           r2 <- jobWait spc j
-          r2 @?= Done
+          r2 @?= Just Done
           v <- readIORef ref
           v @?= True,
         testCase "timeout" $ do
@@ -26,28 +26,28 @@ tests =
           ref <- newIORef False
           j <- jobAdd spc $ Job (threadDelay 2000000 >> writeIORef ref True) 1
           r1 <- jobStatus spc j
-          r1 @?= JobRunning
+          r1 @?= Just JobRunning
           r2 <- jobWait spc j
-          r2 @?= DoneTimeout,
+          r2 @?= Just DoneTimeout,
         testCase "cancel" $ do
           spc <- startSPC
           ref <- newIORef False
           j <- jobAdd spc $ Job (threadDelay 20000000 >> writeIORef ref True) 1
           r1 <- jobStatus spc j
-          r1 @?= JobRunning
+          r1 @?= Just JobRunning
           jobCancel spc j
           r2 <- jobWait spc j
-          r2 @?= DoneCancelled,
+          r2 @?= Just DoneCancelled,
         testCase "crash" $ do
           spc <- startSPC
           j1 <- jobAdd spc $ Job (error "boom") 1
           r1 <- jobWait spc j1
-          r1 @?= DoneCrashed
+          r1 @?= Just DoneCrashed
           -- Ensure new jobs can still work.
           ref <- newIORef False
           j2 <- jobAdd spc $ Job (writeIORef ref True) 1
           r2 <- jobWait spc j2
-          r2 @?= Done
+          r2 @?= Just Done
           v <- readIORef ref
           v @?= True
       ]

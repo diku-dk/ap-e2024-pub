@@ -78,8 +78,6 @@ data JobStatus
     JobRunning
   | -- | The job is enqueued, but is waiting for an idle worker.
     JobPending
-  | -- | A job with this ID is not known to this SPC instance.
-    JobUnknown
   deriving (Eq, Ord, Show)
 
 -- Messages sent to SPC.
@@ -89,9 +87,9 @@ data SPCMsg
   | -- | Cancel the given job.
     MsgJobCancel JobId
   | -- | Immediately reply the status of the job.
-    MsgJobStatus JobId (ReplyChan JobStatus)
+    MsgJobStatus JobId (ReplyChan (Maybe JobStatus))
   | -- | Reply when the job is done.
-    MsgJobWait JobId (ReplyChan JobDoneReason)
+    MsgJobWait JobId (ReplyChan (Maybe JobDoneReason))
   | -- | Job has finished.
     MsgJobDone JobId
   | -- | Job crashed.
@@ -109,7 +107,7 @@ data SPCState = SPCState
     spcJobRunning :: Maybe (JobId, Seconds, ThreadId),
     spcJobsDone :: [(JobId, JobDoneReason)],
     -- | These are waiting for this job to terminate.
-    spcWaiting :: [(JobId, ReplyChan JobDoneReason)],
+    spcWaiting :: [(JobId, ReplyChan (Maybe JobDoneReason))],
     spcJobCounter :: JobId
   }
 
@@ -181,7 +179,7 @@ jobDone jobid reason = do
       let (waiting_for_job, not_waiting_for_job) =
             partition ((== jobid) . fst) (spcWaiting state)
       forM_ waiting_for_job $ \(_, rsvp) ->
-        io $ reply rsvp reason
+        io $ reply rsvp $ Just reason
       put $
         state
           { spcWaiting = not_waiting_for_job,
@@ -223,17 +221,17 @@ handleMsg c = do
                                spcJobRunning state,
                                lookup jobid $ spcJobsDone state
                              ) of
-        (Just _, _, _) -> JobPending
+        (Just _, _, _) -> Just JobPending
         (_, Just (running_job, _, _), _)
           | running_job == jobid ->
-              JobRunning
-        (_, _, Just r) -> JobDone r
-        _ -> JobUnknown
+              Just $ JobRunning
+        (_, _, Just r) -> Just $ JobDone r
+        _ -> Nothing
     MsgJobWait jobid rsvp -> do
       state <- get
       case lookup jobid $ spcJobsDone state of
         Just reason -> do
-          io $ reply rsvp reason
+          io $ reply rsvp $ Just reason
         Nothing ->
           put $ state {spcWaiting = (jobid, rsvp) : spcWaiting state}
     MsgJobDone done_jobid -> do
@@ -284,13 +282,15 @@ jobAdd :: SPC -> Job -> IO JobId
 jobAdd (SPC c) job =
   requestReply c $ MsgJobAdd job
 
--- | Query the job status.
-jobStatus :: SPC -> JobId -> IO JobStatus
+-- | Query the job status. Returns 'Nothing' if job is not known to
+-- this SPC instance.
+jobStatus :: SPC -> JobId -> IO (Maybe JobStatus)
 jobStatus (SPC c) jobid =
   requestReply c $ MsgJobStatus jobid
 
 -- | Synchronously block until job is done and return the reason.
-jobWait :: SPC -> JobId -> IO JobDoneReason
+-- Returns 'Nothing' if job is not known to this SPC instance.
+jobWait :: SPC -> JobId -> IO (Maybe JobDoneReason)
 jobWait (SPC c) jobid =
   requestReply c $ MsgJobWait jobid
 

@@ -458,8 +458,6 @@ data JobStatus
     JobRunning
   | -- | The job is enqueued, but is waiting for an idle worker.
     JobPending
-  | -- | A job with this ID is not known to this SPC instance.
-    JobUnknown
   deriving (Eq, Ord, Show)
 ```
 
@@ -512,13 +510,14 @@ handleMsg c = do
     MsgJobStatus jobid rsvp -> do
       state <- get
       io $ reply rsvp $ case lookup jobid $ spcJobsPending state of
-        Just _ -> JobPending
-        _ -> JobUnknown
+        Just _ -> Just JobPending
+        _ -> Nothing
 
--- | Query the status of a job.
-jobStatus :: SPC -> JobId -> IO JobStatus
-jobAdd (SPC c) jID =
-  requestReply c $ MsgJobAdd jID 
+-- | Query the job status. Returns 'Nothing' if job is not known to
+-- this SPC instance.
+jobStatus :: SPC -> JobId -> IO (Maybe JobStatus)
+jobStatus (SPC c) jobid =
+  requestReply c $ MsgJobStatus jobid
 
 -- And a test
 
@@ -531,7 +530,7 @@ tests =
           spc <- startSPC
           j <- jobAdd spc $ Job (pure ()) 1
           r <- jobStatus spc j
-          r @?= JobPending
+          r @?= Just JobPending
       ]
 
 ```
@@ -595,9 +594,9 @@ handleMsg c = do
       io $ reply rsvp $ case ( lookup jobid $ spcJobsPending state,
                                lookup jobid $ spcJobsDone state
                              ) of
-        (Just _, _) -> JobPending
-        (_, Just _) -> JobDone DoneCancelled
-        _ -> JobUnknown
+        (Just _, _) -> Just $ JobPending
+        (_, Just _) -> Just $ JobDone DoneCancelled
+        _ -> Nothing
     MsgJobCancel jobid -> do
       state <- get
       case lookup jobid $ spcJobsPending state of
@@ -620,7 +619,7 @@ testCase "canceling job" $ do
   j <- jobAdd spc $ Job (pure ()) 1
   jobCancel spc j
   r <- jobStatus spc j
-  r @?= JobDone DoneCancelled
+  r @?= Just (JobDone DoneCancelled)
 
 ```
 
@@ -635,7 +634,10 @@ functionality once we implement actual job execution.
 
 ```Haskell
 -- | Synchronously block until job is done and return the reason.
-jobWait :: SPC -> JobId -> IO JobDoneReason
+-- Returns 'Nothing' if job is not known to this SPC instance.
+jobWait :: SPC -> JobId -> IO (Maybe JobDoneReason)
+jobWait (SPC c) jobid =
+  requestReply c $ MsgJobWait jobid
 ```
 
 This is more tricky to handle than the other messages. We must send a
@@ -667,11 +669,11 @@ send a response to all relevant channels.
 ```Haskell
 data SPCMsg
   = ...
-  | MsgJobWait JobId (ReplyChan JobDoneReason)
+  | MsgJobWait JobId (ReplyChan (Maybe JobDoneReason))
 
 data SPCState = SPCState
   { ...
-    spcWaiting :: [(JobId, ReplyChan JobDoneReason)]
+    spcWaiting :: [(JobId, ReplyChan (Maybe JobDoneReason))]
   }
 
 handleMsg :: Chan SPCMsg -> SPCM ()
@@ -687,7 +689,7 @@ handleMsg c = do
           let (waiting_for_jobid, rest) =
                 partition ((== jobid) . fst) $ spcWaiting state
           forM_ waiting_for_jobid $ \(_, rsvp) ->
-            io $ reply rsvp DoneCancelled
+            io $ reply rsvp $ Just DoneCancelled
           put $
             state
               { spcJobsPending = removeAssoc jobid $ spcJobsPending state,
@@ -698,11 +700,11 @@ handleMsg c = do
       state <- get
       case lookup jobid $ spcJobsDone state of
         Just reason -> do
-          io $ reply rsvp reason
+          io $ reply rsvp $ Just reason
         Nothing ->
           put $ state {spcWaiting = (jobid, rsvp) : spcWaiting state}
 
-jobWait :: SPC -> JobId -> IO JobDoneReason
+jobWait :: SPC -> JobId -> IO (Maybe JobDoneReason)
 jobWait (SPC c) jobid =
   requestReply c $ MsgJobWait jobid reply_chan
 
@@ -800,7 +802,7 @@ jobDone jobid reason = do
       let (waiting_for_job, not_waiting_for_job) =
             partition ((== jobid) . fst) (spcWaiting state)
       forM_ waiting_for_job $ \(_, rsvp) ->
-        io $ reply rsvp reason
+        io $ reply rsvp $ Just reason
       put $
         state
           { spcWaiting = not_waiting_for_job,
@@ -820,12 +822,12 @@ handleMsg c = do
                                spcJobRunning state,
                                lookup jobid $ spcJobsDone state
                              ) of
-        (Just _, _, _) -> JobPending
+        (Just _, _, _) -> Just JobPending
         (_, Just (running_job, _), _)
           | running_job == jobid ->
-              JobRunning
-        (_, _, Just r) -> JobDone r
-        _ -> JobUnknown
+              Just $ JobRunning
+        (_, _, Just r) -> Just $ JobDone r
+        _ -> Nothing
     MsgJobDone done_jobid -> do
       state <- get
       case spcJobRunning state of
@@ -850,7 +852,7 @@ testCase "running job" $ do
   spc <- startSPC
   j <- jobAdd spc $ Job (writeIORef ref True) 1
   r <- jobWait spc j
-  r @?= Done
+  r @?= Just Done
   x <- readIORef ref
   x @?= True
 ```
@@ -918,12 +920,12 @@ testCase "crash" $ do
   spc <- startSPC
   j1 <- jobAdd spc $ Job (error "boom") 1
   r1 <- jobWait spc j1
-  r1 @?= DoneCrashed
+  r1 @?= Just DoneCrashed
   -- Ensure new jobs can still work.
   ref <- newIORef False
   j2 <- jobAdd spc $ Job (writeIORef ref True) 1
   r2 <- jobWait spc j2
-  r2 @?= Done
+  r2 @?= Just Done
   v <- readIORef ref
   v @?= True
 ```
@@ -941,7 +943,9 @@ take action in response to a message, but a task stuck in an infinite
 loop sends no messages. Therefore we will add a trivial message with
 no payload (called a "tick") and arrange for a thread to exist that
 does nothing but infinitely send these tick messages to SPC every
-second or so.
+second or so. The specific timing does not matter, as the tick
+messages are not for keeping track of time (we use `getSeconds` for
+that), but merely to give the server a chance to act.
 
 We further augment the state field tracking the currently running job
 to contain a *deadline*. When the current time (as retrieved by
@@ -965,7 +969,7 @@ to contain a *deadline*. When the current time (as retrieved by
 
 4. Extend `handleMsg` to call `checkTimeouts` as appropriate and
    handle the new tick message type.
- 
+
 5. Modify `startSPC` to launch a thread that sends a tick message
    to SPC every second.
 
@@ -1047,9 +1051,9 @@ testCase "timeout" $ do
   ref <- newIORef False
   j <- jobAdd spc $ Job (threadDelay 2000000 >> writeIORef ref True) 1
   r1 <- jobStatus spc j
-  r1 @?= JobRunning
+  r1 @?= Just JobRunning
   r2 <- jobWait spc j
-  r2 @?= DoneTimeout,
+  r2 @?= Just DoneTimeout,
 ```
 
 </details>
