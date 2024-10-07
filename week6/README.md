@@ -147,6 +147,7 @@ maintain the state using a monad. First, add a type repesenting the
 SPC state:
 
 ```Haskell
+-- | The central state. Must be protected from the bourgeoisie.
 data SPCState = SPCState
   { spcPingCounter :: Int
   }
