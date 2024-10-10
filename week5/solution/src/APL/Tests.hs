@@ -69,9 +69,9 @@ instance Arbitrary Exp where
   shrink (Var x) =
     [Var x' | x' <- shrink x, not (null x')]
   shrink (Let x e1 e2) =
-    e1 : [Let x' e1 e2 | x' <- shrink x, not (null x')] ++ [Let x e1' e2 | e1' <- shrink e1] ++ [Let x e1 e2' | e2' <- shrink e2]
+    e1 : [Let x e1' e2 | e1' <- shrink e1] ++ [Let x e1 e2' | e2' <- shrink e2]
   shrink (Lambda x e) =
-    e : [Lambda x' e | x' <- shrink x, not (null x')] ++ [Lambda x e' | e' <- shrink e]
+    e : [Lambda x e' | e' <- shrink e]
   shrink (Apply e1 e2) =
     e1 : e2 : [Apply e1' e2 | e1' <- shrink e1] ++ [Apply e1 e2' | e2' <- shrink e2]
   shrink (TryCatch e1 e2) =
