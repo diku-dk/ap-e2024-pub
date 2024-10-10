@@ -473,7 +473,7 @@ signature:
 
 ```Haskell
 -- | Query the job status.
-jobStatus :: SPC -> JobId -> IO JobStatus
+jobStatus :: SPC -> JobId -> IO (Maybe JobStatus)
 ```
 
 ### Hints
