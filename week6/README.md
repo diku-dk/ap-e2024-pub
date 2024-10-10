@@ -652,7 +652,7 @@ send a response to all relevant channels.
 1. Extend `SPCMsg` with a new message for waiting on a given job to finish.
 
 2. Extend `SPCState` with with a field of type `[(JobId, Chan
-   JobDoneReason)]`.
+   (Maybe JobDoneReason))]`.
 
 3. Extend `handleMsg` to handle the new message added in step 1.
 
@@ -706,7 +706,7 @@ handleMsg c = do
 
 jobWait :: SPC -> JobId -> IO (Maybe JobDoneReason)
 jobWait (SPC c) jobid =
-  requestReply c $ MsgJobWait jobid reply_chan
+  requestReply c $ MsgJobWait jobid
 
 ```
 
