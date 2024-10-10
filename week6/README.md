@@ -481,8 +481,8 @@ jobStatus :: SPC -> JobId -> IO JobStatus
 * Add a constructor to `SPCMsg` for requesting the status of a job.
 
 * Handle the new message in `handleMsg`. If the provided `JobId` is
-  found in the list of pending jobs, then the response should be
-  `JobPending`, and otherwise `JobUnknown`.
+  found in the list of pending jobs, then the response should be `Just
+  JobPending`, and otherwise `Nothing`.
 
 * Implement the `jobStatus` function and add it to the module export
   list.
@@ -500,7 +500,7 @@ jobStatus :: SPC -> JobId -> IO JobStatus
 data SPCMsg
   = ...
   | -- | Immediately reply the status of the job.
-    MsgJobStatus JobId (ReplyChan JobStatus)
+    MsgJobStatus JobId (ReplyChan (Maybe JobStatus))
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
