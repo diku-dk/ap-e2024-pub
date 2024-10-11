@@ -473,7 +473,7 @@ signature:
 
 ```Haskell
 -- | Query the job status.
-jobStatus :: SPC -> JobId -> IO (Maybe JobStatus)
+jobStatus :: SPC -> JobId -> IO JobStatus
 ```
 
 ### Hints
@@ -481,8 +481,8 @@ jobStatus :: SPC -> JobId -> IO (Maybe JobStatus)
 * Add a constructor to `SPCMsg` for requesting the status of a job.
 
 * Handle the new message in `handleMsg`. If the provided `JobId` is
-  found in the list of pending jobs, then the response should be `Just
-  JobPending`, and otherwise `Nothing`.
+  found in the list of pending jobs, then the response should be
+  `JobPending`, and otherwise `JobUnknown`.
 
 * Implement the `jobStatus` function and add it to the module export
   list.
@@ -500,7 +500,7 @@ jobStatus :: SPC -> JobId -> IO (Maybe JobStatus)
 data SPCMsg
   = ...
   | -- | Immediately reply the status of the job.
-    MsgJobStatus JobId (ReplyChan (Maybe JobStatus))
+    MsgJobStatus JobId (ReplyChan JobStatus)
 
 handleMsg :: Chan SPCMsg -> SPCM ()
 handleMsg c = do
@@ -652,7 +652,7 @@ send a response to all relevant channels.
 1. Extend `SPCMsg` with a new message for waiting on a given job to finish.
 
 2. Extend `SPCState` with with a field of type `[(JobId, Chan
-   (Maybe JobDoneReason))]`.
+   JobDoneReason)]`.
 
 3. Extend `handleMsg` to handle the new message added in step 1.
 
@@ -706,8 +706,18 @@ handleMsg c = do
 
 jobWait :: SPC -> JobId -> IO (Maybe JobDoneReason)
 jobWait (SPC c) jobid =
-  requestReply c $ MsgJobWait jobid
+  requestReply c $ MsgJobWait jobid reply_chan
 
+startSPC :: IO SPC
+startSPC = do
+  let initialState c =
+        SPCState
+         { ...
+         , spcChan = c
+         , spcJobRunning = Nothing
+         }
+  server <- spawn $ \c -> runSPCM (initialState c) $ forever $ handleMsg c
+  pure $ SPC server
 ```
 
 </details>
