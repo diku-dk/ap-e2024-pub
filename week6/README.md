@@ -706,8 +706,8 @@ handleMsg c = do
 
 jobWait :: SPC -> JobId -> IO (Maybe JobDoneReason)
 jobWait (SPC c) jobid =
-  requestReply c $ MsgJobWait jobid reply_chan
-  
+  requestReply c $ MsgJobWait jobid
+
 startSPC :: IO SPC
 startSPC = do
   let initialState c =
