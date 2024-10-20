@@ -184,6 +184,9 @@ jobDone jobid reason = do
         state
           { spcWaiting = not_waiting_for_job,
             spcJobsDone = (jobid, reason) : spcJobsDone state,
+            spcJobRunning = case spcJobRunning state of
+              Just (running, _, _) | running == jobid -> Nothing
+              _ -> spcJobRunning state,
             spcJobsPending = removeAssoc jobid $ spcJobsPending state
           }
 
@@ -195,7 +198,6 @@ checkTimeouts = do
     Just (jobid, deadline, tid)
       | now >= deadline -> do
           io $ killThread tid
-          put $ state {spcJobRunning = Nothing}
           jobDone jobid DoneTimeout
     _ -> pure ()
 

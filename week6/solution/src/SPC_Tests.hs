@@ -1,6 +1,7 @@
 module SPC_Tests (tests) where
 
 import Control.Concurrent (threadDelay)
+import Control.Monad (replicateM)
 import Data.IORef
 import SPC
 import Test.Tasty (TestTree, localOption, mkTimeout, testGroup)
@@ -21,6 +22,15 @@ tests =
           r2 @?= Just Done
           v <- readIORef ref
           v @?= True,
+        testCase "multiple-jobs" $ do
+          spc <- startSPC
+          let num_jobs = 10
+          ref <- newIORef (0 :: Int)
+          js <- replicateM num_jobs $ jobAdd spc $ Job (modifyIORef ref (+ 1)) 1
+          rs <- mapM (jobWait spc) js
+          rs @?= replicate num_jobs (Just Done)
+          v <- readIORef ref
+          v @?= 10,
         testCase "timeout" $ do
           spc <- startSPC
           ref <- newIORef False
