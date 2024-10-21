@@ -10,6 +10,8 @@
 * [The three kinds of Haskell exceptions and how to use
   them](https://www.tweag.io/blog/2020-04-16-exceptions-in-haskell/)
 
+* [`exitFailure` doesn’t exit](https://h2.jaguarpaw.co.uk/posts/exitfailure-doesnt-exit/)
+
 ## Exercises
 
 In these exercises, and the associated assignment, you will be
