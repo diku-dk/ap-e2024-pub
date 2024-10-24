@@ -3,6 +3,8 @@
 This week does not contain any fundamentally new material, but merely
 elaborates on previous content.
 
+[Slides](7b.pdf)
+
 ## Suggested Reading
 
 * [Course Notes Chapter 7](https://diku-dk.github.io/ap-notes/chapter_7.html)
