@@ -301,8 +301,8 @@ description.
 
 The reexam takes the same form as the ordinary exam (with the
 possibility of switching to an oral exam if there are very few
-attendees, but this is highly unlikely) and is held at a currently
-unknown time - probably after block 2.
+attendees, but this is highly unlikely) and is held from 27/1 8:00 to
+31/1 21:00.
 
 If you did not qualify for the ordinary exam, qualification for the
 re-exam can be achieved by (re)submission and approval of the
